@@ -98,10 +98,10 @@
   var camera = new THREE.PerspectiveCamera(43, window.innerWidth / window.innerHeight, 0.1, 1600);
   camera.position.set(0, CONFIG.camera.height, CONFIG.camera.radius);
 
-  var ambientLight = new THREE.AmbientLight(0x61789a, 0.24);
+  var ambientLight = new THREE.AmbientLight(0x647b9e, 0.22);
   scene.add(ambientLight);
 
-  var sunLight = new THREE.PointLight(0xffd6a5, 8.6, 0, 1.1);
+  var sunLight = new THREE.PointLight(0xffd6a5, 7.9, 0, 1.1);
   sunLight.position.set(0, 0, 0);
   sunLight.castShadow = false;
   scene.add(sunLight);
@@ -141,7 +141,7 @@
   var PLANETS = [
     {
       name: "Mercury",
-      color: 0xb8a38f,
+      color: 0xa9a7a1,
       radius: 0.36,
       spin: 0.012,
       wellMass: 1.7,
@@ -149,7 +149,7 @@
     },
     {
       name: "Venus",
-      color: 0xd9b38a,
+      color: 0xe1c48d,
       radius: 0.56,
       spin: 0.006,
       wellMass: 2.6,
@@ -157,7 +157,7 @@
     },
     {
       name: "Earth",
-      color: 0x5da3ff,
+      color: 0x4d6fb3,
       radius: 0.62,
       spin: 0.044,
       wellMass: 3.2,
@@ -165,7 +165,7 @@
     },
     {
       name: "Mars",
-      color: 0xd07d61,
+      color: 0xb95c43,
       radius: 0.48,
       spin: 0.043,
       wellMass: 2.2,
@@ -173,7 +173,7 @@
     },
     {
       name: "Jupiter",
-      color: 0xcba56a,
+      color: 0xc6a47a,
       radius: 1.6,
       spin: 0.091,
       wellMass: 8.8,
@@ -181,25 +181,25 @@
     },
     {
       name: "Saturn",
-      color: 0xd0c08a,
+      color: 0xd9c898,
       radius: 1.36,
       spin: 0.078,
       wellMass: 7.2,
-      ring: { inner: 1.7, outer: 2.8, color: 0xd4be8f, tilt: 74 },
+      ring: { inner: 1.7, outer: 2.8, color: 0xcdbb8d, tilt: 74 },
       elements: { N0: 113.6634, Nd: 2.3898e-5, i0: 2.4886, id: -1.081e-7, w0: 339.3939, wd: 2.97661e-5, a0: 9.55475, ad: 0, e0: 0.055546, ed: -9.499e-9, M0: 316.9670, Md: 0.0334442282 }
     },
     {
       name: "Uranus",
-      color: 0x8bd1db,
+      color: 0x84c7d9,
       radius: 1.02,
       spin: 0.061,
       wellMass: 4.8,
-      ring: { inner: 1.45, outer: 1.85, color: 0xb2f2f8, tilt: 98 },
+      ring: { inner: 1.45, outer: 1.85, color: 0xa4e6ef, tilt: 98 },
       elements: { N0: 74.0005, Nd: 1.3978e-5, i0: 0.7733, id: 1.9e-8, w0: 96.6612, wd: 3.0565e-5, a0: 19.18171, ad: -1.55e-8, e0: 0.047318, ed: 7.45e-9, M0: 142.5905, Md: 0.011725806 }
     },
     {
       name: "Neptune",
-      color: 0x5b90e8,
+      color: 0x3f68c2,
       radius: 0.97,
       spin: 0.062,
       wellMass: 4.4,
@@ -242,7 +242,7 @@
     sun.rotation.y += delta * 0.045;
     var glowPulse = 1 + Math.sin(elapsed * 1.45) * 0.04;
     sunGlow.scale.set(glowPulse, glowPulse, glowPulse);
-    sunLight.intensity = 8.6 + Math.sin(elapsed * 1.45) * 0.24;
+    sunLight.intensity = 7.9 + Math.sin(elapsed * 1.45) * 0.18;
 
     renderer.render(scene, camera);
   }
@@ -313,16 +313,7 @@
   function createPlanet(definition, dayValue) {
     var maps = createPlanetMaps(definition);
     var geometry = new THREE.SphereGeometry(definition.radius, 34, 28);
-    var material = new THREE.MeshStandardMaterial({
-      color: definition.color,
-      map: maps.albedo,
-      bumpMap: maps.bump,
-      bumpScale: definition.radius > 1 ? 0.12 : 0.18,
-      emissive: definition.color,
-      emissiveIntensity: 0.11,
-      roughness: definition.radius > 1 ? 0.44 : 0.3,
-      metalness: 0.02
-    });
+    var material = createPlanetMaterial(definition, maps);
     var mesh = new THREE.Mesh(geometry, material);
     mesh.castShadow = false;
     mesh.receiveShadow = false;
@@ -345,12 +336,10 @@
     if (definition.ring) {
       ring = new THREE.Mesh(
         new THREE.RingGeometry(definition.ring.inner, definition.ring.outer, 96),
-        new THREE.MeshStandardMaterial({
+        new THREE.MeshBasicMaterial({
           color: definition.ring.color,
           transparent: true,
           opacity: 0.56,
-          roughness: 0.85,
-          metalness: 0.02,
           side: THREE.DoubleSide,
           depthWrite: false
         })
@@ -372,6 +361,69 @@
       orbit: orbit,
       position: new THREE.Vector3()
     };
+  }
+
+  function createPlanetMaterial(definition, maps) {
+    var isGiant = definition.radius > 1;
+    var ambient = isGiant ? 0.42 : 0.36;
+    var rimStrength = isGiant ? 0.18 : 0.14;
+
+    return new THREE.ShaderMaterial({
+      uniforms: {
+        uBaseColor: { value: new THREE.Color(definition.color) },
+        uSunPos: { value: new THREE.Vector3(0, 0, 0) },
+        uAlbedo: { value: maps.albedo || null },
+        uUseAlbedo: { value: maps.albedo ? 1.0 : 0.0 },
+        uAmbient: { value: ambient },
+        uRimStrength: { value: rimStrength }
+      },
+      vertexShader:
+        "varying vec3 vWorldPos;\n" +
+        "varying vec3 vWorldNormal;\n" +
+        "varying vec2 vUv;\n" +
+        "void main() {\n" +
+        "  vUv = uv;\n" +
+        "  vec4 worldPos = modelMatrix * vec4(position, 1.0);\n" +
+        "  vWorldPos = worldPos.xyz;\n" +
+        "  vWorldNormal = normalize(mat3(modelMatrix) * normal);\n" +
+        "  gl_Position = projectionMatrix * viewMatrix * worldPos;\n" +
+        "}",
+      fragmentShader:
+        "uniform vec3 uBaseColor;\n" +
+        "uniform vec3 uSunPos;\n" +
+        "uniform sampler2D uAlbedo;\n" +
+        "uniform float uUseAlbedo;\n" +
+        "uniform float uAmbient;\n" +
+        "uniform float uRimStrength;\n" +
+        "varying vec3 vWorldPos;\n" +
+        "varying vec3 vWorldNormal;\n" +
+        "varying vec2 vUv;\n" +
+        "void main() {\n" +
+        "  vec3 N = normalize(vWorldNormal);\n" +
+        "  vec3 L = normalize(uSunPos - vWorldPos);\n" +
+        "  vec3 V = normalize(cameraPosition - vWorldPos);\n" +
+        "  float ndotl = max(dot(N, L), 0.0);\n" +
+        "  float diffuse = smoothstep(-0.05, 0.95, ndotl);\n" +
+        "  float nightFactor = smoothstep(-0.45, 0.55, dot(N, L));\n" +
+        "  vec3 texColor = mix(vec3(1.0), texture2D(uAlbedo, vUv).rgb, uUseAlbedo);\n" +
+        "  vec3 base = uBaseColor * texColor;\n" +
+        "  vec3 warmTint = vec3(1.05, 1.01, 0.98);\n" +
+        "  vec3 coolTint = vec3(0.89, 0.93, 1.0);\n" +
+        "  vec3 litTint = mix(coolTint, warmTint, diffuse);\n" +
+        "  vec3 H = normalize(L + V);\n" +
+        "  float spec = pow(max(dot(N, H), 0.0), 20.0) * 0.16;\n" +
+        "  float rim = pow(1.0 - max(dot(N, V), 0.0), 3.2) * uRimStrength;\n" +
+        "  float lighting = uAmbient + (1.0 - uAmbient) * pow(diffuse, 0.85);\n" +
+        "  vec3 color = base * litTint * lighting;\n" +
+        "  color += base * 0.16 * (1.0 - nightFactor);\n" +
+        "  color += vec3(spec * 0.5);\n" +
+        "  color += base * rim * 0.22;\n" +
+        "  gl_FragColor = vec4(color, 1.0);\n" +
+        "  #include <tonemapping_fragment>\n" +
+        "  #include <colorspace_fragment>\n" +
+        "}",
+      dithering: true
+    });
   }
 
   function createOrbitLine(definition, dayValue) {
@@ -486,37 +538,62 @@
     var albedoPixels = albedoData.data;
     var bumpPixels = bumpData.data;
 
-    var base = new THREE.Color(definition.color);
-    var baseR = Math.round(base.r * 255);
-    var baseG = Math.round(base.g * 255);
-    var baseB = Math.round(base.b * 255);
+    var profile = getPlanetProfile(definition.name);
+    var colorA = hexToRgb(profile.colorA);
+    var colorB = hexToRgb(profile.colorB);
+    var colorC = profile.colorC ? hexToRgb(profile.colorC) : null;
     var seed = hashString(definition.name);
     var seedPhase = (seed % 7200) / 7200;
-    var isRocky = definition.radius < 0.9;
-    var bandFreq = isRocky ? 8 : 18;
-    var bandAmp = isRocky ? 0.12 : 0.2;
-    var minFloor = isRocky ? 52 : 58;
 
     for (var y = 0; y < size; y += 1) {
       var v = y / (size - 1);
       var latitude = v * 2 - 1;
-      var polarDark = -Math.pow(Math.abs(latitude), isRocky ? 1.2 : 1.55) * 0.05;
+      var polarDark = -Math.pow(Math.abs(latitude), profile.polePower) * profile.poleDark;
+      var band = Math.sin((v + seedPhase) * Math.PI * profile.bandFreq) * profile.bandAmp;
 
       for (var x = 0; x < size; x += 1) {
         var u = x / (size - 1);
-        var noise = valueNoise2D(u * (isRocky ? 30 : 18), v * (isRocky ? 30 : 24), seed);
-        var micro = valueNoise2D(u * 92 + 7.3, v * 92 + 3.8, seed + 19);
-        var bands = Math.sin((v + seedPhase) * Math.PI * bandFreq) * bandAmp;
-        var tone = bands + (noise - 0.5) * (isRocky ? 0.18 : 0.11) + polarDark + 0.08;
+        var noise = valueNoise2D(u * profile.noiseScale, v * profile.noiseScale, seed);
+        var micro = valueNoise2D(u * profile.detailScale + 7.3, v * profile.detailScale + 3.8, seed + 19);
+        var blend = 0.5 + band + (noise - 0.5) * profile.noiseAmp + (micro - 0.5) * profile.microAmp;
+
+        if (profile.style === "earth") {
+          blend = smoothRange(profile.continentStart, profile.continentEnd, noise + (micro - 0.5) * 0.25);
+        }
+
+        blend = clamp01(blend);
 
         var index = (y * size + x) * 4;
-        var shift = Math.round(tone * 72);
-        albedoPixels[index] = clampByte(Math.max(minFloor, baseR + shift + Math.round((micro - 0.5) * 16)));
-        albedoPixels[index + 1] = clampByte(Math.max(minFloor, baseG + shift));
-        albedoPixels[index + 2] = clampByte(Math.max(minFloor, baseB + shift - Math.round((micro - 0.5) * 12)));
+
+        var r = lerp(colorA.r, colorB.r, blend);
+        var g = lerp(colorA.g, colorB.g, blend);
+        var b = lerp(colorA.b, colorB.b, blend);
+
+        if (colorC) {
+          var accentWave = smoothRange(0.62, 0.9, Math.sin((v + seedPhase * 0.65) * Math.PI * profile.accentFreq) * 0.5 + 0.5);
+          var accent = accentWave * profile.accentAmp;
+          r = lerp(r, colorC.r, accent);
+          g = lerp(g, colorC.g, accent);
+          b = lerp(b, colorC.b, accent);
+        }
+
+        if (profile.style === "earth") {
+          var cloud = smoothRange(0.67, 0.9, micro + Math.abs(latitude) * 0.06) * 0.32;
+          r = lerp(r, 242, cloud);
+          g = lerp(g, 246, cloud);
+          b = lerp(b, 250, cloud);
+        }
+
+        var brightness = 1 + polarDark + (micro - 0.5) * profile.contrast;
+        albedoPixels[index] = clampByte(Math.max(profile.minFloor, Math.round(r * brightness)));
+        albedoPixels[index + 1] = clampByte(Math.max(profile.minFloor, Math.round(g * brightness)));
+        albedoPixels[index + 2] = clampByte(Math.max(profile.minFloor, Math.round(b * brightness)));
         albedoPixels[index + 3] = 255;
 
-        var bumpTone = 0.48 + bands * 0.55 + (noise - 0.5) * (isRocky ? 0.95 : 0.45) + (micro - 0.5) * 0.24;
+        var bumpTone = 0.5 + band * profile.bumpBand + (noise - 0.5) * profile.bumpNoise + (micro - 0.5) * profile.bumpMicro;
+        if (profile.style === "earth") {
+          bumpTone += (blend - 0.5) * 0.18;
+        }
         var bumpValue = clampByte(Math.round(bumpTone * 255));
         bumpPixels[index] = bumpValue;
         bumpPixels[index + 1] = bumpValue;
@@ -540,6 +617,250 @@
       albedo: albedoTexture,
       bump: bumpTexture
     };
+  }
+
+  function getPlanetProfile(name) {
+    switch (name) {
+      case "Mercury":
+        return {
+          style: "rocky",
+          colorA: 0x8e8a84,
+          colorB: 0xb3aea5,
+          colorC: null,
+          noiseScale: 30,
+          detailScale: 90,
+          noiseAmp: 0.82,
+          microAmp: 0.34,
+          contrast: 0.16,
+          minFloor: 54,
+          polePower: 1.2,
+          poleDark: 0.08,
+          bandFreq: 6,
+          bandAmp: 0.04,
+          accentFreq: 0,
+          accentAmp: 0,
+          bumpBand: 0.08,
+          bumpNoise: 0.9,
+          bumpMicro: 0.34,
+          continentStart: 0,
+          continentEnd: 1
+        };
+      case "Venus":
+        return {
+          style: "cloud",
+          colorA: 0xd7bf93,
+          colorB: 0xc8a778,
+          colorC: 0xead8b5,
+          noiseScale: 18,
+          detailScale: 76,
+          noiseAmp: 0.44,
+          microAmp: 0.22,
+          contrast: 0.1,
+          minFloor: 62,
+          polePower: 1.3,
+          poleDark: 0.04,
+          bandFreq: 9,
+          bandAmp: 0.13,
+          accentFreq: 4,
+          accentAmp: 0.18,
+          bumpBand: 0.04,
+          bumpNoise: 0.22,
+          bumpMicro: 0.12,
+          continentStart: 0,
+          continentEnd: 1
+        };
+      case "Earth":
+        return {
+          style: "earth",
+          colorA: 0x29589e,
+          colorB: 0x6f9b59,
+          colorC: 0xe6edf5,
+          noiseScale: 16,
+          detailScale: 88,
+          noiseAmp: 0.38,
+          microAmp: 0.18,
+          contrast: 0.12,
+          minFloor: 50,
+          polePower: 1.45,
+          poleDark: 0.06,
+          bandFreq: 6,
+          bandAmp: 0.05,
+          accentFreq: 0,
+          accentAmp: 0,
+          bumpBand: 0.05,
+          bumpNoise: 0.36,
+          bumpMicro: 0.2,
+          continentStart: 0.5,
+          continentEnd: 0.66
+        };
+      case "Mars":
+        return {
+          style: "rocky",
+          colorA: 0x8e4738,
+          colorB: 0xc36f4f,
+          colorC: null,
+          noiseScale: 24,
+          detailScale: 92,
+          noiseAmp: 0.72,
+          microAmp: 0.3,
+          contrast: 0.14,
+          minFloor: 52,
+          polePower: 1.35,
+          poleDark: 0.08,
+          bandFreq: 7,
+          bandAmp: 0.06,
+          accentFreq: 0,
+          accentAmp: 0,
+          bumpBand: 0.12,
+          bumpNoise: 0.78,
+          bumpMicro: 0.3,
+          continentStart: 0,
+          continentEnd: 1
+        };
+      case "Jupiter":
+        return {
+          style: "banded",
+          colorA: 0xb88f67,
+          colorB: 0xd0b087,
+          colorC: 0xe2cfaf,
+          noiseScale: 14,
+          detailScale: 64,
+          noiseAmp: 0.34,
+          microAmp: 0.16,
+          contrast: 0.08,
+          minFloor: 60,
+          polePower: 1.55,
+          poleDark: 0.04,
+          bandFreq: 14,
+          bandAmp: 0.23,
+          accentFreq: 9,
+          accentAmp: 0.22,
+          bumpBand: 0.14,
+          bumpNoise: 0.24,
+          bumpMicro: 0.1,
+          continentStart: 0,
+          continentEnd: 1
+        };
+      case "Saturn":
+        return {
+          style: "banded",
+          colorA: 0xbda47a,
+          colorB: 0xd9ca9f,
+          colorC: 0xeadbb8,
+          noiseScale: 12,
+          detailScale: 56,
+          noiseAmp: 0.28,
+          microAmp: 0.14,
+          contrast: 0.08,
+          minFloor: 62,
+          polePower: 1.6,
+          poleDark: 0.04,
+          bandFreq: 16,
+          bandAmp: 0.17,
+          accentFreq: 9,
+          accentAmp: 0.16,
+          bumpBand: 0.1,
+          bumpNoise: 0.18,
+          bumpMicro: 0.1,
+          continentStart: 0,
+          continentEnd: 1
+        };
+      case "Uranus":
+        return {
+          style: "banded",
+          colorA: 0x72bccd,
+          colorB: 0x9ad8e0,
+          colorC: 0xbdeaf0,
+          noiseScale: 10,
+          detailScale: 48,
+          noiseAmp: 0.16,
+          microAmp: 0.1,
+          contrast: 0.06,
+          minFloor: 56,
+          polePower: 1.6,
+          poleDark: 0.03,
+          bandFreq: 6,
+          bandAmp: 0.08,
+          accentFreq: 4,
+          accentAmp: 0.08,
+          bumpBand: 0.05,
+          bumpNoise: 0.12,
+          bumpMicro: 0.07,
+          continentStart: 0,
+          continentEnd: 1
+        };
+      case "Neptune":
+        return {
+          style: "banded",
+          colorA: 0x3059a9,
+          colorB: 0x5784d7,
+          colorC: 0x7ea7ea,
+          noiseScale: 12,
+          detailScale: 52,
+          noiseAmp: 0.2,
+          microAmp: 0.12,
+          contrast: 0.07,
+          minFloor: 48,
+          polePower: 1.55,
+          poleDark: 0.04,
+          bandFreq: 7,
+          bandAmp: 0.12,
+          accentFreq: 4,
+          accentAmp: 0.1,
+          bumpBand: 0.08,
+          bumpNoise: 0.15,
+          bumpMicro: 0.08,
+          continentStart: 0,
+          continentEnd: 1
+        };
+      default:
+        return {
+          style: "rocky",
+          colorA: 0x7387a6,
+          colorB: 0x9ab0ce,
+          colorC: null,
+          noiseScale: 20,
+          detailScale: 72,
+          noiseAmp: 0.35,
+          microAmp: 0.18,
+          contrast: 0.1,
+          minFloor: 48,
+          polePower: 1.4,
+          poleDark: 0.05,
+          bandFreq: 7,
+          bandAmp: 0.1,
+          accentFreq: 0,
+          accentAmp: 0,
+          bumpBand: 0.1,
+          bumpNoise: 0.32,
+          bumpMicro: 0.18,
+          continentStart: 0,
+          continentEnd: 1
+        };
+    }
+  }
+
+  function hexToRgb(hex) {
+    return {
+      r: (hex >> 16) & 255,
+      g: (hex >> 8) & 255,
+      b: hex & 255
+    };
+  }
+
+  function smoothRange(edge0, edge1, value) {
+    var t = clamp01((value - edge0) / (edge1 - edge0));
+    return t * t * (3 - 2 * t);
+  }
+
+  function clamp01(value) {
+    if (value < 0) {
+      return 0;
+    }
+    if (value > 1) {
+      return 1;
+    }
+    return value;
   }
 
   function valueNoise2D(x, y, seed) {
