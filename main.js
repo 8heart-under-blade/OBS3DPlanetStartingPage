@@ -347,6 +347,45 @@
     camera.lookAt(0, CONFIG.camera.lookHeight, 0);
   }
 
+  var sunFaculaAlphaMap = createSunFaculaAlphaMap();
+
+  function createSunFaculaAlphaMap() {
+    var size = 128;
+    var canvas = document.createElement("canvas");
+    canvas.width = size;
+    canvas.height = size;
+
+    var context = canvas.getContext("2d");
+    if (!context) {
+      return null;
+    }
+
+    var gradient = context.createRadialGradient(
+      size * 0.5,
+      size * 0.5,
+      size * 0.1,
+      size * 0.5,
+      size * 0.5,
+      size * 0.5
+    );
+    gradient.addColorStop(0, "rgba(255, 255, 255, 0.42)");
+    gradient.addColorStop(0.42, "rgba(255, 255, 255, 0.2)");
+    gradient.addColorStop(0.78, "rgba(255, 255, 255, 0.06)");
+    gradient.addColorStop(1, "rgba(255, 255, 255, 0)");
+
+    context.fillStyle = gradient;
+    context.fillRect(0, 0, size, size);
+
+    var texture = new THREE.CanvasTexture(canvas);
+    texture.minFilter = THREE.LinearFilter;
+    texture.magFilter = THREE.LinearFilter;
+    texture.wrapS = THREE.ClampToEdgeWrapping;
+    texture.wrapT = THREE.ClampToEdgeWrapping;
+    texture.generateMipmaps = false;
+    texture.needsUpdate = true;
+    return texture;
+  }
+
   function createSunActivityRegions(totalCount) {
     var group = new THREE.Group();
     var regions = [];
@@ -388,6 +427,7 @@
           side: THREE.DoubleSide,
           transparent: true,
           opacity: 0,
+          alphaMap: sunFaculaAlphaMap,
           blending: THREE.AdditiveBlending,
           depthWrite: false
         })
@@ -463,16 +503,16 @@
 
       var sizePulse = 1 + Math.sin(elapsed * (region.pulseSpeed + 1.1) + region.phase * 0.63) * 0.06;
       var spotScale = region.baseSize * sizePulse * (0.94 + intensity * 0.32);
-      var limbBoost = 0.55 + (1 - viewDot) * 0.95;
+      var limbBoost = 0.72 + smoothRange(0, 0.95, 1 - viewDot) * 0.45;
 
       region.penumbra.scale.setScalar(spotScale);
       region.umbra.scale.setScalar(spotScale * 0.56);
-      region.facula.scale.setScalar(spotScale * (1.85 + activity * 0.7));
+      region.facula.scale.setScalar(spotScale * (1.45 + activity * 0.45));
 
       region.penumbra.material.opacity = intensity * (0.34 + (1 - activity) * 0.26);
       region.umbra.material.opacity = intensity * (0.58 + (1 - activity) * 0.2);
-      region.facula.material.opacity = intensity * (0.08 + activity * 0.28) * limbBoost;
-      region.facula.material.color.setHSL(0.09 + activity * 0.02, 0.9, 0.5 + intensity * 0.08);
+      region.facula.material.opacity = intensity * (0.04 + activity * 0.12) * limbBoost;
+      region.facula.material.color.setHSL(0.09 + activity * 0.016, 0.84, 0.47 + intensity * 0.06);
     }
   }
 
