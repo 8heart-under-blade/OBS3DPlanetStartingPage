@@ -6,9 +6,18 @@
   --text-sub: #b8cae7;
   --accent: #86bdfd;
   --warm: #ffd8a2;
+  --title-color-a: #f2f8ff;
+  --title-color-b: #c9defe;
+  --title-color-c: #97c2f4;
+  --subtitle-color: #c4d7f2;
+  --subtitle-glow: rgba(93, 146, 214, 0.32);
   --font-ui: "Trebuchet MS", "Gill Sans", "Segoe UI", sans-serif;
   --font-title: var(--font-ui);
   --font-subtitle: var(--font-ui);
+  --title-weight: 700;
+  --subtitle-weight: 400;
+  --title-transform: uppercase;
+  --subtitle-transform: none;
   --overlay-top: min(4vh, 34px);
   --overlay-top-mobile: 18px;
   --title-offset-x: 0px;
@@ -91,24 +100,36 @@ h1 {
   font-size: clamp(1.7rem, 4.7vw, 3.9rem);
   line-height: 0.98;
   letter-spacing: var(--title-kerning);
-  text-transform: uppercase;
+  text-transform: var(--title-transform);
   color: var(--text-main);
+  background: linear-gradient(102deg, var(--title-color-a) 0%, var(--title-color-b) 42%, var(--title-color-c) 54%, var(--title-color-a) 100%);
+  background-size: 220% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
   font-family: var(--font-title);
+  font-weight: var(--title-weight);
   transform: translate3d(var(--title-offset-x), var(--title-offset-y), 0);
   text-shadow:
     0 0 22px rgba(25, 58, 103, 0.7),
     0 0 70px rgba(16, 36, 64, 0.62);
+  animation: title-sheen 9s ease-in-out infinite;
 }
 
 #subtitle {
   margin: 10px 0 0;
   font-size: clamp(0.82rem, 1.35vw, 1.04rem);
   letter-spacing: var(--subtitle-kerning);
-  color: var(--text-sub);
+  text-transform: var(--subtitle-transform);
+  color: var(--subtitle-color);
   font-family: var(--font-subtitle);
+  font-weight: var(--subtitle-weight);
   transform: translate3d(var(--subtitle-offset-x), var(--subtitle-offset-y), 0);
-  text-shadow: 0 0 14px rgba(0, 0, 0, 0.5);
-  opacity: 0.95;
+  text-shadow:
+    0 0 14px rgba(0, 0, 0, 0.42),
+    0 0 18px var(--subtitle-glow);
+  opacity: 0.92;
+  animation: subtitle-breathe 5.8s ease-in-out infinite;
 }
 
 .boot-error {
@@ -134,6 +155,34 @@ h1 {
   to {
     opacity: 1;
     transform: translate(-50%, 0);
+  }
+}
+
+@keyframes title-sheen {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+@keyframes subtitle-breathe {
+  0%,
+  100% {
+    opacity: 0.86;
+    text-shadow:
+      0 0 12px rgba(0, 0, 0, 0.38),
+      0 0 12px rgba(93, 146, 214, 0.18);
+  }
+  50% {
+    opacity: 1;
+    text-shadow:
+      0 0 16px rgba(0, 0, 0, 0.46),
+      0 0 22px rgba(93, 146, 214, 0.34);
   }
 }
 

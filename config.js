@@ -13,11 +13,16 @@
       subtitle: "Calibrating spacetime and aligning planetary ephemerides...",
       titleFontFamily: "'Oracles', serif",
       subtitleFontFamily: "'Orbitron', sans-serif",
+      titleFontWeight: 400,
+      subtitleFontWeight: 400,
+      titleTextTransform: "uppercase",
+      subtitleTextTransform: "none",
 
       // Overlay/top placement.
       // Accepts CSS units as string ("40px", "6vh", "min(4vh, 34px)") or number (px).
-      overlayTop: "min(4vh, 34px)",
-      overlayTopMobile: 18,
+      // This moves the whole text block (eyebrow + title + subtitle).
+      overlayTop: "12vh",
+      overlayTopMobile: "10vh",
 
       // Fine positioning of title/subtitle (X/Y).
       // Accepts CSS unit string or number (px).
@@ -28,7 +33,7 @@
 
       // Letter spacing (kerning/tracking).
       // Accepts CSS unit string ("0.12em", "2px") or number (em).
-      titleKerning: 0.11,
+      titleKerning: 0.06,
       subtitleKerning: 0.03,
 
       // Example web font stylesheet:

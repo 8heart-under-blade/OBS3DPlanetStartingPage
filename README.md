@@ -72,6 +72,7 @@ Edit `config.js`:
 - Asset behavior: `STREAM_CONFIG.assets.mode`
 - Overlay text: `STREAM_CONFIG.overlay.title`, `STREAM_CONFIG.overlay.subtitle`
 - Overlay fonts: `STREAM_CONFIG.overlay.titleFontFamily`, `STREAM_CONFIG.overlay.subtitleFontFamily`
+- Overlay font style: `titleFontWeight`, `subtitleFontWeight`, `titleTextTransform`, `subtitleTextTransform`
 - Overlay position: `overlayTop`, `overlayTopMobile`, `titleOffsetX`, `titleOffsetY`, `subtitleOffsetX`, `subtitleOffsetY`
 - Overlay kerning: `titleKerning`, `subtitleKerning`
 
@@ -94,6 +95,10 @@ window.STREAM_CONFIG = {
     subtitle: "Subtitle with custom typography",
     titleFontFamily: "'Oracles', serif",
     subtitleFontFamily: "'Orbitron', sans-serif",
+    titleFontWeight: 400,
+    subtitleFontWeight: 400,
+    titleTextTransform: "uppercase",
+    subtitleTextTransform: "none",
     externalFontStylesheets: [
       "https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap"
     ],
@@ -133,6 +138,8 @@ Value rules:
 - For `overlayTop`, offsets, and kerning, you can use CSS strings (`"12px"`, `"1.2em"`, `"6vh"`) or numbers.
 - Number offsets/top values are treated as `px`.
 - Number kerning values are treated as `em`.
+- Font weight accepts number or string (`400`, `700`, `"bold"`).
+- Text transform accepts CSS values (`"uppercase"`, `"none"`, `"lowercase"`).
 
 Notes:
 - `customFontFaces[].src` accepts `@oracles.woff`, direct paths/URLs (`fonts/oracles.woff2`), or full CSS `url(...)` syntax.
@@ -143,4 +150,5 @@ Notes:
 
 - If you see a boot error about assets, verify `vendor/three.min.js` exists or switch to `?assets=cdn`.
 - If the page looks stale after changes, hard refresh with `Ctrl+F5`.
+- If local fonts do not apply, serve over `http://localhost` instead of opening with `file://`, then refresh cache in OBS/browser.
 - If using offline mode, keep `index.html`, `main.js`, `styles.css`, and `vendor/` together.

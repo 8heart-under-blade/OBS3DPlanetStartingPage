@@ -26,6 +26,10 @@
       subtitle: pickDefined(overlayOverrides.subtitle, "Calibrating spacetime and aligning planetary ephemerides..."),
       titleFontFamily: pickDefined(overlayOverrides.titleFontFamily, '"Trebuchet MS", "Gill Sans", "Segoe UI", sans-serif'),
       subtitleFontFamily: pickDefined(overlayOverrides.subtitleFontFamily, '"Trebuchet MS", "Gill Sans", "Segoe UI", sans-serif'),
+      titleFontWeight: pickDefined(overlayOverrides.titleFontWeight, 700),
+      subtitleFontWeight: pickDefined(overlayOverrides.subtitleFontWeight, 400),
+      titleTextTransform: pickDefined(overlayOverrides.titleTextTransform, "uppercase"),
+      subtitleTextTransform: pickDefined(overlayOverrides.subtitleTextTransform, "none"),
       externalFontStylesheets: ensureArray(pickDefined(overlayOverrides.externalFontStylesheets, overlayOverrides.fontStylesheet)),
       customFontFaces: ensureArray(overlayOverrides.customFontFaces),
       overlayTop: pickDefined(overlayOverrides.overlayTop, "min(4vh, 34px)"),
@@ -1076,6 +1080,10 @@
     if (root) {
       setRootCssVariable(root, "--font-title", overlayConfig.titleFontFamily);
       setRootCssVariable(root, "--font-subtitle", overlayConfig.subtitleFontFamily);
+      setRootCssVariable(root, "--title-weight", overlayConfig.titleFontWeight);
+      setRootCssVariable(root, "--subtitle-weight", overlayConfig.subtitleFontWeight);
+      setRootCssVariable(root, "--title-transform", overlayConfig.titleTextTransform);
+      setRootCssVariable(root, "--subtitle-transform", overlayConfig.subtitleTextTransform);
       setRootCssVariable(root, "--overlay-top", overlayConfig.overlayTop, "px");
       setRootCssVariable(root, "--overlay-top-mobile", overlayConfig.overlayTopMobile, "px");
       setRootCssVariable(root, "--title-offset-x", overlayConfig.titleOffsetX, "px");
