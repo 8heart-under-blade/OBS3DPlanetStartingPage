@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Stream Starting Soon - Space Fabric</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div id="scene" aria-hidden="true"></div>
+
+  <div class="overlay">
+    <p class="eyebrow">Live Transmission</p>
+    <h1 id="title">STREAM STARTING SOON</h1>
+    <p id="subtitle">Calibrating spacetime and aligning planetary ephemerides...</p>
+  </div>
+
+  <p id="bootError" class="boot-error" hidden></p>
+
+  <script>
+    (function bootLoader() {
+      var params = new URLSearchParams(window.location.search);
+      var requestedMode = (params.get("assets") || "").toLowerCase();
+      var mode = ["auto", "offline", "cdn"].indexOf(requestedMode) >= 0 ? requestedMode : "auto";
+
+      window.STREAM_ASSET_MODE = mode;
+      window.STREAM_ASSET_SOURCES = {
+        localThree: "vendor/three.min.js",
+        cdnThree: "https://unpkg.com/three@0.160.1/build/three.min.js"
+      };
+
+      function loadScript(src) {
+        return new Promise(function (resolve, reject) {
+          var script = document.createElement("script");
+          script.src = src;
+          script.async = true;
+          script.onload = resolve;
+          script.onerror = function () {
+            reject(new Error("Failed to load script: " + src));
+          };
+          document.head.appendChild(script);
+        });
+      }
+
+      function showBootError(message) {
+        var errorElement = document.getElementById("bootError");
+        if (!errorElement) {
+          return;
+        }
+        errorElement.textContent = message;
+        errorElement.hidden = false;
+      }
+
+      async function boot() {
+        var sources = window.STREAM_ASSET_SOURCES;
+
+        if (mode === "cdn") {
+          await loadScript(sources.cdnThree);
+        } else if (mode === "offline") {
+          await loadScript(sources.localThree);
+        } else {
+          try {
+            await loadScript(sources.localThree);
+          } catch (error) {
+            await loadScript(sources.cdnThree);
+          }
+        }
+
+        await loadScript("main.js");
+      }
+
+      boot().catch(function (error) {
+        console.error(error);
+        if (mode === "offline") {
+          showBootError("Offline mode selected, but local assets could not be loaded. Keep the vendor folder next to index.html, or switch to ?assets=auto.");
+        } else {
+          showBootError("Could not load rendering assets. Check network access or local vendor files.");
+        }
+      });
+    })();
+  </script>
+</body>
+</html>
