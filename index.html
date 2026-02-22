@@ -17,16 +17,36 @@
 
   <p id="bootError" class="boot-error" hidden></p>
 
+  <script src="config.js"></script>
   <script>
     (function bootLoader() {
+      var pageConfig = window.STREAM_CONFIG;
+      if (!pageConfig || typeof pageConfig !== "object") {
+        pageConfig = {};
+      }
+
+      var assetConfig = pageConfig.assets && typeof pageConfig.assets === "object" ? pageConfig.assets : {};
+      if (!window.STREAM_OVERLAY && pageConfig.overlay && typeof pageConfig.overlay === "object") {
+        window.STREAM_OVERLAY = pageConfig.overlay;
+      }
+
       var params = new URLSearchParams(window.location.search);
       var requestedMode = (params.get("assets") || "").toLowerCase();
-      var mode = ["auto", "offline", "cdn"].indexOf(requestedMode) >= 0 ? requestedMode : "auto";
+      var configMode = typeof assetConfig.mode === "string" ? assetConfig.mode.toLowerCase() : "";
+      var modeCandidate = requestedMode || configMode;
+      var mode = ["auto", "offline", "cdn"].indexOf(modeCandidate) >= 0 ? modeCandidate : "auto";
+
+      var localThreeSource = typeof assetConfig.localThree === "string" && assetConfig.localThree
+        ? assetConfig.localThree
+        : "vendor/three.min.js";
+      var cdnThreeSource = typeof assetConfig.cdnThree === "string" && assetConfig.cdnThree
+        ? assetConfig.cdnThree
+        : "https://unpkg.com/three@0.160.1/build/three.min.js";
 
       window.STREAM_ASSET_MODE = mode;
       window.STREAM_ASSET_SOURCES = {
-        localThree: "vendor/three.min.js",
-        cdnThree: "https://unpkg.com/three@0.160.1/build/three.min.js"
+        localThree: localThreeSource,
+        cdnThree: cdnThreeSource
       };
 
       function loadScript(src) {

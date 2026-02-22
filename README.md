@@ -10,6 +10,7 @@ It includes:
 
 ## Files
 
+- `config.js` - runtime settings (assets, overlay text, custom fonts)
 - `index.html` - page shell + asset boot loader
 - `styles.css` - visual styling and overlay layout
 - `main.js` - 3D scene logic and animation
@@ -37,7 +38,12 @@ http://localhost:8080/
 
 ## Asset modes
 
-Use the `assets` query parameter to control where Three.js loads from:
+Asset mode can be set in `config.js` (`STREAM_CONFIG.assets.mode`) or by URL query.
+
+- `config.js` default mode is used first
+- `?assets=...` in the URL overrides `config.js`
+
+Available modes:
 
 - `?assets=auto` (default) - try local `vendor/three.min.js`, fallback to CDN
 - `?assets=offline` - local only (requires `vendor/three.min.js`)
@@ -61,11 +67,77 @@ http://localhost:8080/?assets=cdn
 
 ## Basic customization
 
-Edit `main.js`:
+Edit `config.js`:
 
-- Overlay text: `CONFIG.overlay.title`, `CONFIG.overlay.subtitle`
+- Asset behavior: `STREAM_CONFIG.assets.mode`
+- Overlay text: `STREAM_CONFIG.overlay.title`, `STREAM_CONFIG.overlay.subtitle`
+- Overlay fonts: `STREAM_CONFIG.overlay.titleFontFamily`, `STREAM_CONFIG.overlay.subtitleFontFamily`
+- Overlay position: `overlayTop`, `overlayTopMobile`, `titleOffsetX`, `titleOffsetY`, `subtitleOffsetX`, `subtitleOffsetY`
+- Overlay kerning: `titleKerning`, `subtitleKerning`
+
+Edit `main.js` only for simulation/visual behavior:
+
 - Simulation speed: `CONFIG.simulation.daysPerSecond`
 - Sun cycle behavior: `CONFIG.sun.cycleSeconds`, `minActiveRegions`, `maxActiveRegions`, `startLatitude`, `endLatitude`
+
+## Custom title/subtitle fonts
+
+Configure fonts in `config.js` under `STREAM_CONFIG.overlay`:
+
+```js
+window.STREAM_CONFIG = {
+  assets: {
+    mode: "auto"
+  },
+  overlay: {
+    title: "MY CUSTOM TITLE",
+    subtitle: "Subtitle with custom typography",
+    titleFontFamily: "'Oracles', serif",
+    subtitleFontFamily: "'Orbitron', sans-serif",
+    externalFontStylesheets: [
+      "https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap"
+    ],
+    customFontFaces: [
+      {
+        family: "Oracles",
+        src: "@oracles.woff",
+        weight: "400",
+        style: "normal",
+        display: "swap"
+      }
+    ]
+  }
+};
+```
+
+## Title/subtitle position and kerning
+
+You can move the title/subtitle and adjust letter spacing directly in `config.js`:
+
+```js
+window.STREAM_CONFIG = {
+  overlay: {
+    overlayTop: "48px",
+    overlayTopMobile: 22,
+    titleOffsetX: 0,
+    titleOffsetY: 6,
+    subtitleOffsetX: 0,
+    subtitleOffsetY: 10,
+    titleKerning: 0.14,
+    subtitleKerning: "0.05em"
+  }
+};
+```
+
+Value rules:
+- For `overlayTop`, offsets, and kerning, you can use CSS strings (`"12px"`, `"1.2em"`, `"6vh"`) or numbers.
+- Number offsets/top values are treated as `px`.
+- Number kerning values are treated as `em`.
+
+Notes:
+- `customFontFaces[].src` accepts `@oracles.woff`, direct paths/URLs (`fonts/oracles.woff2`), or full CSS `url(...)` syntax.
+- `externalFontStylesheets` is for web-hosted font CSS (for example Google Fonts).
+- Keep local font files next to `index.html` (or use relative paths).
 
 ## Troubleshooting
 

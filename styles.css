@@ -6,6 +6,17 @@
   --text-sub: #b8cae7;
   --accent: #86bdfd;
   --warm: #ffd8a2;
+  --font-ui: "Trebuchet MS", "Gill Sans", "Segoe UI", sans-serif;
+  --font-title: var(--font-ui);
+  --font-subtitle: var(--font-ui);
+  --overlay-top: min(4vh, 34px);
+  --overlay-top-mobile: 18px;
+  --title-offset-x: 0px;
+  --title-offset-y: 0px;
+  --subtitle-offset-x: 0px;
+  --subtitle-offset-y: 0px;
+  --title-kerning: 0.11em;
+  --subtitle-kerning: 0.03em;
 }
 
 * {
@@ -27,7 +38,7 @@ body {
     radial-gradient(1000px 580px at 70% 18%, rgba(24, 66, 118, 0.45) 0%, rgba(7, 15, 32, 0) 70%),
     radial-gradient(760px 760px at 18% 92%, rgba(15, 42, 74, 0.4) 0%, rgba(5, 11, 23, 0) 72%),
     linear-gradient(145deg, var(--bg-deep) 0%, var(--bg-mid) 52%, #08101f 100%);
-  font-family: "Trebuchet MS", "Gill Sans", "Segoe UI", sans-serif;
+  font-family: var(--font-ui);
 }
 
 body::before {
@@ -57,7 +68,7 @@ body::before {
 .overlay {
   position: absolute;
   left: 50%;
-  top: min(4vh, 34px);
+  top: var(--overlay-top);
   transform: translateX(-50%);
   z-index: 3;
   width: min(92vw, 1120px);
@@ -79,9 +90,11 @@ h1 {
   margin: 0;
   font-size: clamp(1.7rem, 4.7vw, 3.9rem);
   line-height: 0.98;
-  letter-spacing: 0.11em;
+  letter-spacing: var(--title-kerning);
   text-transform: uppercase;
   color: var(--text-main);
+  font-family: var(--font-title);
+  transform: translate3d(var(--title-offset-x), var(--title-offset-y), 0);
   text-shadow:
     0 0 22px rgba(25, 58, 103, 0.7),
     0 0 70px rgba(16, 36, 64, 0.62);
@@ -90,8 +103,10 @@ h1 {
 #subtitle {
   margin: 10px 0 0;
   font-size: clamp(0.82rem, 1.35vw, 1.04rem);
-  letter-spacing: 0.03em;
+  letter-spacing: var(--subtitle-kerning);
   color: var(--text-sub);
+  font-family: var(--font-subtitle);
+  transform: translate3d(var(--subtitle-offset-x), var(--subtitle-offset-y), 0);
   text-shadow: 0 0 14px rgba(0, 0, 0, 0.5);
   opacity: 0.95;
 }
@@ -133,7 +148,7 @@ h1 {
 
 @media (max-width: 840px) {
   .overlay {
-    top: 18px;
+    top: var(--overlay-top-mobile);
     width: calc(100% - 28px);
   }
 

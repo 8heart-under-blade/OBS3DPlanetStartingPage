@@ -12,11 +12,30 @@
 
   var THREE = window.THREE;
   var TWO_PI = Math.PI * 2;
+  var overlayOverrides = window.STREAM_OVERLAY;
+  if ((!overlayOverrides || typeof overlayOverrides !== "object") && window.STREAM_CONFIG && typeof window.STREAM_CONFIG === "object") {
+    overlayOverrides = window.STREAM_CONFIG.overlay;
+  }
+  if (!overlayOverrides || typeof overlayOverrides !== "object") {
+    overlayOverrides = {};
+  }
 
   var CONFIG = {
     overlay: {
-      title: "STREAM STARTING SOON",
-      subtitle: "Calibrating spacetime and aligning planetary ephemerides..."
+      title: pickDefined(overlayOverrides.title, "STREAM STARTING SOON"),
+      subtitle: pickDefined(overlayOverrides.subtitle, "Calibrating spacetime and aligning planetary ephemerides..."),
+      titleFontFamily: pickDefined(overlayOverrides.titleFontFamily, '"Trebuchet MS", "Gill Sans", "Segoe UI", sans-serif'),
+      subtitleFontFamily: pickDefined(overlayOverrides.subtitleFontFamily, '"Trebuchet MS", "Gill Sans", "Segoe UI", sans-serif'),
+      externalFontStylesheets: ensureArray(pickDefined(overlayOverrides.externalFontStylesheets, overlayOverrides.fontStylesheet)),
+      customFontFaces: ensureArray(overlayOverrides.customFontFaces),
+      overlayTop: pickDefined(overlayOverrides.overlayTop, "min(4vh, 34px)"),
+      overlayTopMobile: pickDefined(overlayOverrides.overlayTopMobile, 18),
+      titleOffsetX: pickDefined(overlayOverrides.titleOffsetX, 0),
+      titleOffsetY: pickDefined(overlayOverrides.titleOffsetY, 0),
+      subtitleOffsetX: pickDefined(overlayOverrides.subtitleOffsetX, 0),
+      subtitleOffsetY: pickDefined(overlayOverrides.subtitleOffsetY, 0),
+      titleKerning: pickDefined(overlayOverrides.titleKerning, 0.11),
+      subtitleKerning: pickDefined(overlayOverrides.subtitleKerning, 0.03)
     },
     renderer: {
       maxPixelRatio: 1.6,
@@ -60,6 +79,8 @@
       baseRegionSize: 0.21
     }
   };
+
+  applyOverlayTypography(CONFIG.overlay);
 
   var titleEl = document.getElementById("title");
   var subtitleEl = document.getElementById("subtitle");
@@ -1044,6 +1065,193 @@
           continentEnd: 1
         };
     }
+  }
+
+  function applyOverlayTypography(overlayConfig) {
+    if (!overlayConfig) {
+      return;
+    }
+
+    var root = document.documentElement;
+    if (root) {
+      setRootCssVariable(root, "--font-title", overlayConfig.titleFontFamily);
+      setRootCssVariable(root, "--font-subtitle", overlayConfig.subtitleFontFamily);
+      setRootCssVariable(root, "--overlay-top", overlayConfig.overlayTop, "px");
+      setRootCssVariable(root, "--overlay-top-mobile", overlayConfig.overlayTopMobile, "px");
+      setRootCssVariable(root, "--title-offset-x", overlayConfig.titleOffsetX, "px");
+      setRootCssVariable(root, "--title-offset-y", overlayConfig.titleOffsetY, "px");
+      setRootCssVariable(root, "--subtitle-offset-x", overlayConfig.subtitleOffsetX, "px");
+      setRootCssVariable(root, "--subtitle-offset-y", overlayConfig.subtitleOffsetY, "px");
+      setRootCssVariable(root, "--title-kerning", overlayConfig.titleKerning, "em");
+      setRootCssVariable(root, "--subtitle-kerning", overlayConfig.subtitleKerning, "em");
+    }
+
+    var head = document.head;
+    if (!head) {
+      return;
+    }
+
+    var stylesheetUrls = ensureArray(overlayConfig.externalFontStylesheets);
+    for (var i = 0; i < stylesheetUrls.length; i += 1) {
+      var href = stylesheetUrls[i];
+      if (typeof href !== "string") {
+        continue;
+      }
+
+      var trimmedHref = href.trim();
+      if (!trimmedHref) {
+        continue;
+      }
+
+      var stylesheet = document.createElement("link");
+      stylesheet.rel = "stylesheet";
+      stylesheet.href = trimmedHref;
+      head.appendChild(stylesheet);
+    }
+
+    var customFaces = ensureArray(overlayConfig.customFontFaces);
+    var faceRules = [];
+    for (var f = 0; f < customFaces.length; f += 1) {
+      var face = customFaces[f];
+      if (!face || typeof face !== "object") {
+        continue;
+      }
+
+      var family = typeof face.family === "string" ? face.family.trim() : "";
+      var src = normalizeFontSource(face.src);
+      if (!family || !src) {
+        continue;
+      }
+
+      var style = pickDefined(face.style, "normal");
+      var weight = pickDefined(face.weight, "400");
+      var display = pickDefined(face.display, "swap");
+
+      faceRules.push(
+        "@font-face{" +
+          "font-family:'" + escapeCssText(family) + "';" +
+          "src:" + src + ";" +
+          "font-style:" + style + ";" +
+          "font-weight:" + weight + ";" +
+          "font-display:" + display + ";" +
+        "}"
+      );
+    }
+
+    if (faceRules.length > 0) {
+      var faceStyleTag = document.createElement("style");
+      faceStyleTag.type = "text/css";
+      faceStyleTag.textContent = faceRules.join("\n");
+      head.appendChild(faceStyleTag);
+    }
+  }
+
+  function setRootCssVariable(root, variableName, rawValue, defaultUnit) {
+    if (!root || !variableName) {
+      return;
+    }
+
+    var cssValue = normalizeCssValue(rawValue, defaultUnit);
+    if (!cssValue) {
+      return;
+    }
+
+    root.style.setProperty(variableName, cssValue);
+  }
+
+  function normalizeCssValue(value, defaultUnit) {
+    if (value === undefined || value === null) {
+      return "";
+    }
+
+    if (typeof value === "number") {
+      if (!isFinite(value)) {
+        return "";
+      }
+      return String(value) + (defaultUnit || "");
+    }
+
+    if (typeof value === "string") {
+      var trimmedValue = value.trim();
+      return trimmedValue || "";
+    }
+
+    return "";
+  }
+
+  function normalizeFontSource(srcValue) {
+    if (typeof srcValue !== "string") {
+      return "";
+    }
+
+    var trimmed = srcValue.trim();
+    if (!trimmed) {
+      return "";
+    }
+
+    if (/^url\(/i.test(trimmed)) {
+      return trimmed;
+    }
+
+    if (trimmed.charAt(0) === "@") {
+      trimmed = trimmed.slice(1).trim();
+    }
+
+    if (!trimmed) {
+      return "";
+    }
+
+    var format = guessFontFormat(trimmed);
+    var src = "url('" + escapeCssText(trimmed.replace(/\\/g, "/")) + "')";
+    if (format) {
+      src += " format('" + format + "')";
+    }
+    return src;
+  }
+
+  function guessFontFormat(path) {
+    if (typeof path !== "string") {
+      return "";
+    }
+
+    var plainPath = path.split("?")[0].split("#")[0].toLowerCase();
+    var extensionIndex = plainPath.lastIndexOf(".");
+    if (extensionIndex < 0) {
+      return "";
+    }
+
+    var extension = plainPath.slice(extensionIndex + 1);
+    if (extension === "woff2") {
+      return "woff2";
+    }
+    if (extension === "woff") {
+      return "woff";
+    }
+    if (extension === "ttf") {
+      return "truetype";
+    }
+    if (extension === "otf") {
+      return "opentype";
+    }
+    return "";
+  }
+
+  function escapeCssText(value) {
+    return String(value).replace(/\\/g, "\\\\").replace(/'/g, "\\'");
+  }
+
+  function pickDefined(value, fallback) {
+    return value === undefined || value === null ? fallback : value;
+  }
+
+  function ensureArray(value) {
+    if (Array.isArray(value)) {
+      return value.slice();
+    }
+    if (value === undefined || value === null || value === "") {
+      return [];
+    }
+    return [value];
   }
 
   function hexToRgb(hex) {
