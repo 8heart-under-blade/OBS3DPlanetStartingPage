@@ -12,13 +12,15 @@
 
   var THREE = window.THREE;
   var TWO_PI = Math.PI * 2;
+  var streamConfig = window.STREAM_CONFIG && typeof window.STREAM_CONFIG === "object" ? window.STREAM_CONFIG : {};
   var overlayOverrides = window.STREAM_OVERLAY;
-  if ((!overlayOverrides || typeof overlayOverrides !== "object") && window.STREAM_CONFIG && typeof window.STREAM_CONFIG === "object") {
-    overlayOverrides = window.STREAM_CONFIG.overlay;
+  if ((!overlayOverrides || typeof overlayOverrides !== "object") && streamConfig.overlay && typeof streamConfig.overlay === "object") {
+    overlayOverrides = streamConfig.overlay;
   }
   if (!overlayOverrides || typeof overlayOverrides !== "object") {
     overlayOverrides = {};
   }
+  var audioOverrides = streamConfig.audioReactive && typeof streamConfig.audioReactive === "object" ? streamConfig.audioReactive : {};
 
   var CONFIG = {
     overlay: {
@@ -71,6 +73,29 @@
       planetMassScale: 9.4,
       wellDepth: 0.46,
       waveAmp: 0.48
+    },
+    audioReactive: {
+      enabled: pickDefined(audioOverrides.enabled, true),
+      provider: pickDefined(audioOverrides.provider, "obsWebSocket"),
+      mode: normalizeAudioReactiveMode(pickDefined(audioOverrides.mode, "gravityWarp")),
+      url: pickDefined(audioOverrides.url, "ws://127.0.0.1:4455"),
+      password: pickDefined(audioOverrides.password, ""),
+      targetInputs: ensureArray(pickDefined(audioOverrides.targetInputs, ["Desktop Audio", "Desktop Audio 2"])),
+      noiseFloorDb: pickDefined(audioOverrides.noiseFloorDb, -58),
+      gain: pickDefined(audioOverrides.gain, 1.2),
+      attack: pickDefined(audioOverrides.attack, 0.5),
+      release: pickDefined(audioOverrides.release, 0.08),
+      maxBoost: pickDefined(audioOverrides.maxBoost, 0.9),
+      waveInfluence: pickDefined(audioOverrides.waveInfluence, 0.6),
+      speedInfluence: pickDefined(audioOverrides.speedInfluence, 1.2),
+      glowInfluence: pickDefined(audioOverrides.glowInfluence, 0.3),
+      waterfallFlowSpeed: pickDefined(audioOverrides.waterfallFlowSpeed, 0.65),
+      waterfallRowsPerSecond: pickDefined(audioOverrides.waterfallRowsPerSecond, 46),
+      waterfallHeight: pickDefined(audioOverrides.waterfallHeight, 2.2),
+      waterfallTrailDecay: pickDefined(audioOverrides.waterfallTrailDecay, 0.86),
+      waterfallBanding: pickDefined(audioOverrides.waterfallBanding, 1.0),
+      reconnectBaseMs: pickDefined(audioOverrides.reconnectBaseMs, 900),
+      reconnectMaxMs: pickDefined(audioOverrides.reconnectMaxMs, 9000)
     },
     sun: {
       radius: 3.5,
@@ -263,13 +288,18 @@
   }
 
   var fabric = createFabric();
+  var fabricWaterfall = createFabricWaterfallState(fabric);
   var gravityBodies = [];
+  var audioReactive = createAudioReactiveController(CONFIG.audioReactive);
   var clock = new THREE.Clock();
   var simDays = 0;
+
+  audioReactive.start();
 
   animate();
 
   window.addEventListener("resize", onResize);
+  window.addEventListener("beforeunload", audioReactive.stop);
 
   function animate() {
     requestAnimationFrame(animate);
@@ -279,9 +309,11 @@
 
     simDays += delta * CONFIG.simulation.daysPerSecond;
     var currentDays = initialDays + simDays;
+    var audioBoost = audioReactive.update(delta);
+    var audioFeatures = audioReactive.getFeatures();
 
     updatePlanets(currentDays, delta);
-    updateFabric(elapsed);
+    updateFabric(elapsed, delta, audioBoost, audioFeatures);
     updateCamera(elapsed);
 
     stars.rotation.y += delta * 0.0032;
@@ -292,7 +324,7 @@
     var solarActivity = Math.pow(Math.sin(cyclePhase * Math.PI), 1.25);
     var glowPulse = 1 + Math.sin(elapsed * (1.2 + solarActivity * 0.7)) * (0.028 + solarActivity * 0.04);
     sunGlow.scale.set(glowPulse, glowPulse, glowPulse);
-    sunGlow.material.opacity = 0.19 + solarActivity * 0.17;
+    sunGlow.material.opacity = 0.19 + solarActivity * 0.17 + audioBoost * CONFIG.audioReactive.glowInfluence * 0.08;
     sunLight.intensity = 7.55 + solarActivity * 1.2 + Math.sin(elapsed * 1.45) * (0.1 + solarActivity * 0.22);
     if (sunActivityEnabled) {
       try {
@@ -336,9 +368,24 @@
     }
   }
 
-  function updateFabric(elapsed) {
+  function updateFabric(elapsed, delta, audioBoost, audioFeatures) {
+    if (CONFIG.audioReactive.mode === "waterfallGraph") {
+      updateFabricWaterfall(elapsed, delta, audioBoost, audioFeatures);
+      return;
+    }
+
+    updateFabricGravityWarp(elapsed, audioBoost);
+  }
+
+  function updateFabricGravityWarp(elapsed, audioBoost) {
     var positions = fabric.geometry.attributes.position.array;
     var base = fabric.base;
+    var waveBoost = CONFIG.audioReactive.waveInfluence * audioBoost;
+    var speedBoost = 1 + CONFIG.audioReactive.speedInfluence * audioBoost;
+    var wellDepth = CONFIG.fabric.wellDepth * (1 + audioBoost * 0.16);
+
+    fabric.wire.material.opacity = 0.3 + audioBoost * 0.18;
+    fabric.fill.material.opacity = 0.43 + audioBoost * 0.08;
 
     for (var i = 0; i < positions.length; i += 3) {
       var x = base[i];
@@ -353,14 +400,179 @@
         well += body.mass / dist2;
       }
 
-      var waveA = Math.sin(x * 0.11 + elapsed * 0.62) * Math.cos(z * 0.11 - elapsed * 0.46);
+      var waveA = Math.sin(x * 0.11 + elapsed * 0.62 * speedBoost) * Math.cos(z * 0.11 - elapsed * 0.46 * speedBoost);
       var radial = Math.sqrt(x * x + z * z);
-      var waveB = Math.sin(radial * 0.22 - elapsed * 1.24);
+      var waveB = Math.sin(radial * 0.22 - elapsed * 1.24 * speedBoost);
+      var audioWave = Math.sin(radial * 0.14 - elapsed * (1.6 + audioBoost * 1.8)) * waveBoost;
 
-      positions[i + 1] = base[i + 1] - well * CONFIG.fabric.wellDepth + waveA * CONFIG.fabric.waveAmp + waveB * 0.16;
+      positions[i + 1] = base[i + 1] - well * wellDepth + waveA * (CONFIG.fabric.waveAmp + waveBoost * 0.44) + waveB * (0.16 + waveBoost * 0.18) + audioWave;
     }
 
     fabric.geometry.attributes.position.needsUpdate = true;
+  }
+
+  function updateFabricWaterfall(elapsed, delta, audioBoost, audioFeatures) {
+    var positions = fabric.geometry.attributes.position.array;
+    var base = fabric.base;
+    var xCount = fabric.xCount;
+    var zCount = fabric.zCount;
+    var history = fabricWaterfall.history;
+    var rowBuffer = fabricWaterfall.rowBuffer;
+
+    var flowSpeed = Math.max(0.15, Number(CONFIG.audioReactive.waterfallFlowSpeed) || 0.15);
+    var rowsPerSecond = Math.max(2, (Number(CONFIG.audioReactive.waterfallRowsPerSecond) || 0) * flowSpeed);
+    var trailDecayPerSecond = clamp01(Number(CONFIG.audioReactive.waterfallTrailDecay));
+    if (trailDecayPerSecond <= 0) {
+      trailDecayPerSecond = 0.86;
+    }
+    var stepDecay = Math.pow(trailDecayPerSecond, 1 / rowsPerSecond);
+    var passiveDecay = Math.pow(trailDecayPerSecond, Math.max(0.002, delta) * 0.1);
+    var heightScale = Math.max(0.1, Number(CONFIG.audioReactive.waterfallHeight) || 0.1);
+    var banding = Math.max(0.2, Number(CONFIG.audioReactive.waterfallBanding) || 0.2);
+    var frameDelta = isFinite(delta) && delta > 0 ? delta : 0.016;
+
+    fabricWaterfall.accumulator += frameDelta * rowsPerSecond;
+    var shiftCount = Math.floor(fabricWaterfall.accumulator);
+    if (shiftCount > 0) {
+      fabricWaterfall.accumulator -= shiftCount;
+
+      for (var step = 0; step < shiftCount; step += 1) {
+        buildWaterfallInputProfile(rowBuffer, xCount, elapsed + step / rowsPerSecond, audioBoost, audioFeatures, banding, flowSpeed, fabricWaterfall);
+        shiftWaterfallHistoryRows(history, rowBuffer, xCount, zCount, stepDecay);
+      }
+    }
+
+    for (var idx = 0; idx < history.length; idx += 1) {
+      history[idx] *= passiveDecay;
+    }
+
+    var diffusionBlend = 1 - Math.exp(-frameDelta * 5.8);
+    if (diffusionBlend > 0.001) {
+      diffuseWaterfallHistory(history, fabricWaterfall.scratch, xCount, zCount, diffusionBlend);
+    }
+
+    fabric.wire.material.opacity = 0.26 + audioBoost * 0.34;
+    fabric.fill.material.opacity = 0.36 + audioBoost * 0.18;
+
+    for (var z = 0; z < zCount; z += 1) {
+      var zNorm = z / Math.max(1, zCount - 1);
+      var distanceFade = 0.88 + 0.12 * (1 - smoothRange(0.93, 1, zNorm));
+
+      for (var x = 0; x < xCount; x += 1) {
+        var index = (z * xCount + x) * 3;
+        var historyIndex = z * xCount + x;
+        var xNorm = x / Math.max(1, xCount - 1);
+        var centeredX = xNorm * 2 - 1;
+        var xPos = base[index];
+        var zPos = base[index + 2];
+
+        var well = 0;
+        for (var b = 0; b < gravityBodies.length; b += 1) {
+          var body = gravityBodies[b];
+          var dx = xPos - body.x;
+          var dz = zPos - body.z;
+          var dist2 = dx * dx + dz * dz + body.softness;
+          well += body.mass / dist2;
+        }
+
+        var rowEnergy = Math.pow(clamp01(history[historyIndex]), 0.76) * distanceFade;
+        var ridge = rowEnergy * heightScale;
+        var underWave = Math.sin(centeredX * 4.8 - elapsed * 0.86 * (0.4 + flowSpeed * 0.6) + zNorm * 6.2) * 0.07;
+        var gravityShape = -well * CONFIG.fabric.wellDepth * 0.92;
+
+        positions[index + 1] = base[index + 1] + gravityShape + underWave + ridge;
+      }
+    }
+
+    fabric.geometry.attributes.position.needsUpdate = true;
+  }
+
+  function buildWaterfallInputProfile(outputRow, xCount, elapsed, audioBoost, audioFeatures, banding, flowSpeed, waterfallState) {
+    var features = audioFeatures || null;
+    var rms = features && isFinite(features.rms) ? clamp01(features.rms) : clamp01(audioBoost);
+    var peak = features && isFinite(features.peak) ? clamp01(features.peak) : rms;
+    var transient = features && isFinite(features.transient) ? clamp01(features.transient) : clamp01(peak - rms);
+    var balance = features && isFinite(features.balance) ? clampSigned(features.balance) : 0;
+
+    var energy = clamp01(rms * 0.75 + peak * 0.45);
+    var transientLift = clamp01(transient * 1.8);
+    var centerTarget = balance * 0.42;
+    waterfallState.focus += (centerTarget - waterfallState.focus) * 0.28;
+
+    var time = elapsed * flowSpeed;
+    var slowDrift = Math.sin(time * 0.58 + waterfallState.phaseA) * 0.22;
+    var pulse = 0.35 + energy * 0.95;
+    var motionA = time * (1.55 + pulse * 2.4 + transientLift * 2.1) + waterfallState.phaseB;
+    var motionB = time * (3.8 + transientLift * 6.2) + waterfallState.phaseC;
+
+    for (var x = 0; x < xCount; x += 1) {
+      var xNorm = x / Math.max(1, xCount - 1);
+      var centeredX = xNorm * 2 - 1;
+
+      var focus = waterfallState.focus + slowDrift;
+      var lowBody = Math.exp(-Math.pow((centeredX - focus) / 0.55, 2));
+      var midBand = 0.5 + 0.5 * Math.sin(centeredX * (7.2 * banding) + motionA);
+      var highBand = Math.pow(0.5 + 0.5 * Math.sin(centeredX * (22 * banding) - motionB), 2.2);
+      var sideRidge = Math.exp(-Math.pow((Math.abs(centeredX) - 0.62) / 0.2, 2));
+      var grain = 0.5 + 0.5 * Math.sin(centeredX * 41 + motionB * 0.71 + waterfallState.phaseA * 0.43);
+
+      var value = 0;
+      value += lowBody * (0.12 + energy * 0.82);
+      value += midBand * (0.08 + energy * 0.52);
+      value += highBand * (0.04 + transientLift * 0.68);
+      value += sideRidge * (0.03 + energy * 0.12);
+      value += grain * transientLift * 0.18;
+
+      outputRow[x] = clamp01(value);
+    }
+  }
+
+  function shiftWaterfallHistoryRows(history, rowBuffer, xCount, zCount, stepDecay) {
+    for (var row = zCount - 1; row > 0; row -= 1) {
+      var dstOffset = row * xCount;
+      var srcOffset = (row - 1) * xCount;
+
+      for (var col = 0; col < xCount; col += 1) {
+        history[dstOffset + col] = history[srcOffset + col] * stepDecay;
+      }
+    }
+
+    for (var x = 0; x < xCount; x += 1) {
+      history[x] = rowBuffer[x];
+    }
+  }
+
+  function diffuseWaterfallHistory(history, scratch, xCount, zCount, blend) {
+    var inverseBlend = 1 - blend;
+
+    for (var row = 0; row < zCount; row += 1) {
+      for (var col = 0; col < xCount; col += 1) {
+        var index = row * xCount + col;
+        var center = history[index];
+
+        var left = col > 0 ? history[index - 1] : center;
+        var right = col < xCount - 1 ? history[index + 1] : center;
+        var back = row > 0 ? history[index - xCount] : center;
+        var front = row < zCount - 1 ? history[index + xCount] : center;
+
+        var neighborhood = (center * 2 + left + right + back + front) / 6;
+        scratch[index] = center * inverseBlend + neighborhood * blend;
+      }
+    }
+
+    for (var i = 0; i < history.length; i += 1) {
+      history[i] = scratch[i];
+    }
+  }
+
+  function clampSigned(value) {
+    if (value < -1) {
+      return -1;
+    }
+    if (value > 1) {
+      return 1;
+    }
+    return value;
   }
 
   function updateCamera(elapsed) {
@@ -370,6 +582,580 @@
     camera.position.z = Math.sin(yaw) * driftRadius;
     camera.position.y = CONFIG.camera.height + Math.sin(elapsed * 0.18) * CONFIG.camera.bobAmount;
     camera.lookAt(0, CONFIG.camera.lookHeight, 0);
+  }
+
+  function createAudioReactiveController(config) {
+    var settings = config || {};
+    var enabled = settings.enabled !== false && settings.provider === "obsWebSocket";
+    var supportsWebSocket = typeof window.WebSocket === "function";
+    var targetInputs = normalizeInputFilters(settings.targetInputs);
+
+    var state = {
+      ws: null,
+      rawLevel: 0,
+      rawRms: 0,
+      rawPeak: 0,
+      rawTransient: 0,
+      rawBalance: 0,
+      smoothedLevel: 0,
+      smoothedRms: 0,
+      smoothedPeak: 0,
+      smoothedTransient: 0,
+      smoothedBalance: 0,
+      reconnectHandle: 0,
+      reconnectAttempt: 0,
+      warnedNoTargetMatch: false,
+      stopping: false,
+      status: "idle",
+      featureSnapshot: {
+        level: 0,
+        rms: 0,
+        peak: 0,
+        transient: 0,
+        balance: 0
+      }
+    };
+
+    if (!enabled || !supportsWebSocket) {
+      if (enabled && !supportsWebSocket) {
+        console.warn("Audio reactive mode disabled: WebSocket not supported in this browser source.");
+      }
+      return {
+        start: function () {},
+        stop: function () {},
+        update: function () { return 0; },
+        getFeatures: function () {
+          return {
+            level: 0,
+            rms: 0,
+            peak: 0,
+            transient: 0,
+            balance: 0
+          };
+        }
+      };
+    }
+
+    var wsUrl = typeof settings.url === "string" ? settings.url.trim() : "";
+    if (!wsUrl) {
+      wsUrl = "ws://127.0.0.1:4455";
+    }
+
+    var wsPassword = typeof settings.password === "string" ? settings.password : "";
+    var gain = Math.max(0, Number(settings.gain) || 0);
+    var attack = Math.max(0.01, Number(settings.attack) || 0.01);
+    var release = Math.max(0.01, Number(settings.release) || 0.01);
+    var maxBoost = Math.max(0, Number(settings.maxBoost) || 0);
+    var reconnectBaseMs = Math.max(250, Number(settings.reconnectBaseMs) || 900);
+    var reconnectMaxMs = Math.max(reconnectBaseMs, Number(settings.reconnectMaxMs) || 9000);
+    var noiseFloorDb = Number(settings.noiseFloorDb);
+    if (!isFinite(noiseFloorDb)) {
+      noiseFloorDb = -58;
+    }
+    var noiseFloorLinear = dbToLinear(noiseFloorDb);
+    var dynamicRange = Math.max(0.0001, 1 - noiseFloorLinear);
+
+    function start() {
+      state.stopping = false;
+      connect();
+    }
+
+    function stop() {
+      state.stopping = true;
+      if (state.reconnectHandle) {
+        clearTimeout(state.reconnectHandle);
+        state.reconnectHandle = 0;
+      }
+      if (state.ws) {
+        try {
+          state.ws.close();
+        } catch (error) {
+          console.warn("Audio websocket close warning:", error);
+        }
+        state.ws = null;
+      }
+      state.status = "stopped";
+    }
+
+    function update(delta) {
+      var frameDelta = isFinite(delta) && delta > 0 ? delta : 0.016;
+      state.rawLevel *= Math.exp(-frameDelta * 7.8);
+      state.rawRms *= Math.exp(-frameDelta * 6.4);
+      state.rawPeak *= Math.exp(-frameDelta * 9.6);
+      state.rawTransient *= Math.exp(-frameDelta * 11.2);
+      state.rawBalance *= Math.exp(-frameDelta * 2.7);
+
+      var targetLevel = clamp01((Math.max(state.rawLevel, state.rawPeak) - noiseFloorLinear) / dynamicRange);
+      targetLevel = clamp01(targetLevel * gain);
+
+      var targetRms = clamp01((state.rawRms - noiseFloorLinear) / dynamicRange);
+      targetRms = clamp01(targetRms * gain * 0.95);
+
+      var targetPeak = clamp01((state.rawPeak - noiseFloorLinear) / dynamicRange);
+      targetPeak = clamp01(targetPeak * gain * 1.05);
+
+      var targetTransient = clamp01(targetPeak - targetRms * 0.85 + state.rawTransient * 0.35);
+      var targetBalance = clampSigned(state.rawBalance);
+
+      var levelRate = targetLevel > state.smoothedLevel ? attack : release;
+      var levelBlend = 1 - Math.exp(-frameDelta * levelRate * 12);
+      state.smoothedLevel += (targetLevel - state.smoothedLevel) * levelBlend;
+
+      var rmsRate = targetRms > state.smoothedRms ? attack * 0.85 : release * 0.9;
+      var rmsBlend = 1 - Math.exp(-frameDelta * rmsRate * 10);
+      state.smoothedRms += (targetRms - state.smoothedRms) * rmsBlend;
+
+      var peakRate = targetPeak > state.smoothedPeak ? attack * 1.15 : release * 0.75;
+      var peakBlend = 1 - Math.exp(-frameDelta * peakRate * 13.5);
+      state.smoothedPeak += (targetPeak - state.smoothedPeak) * peakBlend;
+
+      var transientRate = targetTransient > state.smoothedTransient ? attack * 1.75 : release * 0.7;
+      var transientBlend = 1 - Math.exp(-frameDelta * transientRate * 16);
+      state.smoothedTransient += (targetTransient - state.smoothedTransient) * transientBlend;
+
+      var balanceBlend = 1 - Math.exp(-frameDelta * 6.5);
+      state.smoothedBalance += (targetBalance - state.smoothedBalance) * balanceBlend;
+
+      state.featureSnapshot.level = clamp01(state.smoothedLevel);
+      state.featureSnapshot.rms = clamp01(state.smoothedRms);
+      state.featureSnapshot.peak = clamp01(state.smoothedPeak);
+      state.featureSnapshot.transient = clamp01(state.smoothedTransient);
+      state.featureSnapshot.balance = clampSigned(state.smoothedBalance);
+
+      return clamp01(state.featureSnapshot.level * maxBoost);
+    }
+
+    function connect() {
+      if (state.stopping || state.ws) {
+        return;
+      }
+
+      var ws;
+      try {
+        ws = new window.WebSocket(wsUrl, "obswebsocket.json");
+      } catch (error) {
+        console.warn("Audio websocket open failed:", error);
+        scheduleReconnect();
+        return;
+      }
+
+      state.ws = ws;
+      state.status = "connecting";
+
+      ws.onopen = function () {
+        state.status = "socket-open";
+      };
+
+      ws.onmessage = function (event) {
+        handleSocketMessage(event.data);
+      };
+
+      ws.onerror = function () {
+        state.status = "error";
+      };
+
+      ws.onclose = function () {
+        if (state.ws === ws) {
+          state.ws = null;
+        }
+        if (!state.stopping) {
+          state.status = "closed";
+          scheduleReconnect();
+        }
+      };
+    }
+
+    function scheduleReconnect() {
+      if (state.reconnectHandle || state.stopping) {
+        return;
+      }
+
+      var delay = Math.min(reconnectMaxMs, reconnectBaseMs * Math.pow(1.55, state.reconnectAttempt));
+      state.reconnectAttempt += 1;
+      state.reconnectHandle = setTimeout(function () {
+        state.reconnectHandle = 0;
+        connect();
+      }, delay);
+    }
+
+    function handleSocketMessage(rawData) {
+      var message;
+      try {
+        message = JSON.parse(rawData);
+      } catch (error) {
+        return;
+      }
+
+      if (!message || typeof message.op !== "number") {
+        return;
+      }
+
+      var data = message.d || {};
+
+      if (message.op === 0) {
+        handleHello(data);
+        return;
+      }
+
+      if (message.op === 2) {
+        state.status = "identified";
+        state.reconnectAttempt = 0;
+        return;
+      }
+
+      if (message.op === 5 && data.eventType === "InputVolumeMeters") {
+        ingestVolumeEvent(data.eventData);
+      }
+    }
+
+    function handleHello(helloData) {
+      if (!helloData || typeof helloData !== "object") {
+        return;
+      }
+
+      var rpcVersion = typeof helloData.rpcVersion === "number" && isFinite(helloData.rpcVersion)
+        ? Math.max(1, Math.floor(helloData.rpcVersion))
+        : 1;
+
+      var identify = {
+        rpcVersion: rpcVersion,
+        eventSubscriptions: 2047 | (1 << 16)
+      };
+
+      var authData = helloData.authentication;
+      if (!authData || typeof authData !== "object") {
+        sendSocketMessage({ op: 1, d: identify });
+        return;
+      }
+
+      createObsWebSocketAuth(wsPassword, authData.salt, authData.challenge)
+        .then(function (authString) {
+          identify.authentication = authString;
+          sendSocketMessage({ op: 1, d: identify });
+        })
+        .catch(function (error) {
+          console.warn("Audio websocket authentication failed:", error);
+          if (state.ws) {
+            try {
+              state.ws.close();
+            } catch (closeError) {
+              console.warn("Audio websocket close warning:", closeError);
+            }
+          }
+        });
+    }
+
+    function sendSocketMessage(payload) {
+      if (!state.ws || state.ws.readyState !== 1) {
+        return;
+      }
+      state.ws.send(JSON.stringify(payload));
+    }
+
+    function ingestVolumeEvent(eventData) {
+      if (!eventData || !Array.isArray(eventData.inputs)) {
+        return;
+      }
+
+      var inputs = eventData.inputs;
+      var aggregate = {
+        level: 0,
+        rms: 0,
+        peak: 0,
+        transient: 0,
+        balanceWeighted: 0,
+        balanceWeight: 0
+      };
+      var foundTarget = targetInputs.length === 0;
+
+      for (var i = 0; i < inputs.length; i += 1) {
+        var input = inputs[i];
+        if (!input || typeof input !== "object") {
+          continue;
+        }
+
+        var inputName = normalizeInputName(input.inputName);
+        if (targetInputs.length > 0 && targetInputs.indexOf(inputName) === -1) {
+          continue;
+        }
+
+        foundTarget = true;
+        mergeMeterFeatures(aggregate, extractInputMeterFeatures(input));
+      }
+
+      if (!foundTarget) {
+        if (!state.warnedNoTargetMatch) {
+          state.warnedNoTargetMatch = true;
+          console.warn("Audio reactive: target input not found in InputVolumeMeters events. Falling back to all active inputs.");
+        }
+        for (var j = 0; j < inputs.length; j += 1) {
+          mergeMeterFeatures(aggregate, extractInputMeterFeatures(inputs[j]));
+        }
+      }
+
+      var resolvedBalance = aggregate.balanceWeight > 0
+        ? aggregate.balanceWeighted / aggregate.balanceWeight
+        : 0;
+
+      state.rawLevel = Math.max(aggregate.level, state.rawLevel * 0.72);
+      state.rawRms = Math.max(aggregate.rms, state.rawRms * 0.75);
+      state.rawPeak = Math.max(aggregate.peak, state.rawPeak * 0.7);
+      state.rawTransient = Math.max(aggregate.transient, state.rawTransient * 0.65);
+      state.rawBalance += (clampSigned(resolvedBalance) - state.rawBalance) * 0.58;
+    }
+
+    return {
+      start: start,
+      stop: stop,
+      update: update,
+      getFeatures: function () {
+        return state.featureSnapshot;
+      }
+    };
+  }
+
+  function normalizeInputFilters(inputList) {
+    var source = ensureArray(inputList);
+    var output = [];
+
+    for (var i = 0; i < source.length; i += 1) {
+      var normalized = normalizeInputName(source[i]);
+      if (!normalized || output.indexOf(normalized) >= 0) {
+        continue;
+      }
+      output.push(normalized);
+    }
+
+    return output;
+  }
+
+  function normalizeInputName(name) {
+    if (typeof name !== "string") {
+      return "";
+    }
+    return name.trim().toLowerCase();
+  }
+
+  function normalizeAudioReactiveMode(modeValue) {
+    if (typeof modeValue !== "string") {
+      return "gravityWarp";
+    }
+
+    var normalized = modeValue.trim().toLowerCase();
+    if (!normalized) {
+      return "gravityWarp";
+    }
+
+    if (normalized === "waterfallgraph" || normalized === "waterfall" || normalized === "wf") {
+      return "waterfallGraph";
+    }
+
+    return "gravityWarp";
+  }
+
+  function mergeMeterFeatures(target, features) {
+    if (!target || !features) {
+      return;
+    }
+
+    target.level = Math.max(target.level, clamp01(features.level));
+    target.rms = Math.max(target.rms, clamp01(features.rms));
+    target.peak = Math.max(target.peak, clamp01(features.peak));
+    target.transient = Math.max(target.transient, clamp01(features.transient));
+
+    if (features.hasBalance) {
+      var weight = Math.max(0.08, clamp01(features.level));
+      target.balanceWeighted += clampSigned(features.balance) * weight;
+      target.balanceWeight += weight;
+    }
+  }
+
+  function extractInputMeterFeatures(input) {
+    var fallbackLevel = extractInputMeterLevel(input);
+    var fallback = {
+      level: fallbackLevel,
+      rms: fallbackLevel,
+      peak: fallbackLevel,
+      transient: 0,
+      balance: 0,
+      hasBalance: false
+    };
+
+    if (!input || typeof input !== "object" || !Array.isArray(input.inputLevelsMul)) {
+      return fallback;
+    }
+
+    var channels = input.inputLevelsMul;
+    var sumMagnitude = 0;
+    var maxPeak = 0;
+    var channelCount = 0;
+    var leftMagnitude = null;
+    var rightMagnitude = null;
+
+    for (var c = 0; c < channels.length; c += 1) {
+      var channelData = channels[c];
+      if (!Array.isArray(channelData) || channelData.length === 0) {
+        continue;
+      }
+
+      var magnitude = Number(channelData[0]);
+      var peak = channelData.length > 1 ? Number(channelData[1]) : magnitude;
+
+      if (!isFinite(magnitude) || magnitude < 0) {
+        magnitude = 0;
+      }
+      if (!isFinite(peak) || peak < 0) {
+        peak = magnitude;
+      }
+
+      magnitude = clamp01(magnitude);
+      peak = clamp01(peak);
+
+      sumMagnitude += magnitude;
+      maxPeak = Math.max(maxPeak, peak);
+
+      if (channelCount === 0) {
+        leftMagnitude = magnitude;
+      } else if (channelCount === 1) {
+        rightMagnitude = magnitude;
+      }
+      channelCount += 1;
+    }
+
+    if (channelCount <= 0) {
+      return fallback;
+    }
+
+    var rms = clamp01(sumMagnitude / channelCount);
+    var level = Math.max(rms, maxPeak);
+    var transient = clamp01(maxPeak - rms);
+    var balance = 0;
+    var hasBalance = leftMagnitude !== null && rightMagnitude !== null;
+
+    if (hasBalance) {
+      balance = (rightMagnitude - leftMagnitude) / Math.max(0.001, rightMagnitude + leftMagnitude);
+    }
+
+    return {
+      level: level,
+      rms: rms,
+      peak: maxPeak,
+      transient: transient,
+      balance: balance,
+      hasBalance: hasBalance
+    };
+  }
+
+  function extractInputMeterLevel(input) {
+    if (!input || typeof input !== "object") {
+      return 0;
+    }
+
+    var levelMul = Math.max(
+      extractLinearMeterPeak(input.inputLevelsMul),
+      extractLinearMeterPeak(input.inputLevelMul),
+      extractLinearMeterPeak(input.inputPeakMul)
+    );
+
+    var levelDb = Math.max(
+      extractDbMeterPeak(input.inputLevelsDb),
+      extractDbMeterPeak(input.inputLevelDb),
+      extractDbMeterPeak(input.inputPeakDb)
+    );
+
+    return clamp01(Math.max(levelMul, levelDb));
+  }
+
+  function extractLinearMeterPeak(value) {
+    var samples = [];
+    collectNumericSamples(value, samples, 0);
+    if (samples.length === 0) {
+      return 0;
+    }
+
+    var peak = 0;
+    for (var i = 0; i < samples.length; i += 1) {
+      peak = Math.max(peak, samples[i]);
+    }
+    return clamp01(peak);
+  }
+
+  function extractDbMeterPeak(value) {
+    var samples = [];
+    collectNumericSamples(value, samples, 0);
+    if (samples.length === 0) {
+      return 0;
+    }
+
+    var peak = 0;
+    for (var i = 0; i < samples.length; i += 1) {
+      peak = Math.max(peak, dbToLinear(samples[i]));
+    }
+    return clamp01(peak);
+  }
+
+  function collectNumericSamples(value, output, depth) {
+    if (depth > 6 || output.length > 48 || value === null || value === undefined) {
+      return;
+    }
+
+    if (typeof value === "number") {
+      if (isFinite(value)) {
+        output.push(value);
+      }
+      return;
+    }
+
+    if (Array.isArray(value)) {
+      for (var i = 0; i < value.length; i += 1) {
+        collectNumericSamples(value[i], output, depth + 1);
+      }
+      return;
+    }
+
+    if (typeof value === "object") {
+      var keys = Object.keys(value);
+      for (var k = 0; k < keys.length; k += 1) {
+        collectNumericSamples(value[keys[k]], output, depth + 1);
+      }
+    }
+  }
+
+  function dbToLinear(dbValue) {
+    if (!isFinite(dbValue)) {
+      return 0;
+    }
+    if (dbValue <= -120) {
+      return 0;
+    }
+    return Math.pow(10, dbValue / 20);
+  }
+
+  function createObsWebSocketAuth(password, salt, challenge) {
+    if (!window.crypto || !window.crypto.subtle || typeof window.TextEncoder !== "function") {
+      return Promise.reject(new Error("Web Crypto API not available for OBS websocket authentication."));
+    }
+
+    var safePassword = typeof password === "string" ? password : "";
+    return sha256Base64(safePassword + String(salt || ""))
+      .then(function (secret) {
+        return sha256Base64(secret + String(challenge || ""));
+      });
+  }
+
+  function sha256Base64(text) {
+    var encoder = new window.TextEncoder();
+    var bytes = encoder.encode(String(text));
+    return window.crypto.subtle.digest("SHA-256", bytes).then(arrayBufferToBase64);
+  }
+
+  function arrayBufferToBase64(buffer) {
+    var bytes = new Uint8Array(buffer);
+    var binary = "";
+    for (var i = 0; i < bytes.length; i += 1) {
+      binary += String.fromCharCode(bytes[i]);
+    }
+    return window.btoa(binary);
   }
 
   var sunFaculaAlphaMap = createSunFaculaAlphaMap();
@@ -679,11 +1465,13 @@
   }
 
   function createFabric() {
+    var segmentCount = CONFIG.fabric.segments;
+    var vertexCountPerAxis = segmentCount + 1;
     var geometry = new THREE.PlaneGeometry(
       CONFIG.fabric.size,
       CONFIG.fabric.size,
-      CONFIG.fabric.segments,
-      CONFIG.fabric.segments
+      segmentCount,
+      segmentCount
     );
     geometry.rotateX(-Math.PI / 2);
 
@@ -717,7 +1505,26 @@
       geometry: geometry,
       base: Float32Array.from(geometry.attributes.position.array),
       fill: fill,
-      wire: wire
+      wire: wire,
+      xCount: vertexCountPerAxis,
+      zCount: vertexCountPerAxis
+    };
+  }
+
+  function createFabricWaterfallState(currentFabric) {
+    var xCount = currentFabric && currentFabric.xCount ? currentFabric.xCount : CONFIG.fabric.segments + 1;
+    var zCount = currentFabric && currentFabric.zCount ? currentFabric.zCount : CONFIG.fabric.segments + 1;
+    var cellCount = xCount * zCount;
+
+    return {
+      history: new Float32Array(cellCount),
+      scratch: new Float32Array(cellCount),
+      rowBuffer: new Float32Array(xCount),
+      accumulator: 0,
+      phaseA: Math.random() * TWO_PI,
+      phaseB: Math.random() * TWO_PI,
+      phaseC: Math.random() * TWO_PI,
+      focus: 0
     };
   }
 

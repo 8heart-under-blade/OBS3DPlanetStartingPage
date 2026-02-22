@@ -8,6 +8,50 @@
       localThree: "vendor/three.min.js",
       cdnThree: "https://unpkg.com/three@0.160.1/build/three.min.js"
     },
+    audioReactive: {
+      enabled: true,
+
+      // Current supported provider.
+      provider: "obsWebSocket",
+
+      // Visual mode:
+      // - "gravityWarp" (default): current time-fabric ripple effect
+      // - "waterfallGraph": scrolling waterfall graph from audio level history
+      mode: "gravityWarp",
+
+      // OBS WebSocket (Tools -> WebSocket Server Settings)
+      // Usually ws://127.0.0.1:4455
+      url: "ws://127.0.0.1:4455",
+      password: "",
+
+      // Input names to listen to (Desktop Audio by default)
+      targetInputs: ["Desktop Audio", "Desktop Audio 2"],
+
+      // Signal shaping
+      noiseFloorDb: -58,
+      gain: 3.5,
+      attack: 0.75,
+      release: 0.8,
+
+      // Visual response tuning
+      maxBoost: 0.9,
+      waveInfluence: 0.6,
+      speedInfluence: 1.2,
+      glowInfluence: 0.3,
+
+      // Waterfall graph tuning (used when mode = "waterfallGraph")
+      // Lower flow speed to slow movement.
+      waterfallFlowSpeed: 0.55,
+      waterfallRowsPerSecond: 30,
+      waterfallHeight: 3.5,
+      // 0..1 retention per second (higher = longer persistence)
+      waterfallTrailDecay: 0.92,
+      waterfallBanding: 1.4,
+
+      // Reconnect timing
+      reconnectBaseMs: 900,
+      reconnectMaxMs: 9000
+    },
     overlay: {
       title: "STREAM STARTING SOON",
       subtitle: "Calibrating spacetime and aligning planetary ephemerides...",
