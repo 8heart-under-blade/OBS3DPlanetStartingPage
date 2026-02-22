@@ -50,7 +50,14 @@
       waveAmp: 0.48
     },
     sun: {
-      radius: 3.5
+      radius: 3.5,
+      cycleSeconds: 56,
+      minActiveRegions: 2,
+      maxActiveRegions: 22,
+      startLatitude: 36,
+      endLatitude: 7,
+      latitudeSpread: 9,
+      baseRegionSize: 0.21
     }
   };
 
@@ -137,6 +144,22 @@
     })
   );
   solarSystem.add(sunGlow);
+
+  var sunActivity = null;
+  var sunActivityEnabled = false;
+  var sunSurfaceNormal = new THREE.Vector3(0, 0, 1);
+  var sunSurfaceDirection = new THREE.Vector3();
+  var sunToCameraDirection = new THREE.Vector3();
+  try {
+    sunActivity = createSunActivityRegions(48);
+    if (sunActivity && sunActivity.group) {
+      sun.add(sunActivity.group);
+      sunActivityEnabled = true;
+    }
+  } catch (error) {
+    sunActivityEnabled = false;
+    console.warn("Sun activity disabled:", error);
+  }
 
   var PLANETS = [
     {
@@ -240,9 +263,23 @@
     stars.rotation.x = Math.sin(elapsed * 0.05) * 0.05;
 
     sun.rotation.y += delta * 0.045;
-    var glowPulse = 1 + Math.sin(elapsed * 1.45) * 0.04;
+    var cyclePhase = (elapsed / CONFIG.sun.cycleSeconds) % 1;
+    var solarActivity = Math.pow(Math.sin(cyclePhase * Math.PI), 1.25);
+    var glowPulse = 1 + Math.sin(elapsed * (1.2 + solarActivity * 0.7)) * (0.028 + solarActivity * 0.04);
     sunGlow.scale.set(glowPulse, glowPulse, glowPulse);
-    sunLight.intensity = 7.9 + Math.sin(elapsed * 1.45) * 0.18;
+    sunGlow.material.opacity = 0.19 + solarActivity * 0.17;
+    sunLight.intensity = 7.55 + solarActivity * 1.2 + Math.sin(elapsed * 1.45) * (0.1 + solarActivity * 0.22);
+    if (sunActivityEnabled) {
+      try {
+        updateSunActivityRegions(elapsed, delta, cyclePhase, solarActivity);
+      } catch (error) {
+        sunActivityEnabled = false;
+        if (sunActivity && sunActivity.group) {
+          sun.remove(sunActivity.group);
+        }
+        console.warn("Sun activity update disabled:", error);
+      }
+    }
 
     renderer.render(scene, camera);
   }
@@ -308,6 +345,135 @@
     camera.position.z = Math.sin(yaw) * driftRadius;
     camera.position.y = CONFIG.camera.height + Math.sin(elapsed * 0.18) * CONFIG.camera.bobAmount;
     camera.lookAt(0, CONFIG.camera.lookHeight, 0);
+  }
+
+  function createSunActivityRegions(totalCount) {
+    var group = new THREE.Group();
+    var regions = [];
+    var regionGeometry = new THREE.CircleGeometry(1, 28);
+
+    for (var i = 0; i < totalCount; i += 1) {
+      var anchor = new THREE.Object3D();
+      anchor.visible = false;
+      group.add(anchor);
+
+      var penumbra = new THREE.Mesh(
+        regionGeometry,
+        new THREE.MeshBasicMaterial({
+          color: 0x5e3a20,
+          side: THREE.DoubleSide,
+          transparent: true,
+          opacity: 0,
+          depthWrite: false
+        })
+      );
+      anchor.add(penumbra);
+
+      var umbra = new THREE.Mesh(
+        regionGeometry,
+        new THREE.MeshBasicMaterial({
+          color: 0x1a0e08,
+          side: THREE.DoubleSide,
+          transparent: true,
+          opacity: 0,
+          depthWrite: false
+        })
+      );
+      anchor.add(umbra);
+
+      var facula = new THREE.Mesh(
+        regionGeometry,
+        new THREE.MeshBasicMaterial({
+          color: 0xffbe73,
+          side: THREE.DoubleSide,
+          transparent: true,
+          opacity: 0,
+          blending: THREE.AdditiveBlending,
+          depthWrite: false
+        })
+      );
+      anchor.add(facula);
+
+      regions.push({
+        anchor: anchor,
+        penumbra: penumbra,
+        umbra: umbra,
+        facula: facula,
+        hemisphere: i % 2 === 0 ? 1 : -1,
+        longitude: Math.random() * TWO_PI,
+        longitudeDrift: 0.08 + Math.random() * 0.36,
+        activation: Math.random(),
+        latitudeJitter: Math.random() * 2 - 1,
+        phase: Math.random() * TWO_PI,
+        pulseSpeed: 0.7 + Math.random() * 1.6,
+        baseSize: CONFIG.sun.baseRegionSize * (0.72 + Math.random() * 1.24),
+        strength: 0
+      });
+    }
+
+    return {
+      group: group,
+      regions: regions
+    };
+  }
+
+  function updateSunActivityRegions(elapsed, delta, cyclePhase, activity) {
+    var regions = sunActivity.regions;
+    var minCount = Math.min(CONFIG.sun.minActiveRegions, regions.length);
+    var maxCount = Math.min(CONFIG.sun.maxActiveRegions, regions.length);
+    var threshold = lerp(minCount / regions.length, maxCount / regions.length, activity);
+    var centerLatitude = lerp(CONFIG.sun.startLatitude, CONFIG.sun.endLatitude, cyclePhase);
+    var spreadLatitude = CONFIG.sun.latitudeSpread * (0.65 + activity * 0.85);
+    var surfaceDistance = CONFIG.sun.radius * 1.0017;
+    var riseBlend = 1 - Math.exp(-delta * 1.35);
+    var decayBlend = 1 - Math.exp(-delta * 0.72);
+
+    sunToCameraDirection.copy(camera.position).normalize();
+
+    for (var i = 0; i < regions.length; i += 1) {
+      var region = regions[i];
+      var active = smoothRange(region.activation - 0.08, region.activation + 0.08, threshold);
+      var pulse = 0.82 + 0.18 * Math.sin(elapsed * region.pulseSpeed + region.phase);
+
+      var latitude = toRadians((centerLatitude + region.latitudeJitter * spreadLatitude) * region.hemisphere);
+      var longitude = region.longitude + cyclePhase * TWO_PI * region.longitudeDrift;
+      var cosLatitude = Math.cos(latitude);
+
+      sunSurfaceDirection.set(
+        cosLatitude * Math.cos(longitude),
+        Math.sin(latitude),
+        cosLatitude * Math.sin(longitude)
+      ).normalize();
+
+      var viewDot = sunSurfaceDirection.dot(sunToCameraDirection);
+      var frontness = smoothRange(-0.03, 0.2, viewDot);
+      var targetStrength = active * frontness;
+      var blend = targetStrength > region.strength ? riseBlend : decayBlend;
+      region.strength += (targetStrength - region.strength) * blend;
+      var intensity = region.strength * pulse;
+
+      if (intensity < 0.003) {
+        region.anchor.visible = false;
+        continue;
+      }
+
+      region.anchor.visible = true;
+      region.anchor.position.copy(sunSurfaceDirection).multiplyScalar(surfaceDistance);
+      region.anchor.quaternion.setFromUnitVectors(sunSurfaceNormal, sunSurfaceDirection);
+
+      var sizePulse = 1 + Math.sin(elapsed * (region.pulseSpeed + 1.1) + region.phase * 0.63) * 0.06;
+      var spotScale = region.baseSize * sizePulse * (0.94 + intensity * 0.32);
+      var limbBoost = 0.55 + (1 - viewDot) * 0.95;
+
+      region.penumbra.scale.setScalar(spotScale);
+      region.umbra.scale.setScalar(spotScale * 0.56);
+      region.facula.scale.setScalar(spotScale * (1.85 + activity * 0.7));
+
+      region.penumbra.material.opacity = intensity * (0.34 + (1 - activity) * 0.26);
+      region.umbra.material.opacity = intensity * (0.58 + (1 - activity) * 0.2);
+      region.facula.material.opacity = intensity * (0.08 + activity * 0.28) * limbBoost;
+      region.facula.material.color.setHSL(0.09 + activity * 0.02, 0.9, 0.5 + intensity * 0.08);
+    }
   }
 
   function createPlanet(definition, dayValue) {
