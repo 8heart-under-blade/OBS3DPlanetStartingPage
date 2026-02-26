@@ -66,6 +66,7 @@
     audioReactive: {
       enabled: pickDefined(audioOverrides.enabled, true),
       provider: pickDefined(audioOverrides.provider, "obsWebSocket"),
+      mode: normalizeAudioReactiveMode(pickDefined(audioOverrides.mode, "gravityWarp")),
       url: pickDefined(audioOverrides.url, "ws://127.0.0.1:4455"),
       password: pickDefined(audioOverrides.password, ""),
       targetInputs: ensureArray(pickDefined(audioOverrides.targetInputs, ["Desktop Audio", "Desktop Audio 2"])),
@@ -74,6 +75,11 @@
       attack: pickDefined(audioOverrides.attack, 0.5),
       release: pickDefined(audioOverrides.release, 0.08),
       maxBoost: pickDefined(audioOverrides.maxBoost, 0.9),
+      waterfallFlowSpeed: pickDefined(audioOverrides.waterfallFlowSpeed, 0.65),
+      waterfallRowsPerSecond: pickDefined(audioOverrides.waterfallRowsPerSecond, 46),
+      waterfallHeight: pickDefined(audioOverrides.waterfallHeight, 2.2),
+      waterfallTrailDecay: pickDefined(audioOverrides.waterfallTrailDecay, 0.86),
+      waterfallBanding: pickDefined(audioOverrides.waterfallBanding, 1.0),
       reconnectBaseMs: pickDefined(audioOverrides.reconnectBaseMs, 900),
       reconnectMaxMs: pickDefined(audioOverrides.reconnectMaxMs, 9000)
     }
@@ -221,6 +227,7 @@
   blackHoleGroup.add(warmHalo);
 
   var warpField = createWarpField();
+  var warpWaterfall = createWarpWaterfallState(warpField);
   var audioReactive = createAudioReactiveController(CONFIG.audioReactive);
   var clock = new THREE.Clock();
   var tempDiskNormal = new THREE.Vector3();
@@ -245,7 +252,7 @@
 
     updateCamera(elapsed);
     updateBlackHole(elapsed, delta, audioBoost, audioFeatures);
-    updateWarpField(elapsed, audioBoost, audioFeatures);
+    updateWarpField(elapsed, delta, audioBoost, audioFeatures);
 
     stars.rotation.y += delta * 0.0028;
     stars.rotation.x = Math.sin(elapsed * 0.06) * 0.04;
@@ -310,7 +317,16 @@
     backLight.intensity = 1.8 + rms * 0.7;
   }
 
-  function updateWarpField(elapsed, audioBoost, audioFeatures) {
+  function updateWarpField(elapsed, delta, audioBoost, audioFeatures) {
+    if (CONFIG.audioReactive.mode === "waterfallGraph") {
+      updateWarpFieldWaterfall(elapsed, delta, audioBoost, audioFeatures);
+      return;
+    }
+
+    updateWarpFieldGravityWarp(elapsed, audioBoost, audioFeatures);
+  }
+
+  function updateWarpFieldGravityWarp(elapsed, audioBoost, audioFeatures) {
     var positions = warpField.geometry.attributes.position.array;
     var base = warpField.base;
     var rms = audioFeatures && isFinite(audioFeatures.rms) ? clamp01(audioFeatures.rms) : audioBoost;
@@ -339,6 +355,159 @@
     }
 
     warpField.geometry.attributes.position.needsUpdate = true;
+  }
+
+  function updateWarpFieldWaterfall(elapsed, delta, audioBoost, audioFeatures) {
+    var positions = warpField.geometry.attributes.position.array;
+    var base = warpField.base;
+    var xCount = warpField.xCount;
+    var zCount = warpField.zCount;
+    var history = warpWaterfall.history;
+    var rowBuffer = warpWaterfall.rowBuffer;
+
+    var flowSpeed = Math.max(0.15, Number(CONFIG.audioReactive.waterfallFlowSpeed) || 0.15);
+    var rowsPerSecond = Math.max(2, (Number(CONFIG.audioReactive.waterfallRowsPerSecond) || 0) * flowSpeed);
+    var trailDecayPerSecond = clamp01(Number(CONFIG.audioReactive.waterfallTrailDecay));
+    if (trailDecayPerSecond <= 0) {
+      trailDecayPerSecond = 0.86;
+    }
+
+    var stepDecay = Math.pow(trailDecayPerSecond, 1 / rowsPerSecond);
+    var passiveDecay = Math.pow(trailDecayPerSecond, Math.max(0.002, delta) * 0.12);
+    var heightScale = Math.max(0.1, Number(CONFIG.audioReactive.waterfallHeight) || 0.1);
+    var banding = Math.max(0.2, Number(CONFIG.audioReactive.waterfallBanding) || 0.2);
+    var frameDelta = isFinite(delta) && delta > 0 ? delta : 0.016;
+
+    warpWaterfall.accumulator += frameDelta * rowsPerSecond;
+    var shiftCount = Math.floor(warpWaterfall.accumulator);
+    if (shiftCount > 0) {
+      warpWaterfall.accumulator -= shiftCount;
+
+      for (var step = 0; step < shiftCount; step += 1) {
+        buildWarpWaterfallInputProfile(rowBuffer, xCount, elapsed + step / rowsPerSecond, audioBoost, audioFeatures, banding, flowSpeed, warpWaterfall);
+        shiftWaterfallHistoryRows(history, rowBuffer, xCount, zCount, stepDecay);
+      }
+    }
+
+    for (var idx = 0; idx < history.length; idx += 1) {
+      history[idx] *= passiveDecay;
+    }
+
+    var diffusionBlend = 1 - Math.exp(-frameDelta * 5.8);
+    if (diffusionBlend > 0.001) {
+      diffuseWaterfallHistory(history, warpWaterfall.scratch, xCount, zCount, diffusionBlend);
+    }
+
+    var rms = audioFeatures && isFinite(audioFeatures.rms) ? clamp01(audioFeatures.rms) : audioBoost;
+    var transient = audioFeatures && isFinite(audioFeatures.transient) ? clamp01(audioFeatures.transient) : 0;
+
+    warpField.wire.material.opacity = 0.22 + audioBoost * 0.24;
+    warpField.fill.material.opacity = 0.22 + audioBoost * 0.16;
+
+    for (var z = 0; z < zCount; z += 1) {
+      var zNorm = z / Math.max(1, zCount - 1);
+      var distanceFade = 0.9 + 0.1 * (1 - smoothRange(0.9, 1, zNorm));
+
+      for (var x = 0; x < xCount; x += 1) {
+        var index = (z * xCount + x) * 3;
+        var historyIndex = z * xCount + x;
+        var xPos = base[index];
+        var zPos = base[index + 2];
+        var radius = Math.sqrt(xPos * xPos + zPos * zPos) + 0.0001;
+        var angle = Math.atan2(zPos, xPos);
+
+        var radialInfluence = CONFIG.blackHole.warpWellDepth / Math.pow(1 + radius * 0.082, 1.22);
+        var centerClamp = 1 - smoothRange(CONFIG.blackHole.eventHorizonRadius * 0.7, CONFIG.blackHole.eventHorizonRadius * 2.2, radius);
+        var centerDip = centerClamp * (0.98 + audioBoost * 0.5);
+        var rowEnergy = Math.pow(clamp01(history[historyIndex]), 0.76) * distanceFade;
+        var ridge = rowEnergy * heightScale;
+
+        var waveA = Math.sin(xPos * 0.09 + elapsed * 0.86 * flowSpeed + zNorm * 8.4) * (0.05 + rms * 0.08);
+        var waveB = Math.sin(angle * 2.6 - elapsed * (1.12 + transient * 1.5) + zNorm * 3.2) * 0.04;
+
+        positions[index + 1] = base[index + 1] - radialInfluence * (1 + audioBoost * 0.38) - centerDip + ridge + waveA + waveB;
+      }
+    }
+
+    warpField.geometry.attributes.position.needsUpdate = true;
+  }
+
+  function buildWarpWaterfallInputProfile(outputRow, xCount, elapsed, audioBoost, audioFeatures, banding, flowSpeed, waterfallState) {
+    var features = audioFeatures || null;
+    var rms = features && isFinite(features.rms) ? clamp01(features.rms) : clamp01(audioBoost);
+    var peak = features && isFinite(features.peak) ? clamp01(features.peak) : rms;
+    var transient = features && isFinite(features.transient) ? clamp01(features.transient) : clamp01(peak - rms);
+    var balance = features && isFinite(features.balance) ? clampSigned(features.balance) : 0;
+
+    var energy = clamp01(rms * 0.76 + peak * 0.44);
+    var transientLift = clamp01(transient * 1.8);
+    var centerTarget = balance * 0.34;
+    waterfallState.focus += (centerTarget - waterfallState.focus) * 0.26;
+
+    var time = elapsed * flowSpeed;
+    var slowDrift = Math.sin(time * 0.53 + waterfallState.phaseA) * 0.2;
+    var pulse = 0.36 + energy * 0.92;
+    var motionA = time * (1.42 + pulse * 2.2 + transientLift * 2.0) + waterfallState.phaseB;
+    var motionB = time * (3.6 + transientLift * 5.8) + waterfallState.phaseC;
+
+    for (var x = 0; x < xCount; x += 1) {
+      var xNorm = x / Math.max(1, xCount - 1);
+      var centeredX = xNorm * 2 - 1;
+
+      var focus = waterfallState.focus + slowDrift;
+      var lowBody = Math.exp(-Math.pow((centeredX - focus) / 0.58, 2));
+      var midBand = 0.5 + 0.5 * Math.sin(centeredX * (7.0 * banding) + motionA);
+      var highBand = Math.pow(0.5 + 0.5 * Math.sin(centeredX * (20.5 * banding) - motionB), 2.1);
+      var sideRidge = Math.exp(-Math.pow((Math.abs(centeredX) - 0.64) / 0.22, 2));
+      var grain = 0.5 + 0.5 * Math.sin(centeredX * 39 + motionB * 0.7 + waterfallState.phaseA * 0.4);
+
+      var value = 0;
+      value += lowBody * (0.1 + energy * 0.8);
+      value += midBand * (0.07 + energy * 0.48);
+      value += highBand * (0.04 + transientLift * 0.62);
+      value += sideRidge * (0.03 + energy * 0.12);
+      value += grain * transientLift * 0.16;
+
+      outputRow[x] = clamp01(value);
+    }
+  }
+
+  function shiftWaterfallHistoryRows(history, rowBuffer, xCount, zCount, stepDecay) {
+    for (var row = zCount - 1; row > 0; row -= 1) {
+      var dstOffset = row * xCount;
+      var srcOffset = (row - 1) * xCount;
+
+      for (var col = 0; col < xCount; col += 1) {
+        history[dstOffset + col] = history[srcOffset + col] * stepDecay;
+      }
+    }
+
+    for (var x = 0; x < xCount; x += 1) {
+      history[x] = rowBuffer[x];
+    }
+  }
+
+  function diffuseWaterfallHistory(history, scratch, xCount, zCount, blend) {
+    var inverseBlend = 1 - blend;
+
+    for (var row = 0; row < zCount; row += 1) {
+      for (var col = 0; col < xCount; col += 1) {
+        var index = row * xCount + col;
+        var center = history[index];
+
+        var left = col > 0 ? history[index - 1] : center;
+        var right = col < xCount - 1 ? history[index + 1] : center;
+        var back = row > 0 ? history[index - xCount] : center;
+        var front = row < zCount - 1 ? history[index + xCount] : center;
+
+        var neighborhood = (center * 2 + left + right + back + front) / 6;
+        scratch[index] = center * inverseBlend + neighborhood * blend;
+      }
+    }
+
+    for (var i = 0; i < history.length; i += 1) {
+      history[i] = scratch[i];
+    }
   }
 
   function createAccretionDiskMaterial(innerRadius, outerRadius) {
@@ -610,6 +779,8 @@
 
   function createWarpField() {
     var segmentCount = CONFIG.blackHole.warpSegments;
+    var xCount = segmentCount + 1;
+    var zCount = segmentCount + 1;
     var geometry = new THREE.PlaneGeometry(
       CONFIG.blackHole.warpSize,
       CONFIG.blackHole.warpSize,
@@ -648,7 +819,26 @@
       geometry: geometry,
       base: Float32Array.from(geometry.attributes.position.array),
       fill: fill,
-      wire: wire
+      wire: wire,
+      xCount: xCount,
+      zCount: zCount
+    };
+  }
+
+  function createWarpWaterfallState(field) {
+    var xCount = field && field.xCount ? field.xCount : (CONFIG.blackHole.warpSegments + 1);
+    var zCount = field && field.zCount ? field.zCount : (CONFIG.blackHole.warpSegments + 1);
+    var historyLength = xCount * zCount;
+
+    return {
+      history: new Float32Array(historyLength),
+      rowBuffer: new Float32Array(xCount),
+      scratch: new Float32Array(historyLength),
+      accumulator: 0,
+      focus: 0,
+      phaseA: Math.random() * TWO_PI,
+      phaseB: Math.random() * TWO_PI,
+      phaseC: Math.random() * TWO_PI
     };
   }
 
@@ -1059,6 +1249,23 @@
       return "";
     }
     return name.trim().toLowerCase();
+  }
+
+  function normalizeAudioReactiveMode(modeValue) {
+    if (typeof modeValue !== "string") {
+      return "gravityWarp";
+    }
+
+    var normalized = modeValue.trim().toLowerCase();
+    if (!normalized) {
+      return "gravityWarp";
+    }
+
+    if (normalized === "waterfallgraph" || normalized === "waterfall" || normalized === "wf") {
+      return "waterfallGraph";
+    }
+
+    return "gravityWarp";
   }
 
   function mergeMeterFeatures(target, features) {
