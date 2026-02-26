@@ -3,17 +3,17 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Stream Starting Soon - Space Fabric</title>
-  <link rel="stylesheet" href="styles.css">
+  <title>Stream Be Right Back - Event Horizon</title>
+  <link rel="stylesheet" href="brb.css">
 </head>
 <body>
   <div id="scene" aria-hidden="true"></div>
 
   <div class="overlay">
-    <p class="eyebrow">Live Transmission</p>
-    <h1 id="title">STREAM STARTING SOON</h1>
+    <p class="eyebrow">Transmission Pause</p>
+    <h1 id="title">BE RIGHT BACK</h1>
     <p id="datetime" class="datetime" aria-live="off"></p>
-    <p id="subtitle">Calibrating spacetime and aligning planetary ephemerides...</p>
+    <p id="subtitle">Crossing the event horizon. Return imminent.</p>
   </div>
 
   <p id="bootError" class="boot-error" hidden></p>
@@ -27,14 +27,11 @@
       }
 
       var assetConfig = pageConfig.assets && typeof pageConfig.assets === "object" ? pageConfig.assets : {};
-      if (!window.STREAM_OVERLAY && pageConfig.overlay && typeof pageConfig.overlay === "object") {
-        window.STREAM_OVERLAY = pageConfig.overlay;
-      }
 
       var params = new URLSearchParams(window.location.search);
       var requestedScene = normalizeScene(params.get("scene"));
-      if (requestedScene === "brb") {
-        redirectToScene("brb.html", params, "brb");
+      if (requestedScene === "starting") {
+        redirectToScene("index.html", params, "starting");
         return;
       }
 
@@ -42,6 +39,19 @@
       var configMode = typeof assetConfig.mode === "string" ? assetConfig.mode.toLowerCase() : "";
       var modeCandidate = requestedMode || configMode;
       var mode = ["auto", "offline", "cdn"].indexOf(modeCandidate) >= 0 ? modeCandidate : "auto";
+
+      var localThreeSource = typeof assetConfig.localThree === "string" && assetConfig.localThree
+        ? assetConfig.localThree
+        : "vendor/three.min.js";
+      var cdnThreeSource = typeof assetConfig.cdnThree === "string" && assetConfig.cdnThree
+        ? assetConfig.cdnThree
+        : "https://unpkg.com/three@0.160.1/build/three.min.js";
+
+      window.STREAM_ASSET_MODE = mode;
+      window.STREAM_ASSET_SOURCES = {
+        localThree: localThreeSource,
+        cdnThree: cdnThreeSource
+      };
 
       function normalizeScene(rawValue) {
         if (typeof rawValue !== "string") {
@@ -84,19 +94,6 @@
         window.location.replace(targetUrl);
       }
 
-      var localThreeSource = typeof assetConfig.localThree === "string" && assetConfig.localThree
-        ? assetConfig.localThree
-        : "vendor/three.min.js";
-      var cdnThreeSource = typeof assetConfig.cdnThree === "string" && assetConfig.cdnThree
-        ? assetConfig.cdnThree
-        : "https://unpkg.com/three@0.160.1/build/three.min.js";
-
-      window.STREAM_ASSET_MODE = mode;
-      window.STREAM_ASSET_SOURCES = {
-        localThree: localThreeSource,
-        cdnThree: cdnThreeSource
-      };
-
       function loadScript(src) {
         return new Promise(function (resolve, reject) {
           var script = document.createElement("script");
@@ -134,13 +131,13 @@
           }
         }
 
-        await loadScript("main.js");
+        await loadScript("brb.js");
       }
 
       boot().catch(function (error) {
         console.error(error);
         if (mode === "offline") {
-          showBootError("Offline mode selected, but local assets could not be loaded. Keep the vendor folder next to index.html, or switch to ?assets=auto.");
+          showBootError("Offline mode selected, but local assets could not be loaded. Keep the vendor folder next to brb.html, or switch to ?assets=auto.");
         } else {
           showBootError("Could not load rendering assets. Check network access or local vendor files.");
         }

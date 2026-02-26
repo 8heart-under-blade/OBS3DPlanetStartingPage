@@ -11,6 +11,8 @@
   --title-color-c: #97c2f4;
   --subtitle-color: #c4d7f2;
   --subtitle-glow: rgba(93, 146, 214, 0.32);
+  --datetime-color: #d7e6fb;
+  --datetime-glow: rgba(104, 157, 227, 0.3);
   --font-ui: "Trebuchet MS", "Gill Sans", "Segoe UI", sans-serif;
   --font-title: var(--font-ui);
   --font-subtitle: var(--font-ui);
@@ -130,6 +132,18 @@ h1 {
     0 0 18px var(--subtitle-glow);
   opacity: 0.92;
   animation: subtitle-breathe 5.8s ease-in-out infinite;
+}
+
+.datetime {
+  margin: 10px 0 0;
+  font-size: clamp(0.74rem, 1.2vw, 0.96rem);
+  letter-spacing: 0.16em;
+  text-transform: none;
+  color: var(--datetime-color);
+  opacity: 0.9;
+  text-shadow:
+    0 0 12px rgba(0, 0, 0, 0.42),
+    0 0 18px var(--datetime-glow);
 }
 
 .boot-error {

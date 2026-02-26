@@ -2,20 +2,27 @@
 
 This page renders a looping 3D solar-system style animation for a "starting soon" scene.
 
+It also includes a dedicated "Be Right Back" black-hole scene with an event horizon.
+
 Project creation note: this project was created in OpenCode 1.2.10 (CLI) via Vibe Coding using GPT-5.3 Codex (high/xhigh).
 
 It includes:
 - Animated planets and orbital paths
 - Dynamic sun glow and solar-cycle sunspot activity
+- Dedicated BRB black-hole scene with event horizon and accretion disk
 - A top text overlay (title + subtitle)
+- Live local date/time with timezone in both scenes
 - Automatic asset loading (local file first, then CDN fallback)
 
 ## Files
 
 - `config.js` - runtime settings (assets, overlay text, custom fonts)
 - `index.html` - page shell + asset boot loader
+- `brb.html` - BRB page shell + asset boot loader
 - `styles.css` - visual styling and overlay layout
+- `brb.css` - BRB visual styling and overlay layout
 - `main.js` - 3D scene logic and animation
+- `brb.js` - BRB black-hole scene logic and animation
 - `vendor/three.min.js` - local Three.js dependency for offline mode
 
 ## How to use
@@ -36,6 +43,19 @@ Then open:
 
 ```text
 http://localhost:8080/
+```
+
+For BRB directly:
+
+```text
+http://localhost:8080/brb.html
+```
+
+Use scene switching with one URL pattern:
+
+```text
+http://localhost:8080/?scene=starting
+http://localhost:8080/?scene=brb
 ```
 
 ## Asset modes
@@ -67,6 +87,13 @@ http://localhost:8080/?assets=cdn
 4. Set width/height to your stream resolution (for example `1920x1080`).
 5. If needed, use **Refresh browser when scene becomes active**.
 
+Examples for scene switching in OBS:
+
+```text
+http://localhost:8080/?scene=starting&assets=offline
+http://localhost:8080/?scene=brb&assets=offline
+```
+
 ## Basic customization
 
 Edit `config.js`:
@@ -74,6 +101,7 @@ Edit `config.js`:
 - Asset behavior: `STREAM_CONFIG.assets.mode`
 - Audio reactivity: `STREAM_CONFIG.audioReactive.*`
 - Overlay text: `STREAM_CONFIG.overlay.title`, `STREAM_CONFIG.overlay.subtitle`
+- BRB overlay text (optional): `STREAM_CONFIG.overlayBRB.title`, `STREAM_CONFIG.overlayBRB.subtitle`
 - Overlay fonts: `STREAM_CONFIG.overlay.titleFontFamily`, `STREAM_CONFIG.overlay.subtitleFontFamily`
 - Overlay font style: `titleFontWeight`, `subtitleFontWeight`, `titleTextTransform`, `subtitleTextTransform`
 - Overlay position: `overlayTop`, `overlayTopMobile`, `titleOffsetX`, `titleOffsetY`, `subtitleOffsetX`, `subtitleOffsetY`
@@ -83,6 +111,28 @@ Edit `main.js` only for simulation/visual behavior:
 
 - Simulation speed: `CONFIG.simulation.daysPerSecond`
 - Sun cycle behavior: `CONFIG.sun.cycleSeconds`, `minActiveRegions`, `maxActiveRegions`, `startLatitude`, `endLatitude`
+
+## BRB physics model notes
+
+The BRB black-hole scene in `brb.js` is tuned to NASA GSFC visualization behavior (Jeremy Schnittman):
+
+- Nearly edge-on accretion disk view
+- Bright/dim asymmetry from relativistic Doppler beaming
+- Photon ring + shadow relationship for a non-rotating (Schwarzschild) black hole
+
+The shader uses physically inspired terms:
+
+```text
+beta = sqrt(Rs / (2r))
+gamma = 1 / sqrt(1 - beta^2)
+Doppler factor D = 1 / (gamma * (1 - beta * cos(theta)))
+Gravitational shift g_gr = sqrt(1 - Rs / r)
+Observed intensity ~ (g_gr * D)^3
+```
+
+Reference documentation:
+- NASA SVS black hole accretion disk visualization: `https://svs.gsfc.nasa.gov/13326`
+- NASA Black Hole Visualization (2024): `https://svs.gsfc.nasa.gov/14576/`
 
 ## Custom title/subtitle fonts
 

@@ -17,7 +17,7 @@
       // Visual mode:
       // - "gravityWarp" (default): current time-fabric ripple effect
       // - "waterfallGraph": scrolling waterfall graph from audio level history
-      mode: "gravityWarp",
+      mode: "waterfallGraph",
 
       // OBS WebSocket (Tools -> WebSocket Server Settings)
       // Usually ws://127.0.0.1:4455
@@ -101,6 +101,10 @@
           display: "swap"
         }
       ]
+    },
+    overlayBRB: {
+      title: "BE RIGHT BACK",
+      subtitle: "Crossing the event horizon. Return imminent."
     }
   };
 

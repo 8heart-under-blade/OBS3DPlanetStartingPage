@@ -113,6 +113,8 @@
 
   var titleEl = document.getElementById("title");
   var subtitleEl = document.getElementById("subtitle");
+  var dateTimeEl = document.getElementById("datetime");
+  var stopDateTimeTicker = startDateTimeTicker(dateTimeEl);
   if (titleEl) {
     titleEl.textContent = CONFIG.overlay.title;
   }
@@ -299,7 +301,10 @@
   animate();
 
   window.addEventListener("resize", onResize);
-  window.addEventListener("beforeunload", audioReactive.stop);
+  window.addEventListener("beforeunload", function () {
+    audioReactive.stop();
+    stopDateTimeTicker();
+  });
 
   function animate() {
     requestAnimationFrame(animate);
@@ -1876,6 +1881,97 @@
           continentEnd: 1
         };
     }
+  }
+
+  function startDateTimeTicker(element) {
+    if (!element) {
+      return function () {};
+    }
+
+    var formatDateTime = createDateTimeFormatter();
+
+    function updateDateTime() {
+      element.textContent = formatDateTime(new Date());
+    }
+
+    updateDateTime();
+    var timer = setInterval(updateDateTime, 1000);
+
+    return function stopTicker() {
+      if (!timer) {
+        return;
+      }
+      clearInterval(timer);
+      timer = 0;
+    };
+  }
+
+  function createDateTimeFormatter() {
+    var dateTimeFormatter = null;
+    var timeZoneFormatter = null;
+
+    if (window.Intl && typeof window.Intl.DateTimeFormat === "function") {
+      try {
+        dateTimeFormatter = new window.Intl.DateTimeFormat(undefined, {
+          weekday: "short",
+          year: "numeric",
+          month: "short",
+          day: "2-digit",
+          hour: "numeric",
+          minute: "2-digit",
+          second: "2-digit"
+        });
+      } catch (error) {
+        dateTimeFormatter = null;
+      }
+
+      try {
+        timeZoneFormatter = new window.Intl.DateTimeFormat(undefined, {
+          timeZoneName: "short"
+        });
+      } catch (error) {
+        timeZoneFormatter = null;
+      }
+    }
+
+    return function formatDateTime(dateValue) {
+      var date = dateValue instanceof Date ? dateValue : new Date(dateValue);
+      var dateText = dateTimeFormatter ? dateTimeFormatter.format(date) : date.toLocaleString();
+      var timeZoneText = extractTimeZoneLabel(timeZoneFormatter, date) || fallbackTimeZoneLabel(date);
+      return dateText + " " + timeZoneText;
+    };
+  }
+
+  function extractTimeZoneLabel(formatter, date) {
+    if (!formatter || typeof formatter.formatToParts !== "function") {
+      return "";
+    }
+
+    try {
+      var parts = formatter.formatToParts(date);
+      for (var i = 0; i < parts.length; i += 1) {
+        if (parts[i] && parts[i].type === "timeZoneName" && parts[i].value) {
+          return parts[i].value;
+        }
+      }
+    } catch (error) {
+      return "";
+    }
+
+    return "";
+  }
+
+  function fallbackTimeZoneLabel(date) {
+    var offsetMinutes = -date.getTimezoneOffset();
+    var sign = offsetMinutes >= 0 ? "+" : "-";
+    var absMinutes = Math.abs(offsetMinutes);
+    var hours = Math.floor(absMinutes / 60);
+    var minutes = absMinutes % 60;
+    return "UTC" + sign + pad2(hours) + ":" + pad2(minutes);
+  }
+
+  function pad2(value) {
+    return value < 10 ? "0" + value : String(value);
   }
 
   function applyOverlayTypography(overlayConfig) {
