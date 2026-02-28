@@ -8,6 +8,7 @@
 </head>
 <body>
   <div id="scene" aria-hidden="true"></div>
+  <div id="blackholeLayer" aria-hidden="true"></div>
 
   <div class="overlay">
     <p class="eyebrow">Transmission Pause</p>
@@ -143,6 +144,19 @@
         }
       });
     })();
+  </script>
+  <script type="importmap">
+    {
+      "imports": {
+        "three": "https://unpkg.com/three@0.181.0/build/three.module.js",
+        "three/examples/jsm/": "https://unpkg.com/three@0.181.0/examples/jsm/"
+      }
+    }
+  </script>
+  <script type="module">
+    import { mountBlackholeOverlay } from "./brb-blackhole/blackholeOverlay.module.js";
+
+    mountBlackholeOverlay();
   </script>
 </body>
 </html>

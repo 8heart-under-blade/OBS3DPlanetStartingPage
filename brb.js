@@ -16,6 +16,9 @@
   var baseOverlay = streamConfig.overlay && typeof streamConfig.overlay === "object" ? streamConfig.overlay : {};
   var brbOverlay = streamConfig.overlayBRB && typeof streamConfig.overlayBRB === "object" ? streamConfig.overlayBRB : {};
   var audioOverrides = streamConfig.audioReactive && typeof streamConfig.audioReactive === "object" ? streamConfig.audioReactive : {};
+  var blackHoleReplacementOverrides = streamConfig.brbBlackholeReplacement && typeof streamConfig.brbBlackholeReplacement === "object"
+    ? streamConfig.brbBlackholeReplacement
+    : {};
 
   var CONFIG = {
     overlay: {
@@ -62,6 +65,9 @@
       warpBaseY: -13,
       warpWellDepth: 5.2,
       warpWaveAmp: 0.74
+    },
+    brbBlackholeReplacement: {
+      enabled: pickDefined(blackHoleReplacementOverrides.enabled, true)
     },
     audioReactive: {
       enabled: pickDefined(audioOverrides.enabled, true),
@@ -147,84 +153,97 @@
   var stars = createStars(window.innerWidth < 900 ? 3000 : 4600, 180, 900);
   scene.add(stars);
 
-  var blackHoleGroup = new THREE.Group();
-  scene.add(blackHoleGroup);
+  var blackHoleGroup;
+  var core;
+  var shadowDisk;
+  var photonRingMaterial;
+  var photonRing;
+  var diskMaterial;
+  var accretionDisk;
+  var accretionParticles;
+  var coolHalo;
+  var warmHalo;
 
-  var core = new THREE.Mesh(
-    new THREE.SphereGeometry(CONFIG.blackHole.coreRadius, 62, 62),
-    new THREE.MeshPhysicalMaterial({
-      color: 0x020203,
-      roughness: 0.96,
-      metalness: 0.08,
-      clearcoat: 0.32,
-      clearcoatRoughness: 0.82
-    })
-  );
-  blackHoleGroup.add(core);
+  if (!CONFIG.brbBlackholeReplacement.enabled) {
+    blackHoleGroup = new THREE.Group();
+    scene.add(blackHoleGroup);
 
-  var shadowDisk = new THREE.Mesh(
-    new THREE.CircleGeometry(CONFIG.blackHole.shadowRadius, 128),
-    new THREE.MeshBasicMaterial({
-      color: 0x000000,
-      transparent: false,
-      depthWrite: true,
-      side: THREE.DoubleSide
-    })
-  );
-  shadowDisk.position.z = 0.05;
-  shadowDisk.renderOrder = 5;
-  blackHoleGroup.add(shadowDisk);
+    core = new THREE.Mesh(
+      new THREE.SphereGeometry(CONFIG.blackHole.coreRadius, 62, 62),
+      new THREE.MeshPhysicalMaterial({
+        color: 0x020203,
+        roughness: 0.96,
+        metalness: 0.08,
+        clearcoat: 0.32,
+        clearcoatRoughness: 0.82
+      })
+    );
+    blackHoleGroup.add(core);
 
-  var photonRingDiameter = CONFIG.blackHole.shadowRadius * 3.2;
-  var photonRingShadowNorm = CONFIG.blackHole.shadowRadius / (photonRingDiameter * 0.5);
-  var photonRingMaterial = createPhotonRingMaterial(photonRingShadowNorm);
-  var photonRing = new THREE.Mesh(
-    new THREE.PlaneGeometry(photonRingDiameter, photonRingDiameter, 1, 1),
-    photonRingMaterial
-  );
-  photonRing.position.z = 0.08;
-  photonRing.renderOrder = 4;
-  blackHoleGroup.add(photonRing);
+    shadowDisk = new THREE.Mesh(
+      new THREE.CircleGeometry(CONFIG.blackHole.shadowRadius, 128),
+      new THREE.MeshBasicMaterial({
+        color: 0x000000,
+        transparent: false,
+        depthWrite: true,
+        side: THREE.DoubleSide
+      })
+    );
+    shadowDisk.position.z = 0.05;
+    shadowDisk.renderOrder = 5;
+    blackHoleGroup.add(shadowDisk);
 
-  var diskMaterial = createAccretionDiskMaterial(CONFIG.blackHole.diskInnerRadius, CONFIG.blackHole.diskOuterRadius);
-  var accretionDisk = new THREE.Mesh(
-    new THREE.RingGeometry(CONFIG.blackHole.diskInnerRadius, CONFIG.blackHole.diskOuterRadius, 320, 1),
-    diskMaterial
-  );
-  accretionDisk.rotation.x = CONFIG.blackHole.diskTilt;
-  blackHoleGroup.add(accretionDisk);
+    var photonRingDiameter = CONFIG.blackHole.shadowRadius * 3.2;
+    var photonRingShadowNorm = CONFIG.blackHole.shadowRadius / (photonRingDiameter * 0.5);
+    photonRingMaterial = createPhotonRingMaterial(photonRingShadowNorm);
+    photonRing = new THREE.Mesh(
+      new THREE.PlaneGeometry(photonRingDiameter, photonRingDiameter, 1, 1),
+      photonRingMaterial
+    );
+    photonRing.position.z = 0.08;
+    photonRing.renderOrder = 4;
+    blackHoleGroup.add(photonRing);
 
-  var accretionParticles = createAccretionParticles(CONFIG.blackHole.diskInnerRadius + 0.8, CONFIG.blackHole.diskOuterRadius + 2.2, 2200);
-  accretionParticles.points.rotation.x = CONFIG.blackHole.diskTilt;
-  blackHoleGroup.add(accretionParticles.points);
+    diskMaterial = createAccretionDiskMaterial(CONFIG.blackHole.diskInnerRadius, CONFIG.blackHole.diskOuterRadius);
+    accretionDisk = new THREE.Mesh(
+      new THREE.RingGeometry(CONFIG.blackHole.diskInnerRadius, CONFIG.blackHole.diskOuterRadius, 320, 1),
+      diskMaterial
+    );
+    accretionDisk.rotation.x = CONFIG.blackHole.diskTilt;
+    blackHoleGroup.add(accretionDisk);
 
-  var coolHalo = new THREE.Sprite(
-    new THREE.SpriteMaterial({
-      map: createHaloTexture([238, 112, 46], [76, 48, 40]),
-      color: 0xffa964,
-      transparent: true,
-      opacity: 0.16,
-      blending: THREE.AdditiveBlending,
-      depthWrite: false
-    })
-  );
-  coolHalo.scale.set(CONFIG.blackHole.haloScale, CONFIG.blackHole.haloScale, 1);
-  coolHalo.position.set(0, -0.7, 0);
-  blackHoleGroup.add(coolHalo);
+    accretionParticles = createAccretionParticles(CONFIG.blackHole.diskInnerRadius + 0.8, CONFIG.blackHole.diskOuterRadius + 2.2, 2200);
+    accretionParticles.points.rotation.x = CONFIG.blackHole.diskTilt;
+    blackHoleGroup.add(accretionParticles.points);
 
-  var warmHalo = new THREE.Sprite(
-    new THREE.SpriteMaterial({
-      map: createHaloTexture([255, 182, 96], [122, 51, 24]),
-      color: 0xffcc94,
-      transparent: true,
-      opacity: 0.29,
-      blending: THREE.AdditiveBlending,
-      depthWrite: false
-    })
-  );
-  warmHalo.scale.set(CONFIG.blackHole.haloScale * 0.78, CONFIG.blackHole.haloScale * 0.78, 1);
-  warmHalo.position.set(0, -0.5, 0);
-  blackHoleGroup.add(warmHalo);
+    coolHalo = new THREE.Sprite(
+      new THREE.SpriteMaterial({
+        map: createHaloTexture([238, 112, 46], [76, 48, 40]),
+        color: 0xffa964,
+        transparent: true,
+        opacity: 0.16,
+        blending: THREE.AdditiveBlending,
+        depthWrite: false
+      })
+    );
+    coolHalo.scale.set(CONFIG.blackHole.haloScale, CONFIG.blackHole.haloScale, 1);
+    coolHalo.position.set(0, -0.7, 0);
+    blackHoleGroup.add(coolHalo);
+
+    warmHalo = new THREE.Sprite(
+      new THREE.SpriteMaterial({
+        map: createHaloTexture([255, 182, 96], [122, 51, 24]),
+        color: 0xffcc94,
+        transparent: true,
+        opacity: 0.29,
+        blending: THREE.AdditiveBlending,
+        depthWrite: false
+      })
+    );
+    warmHalo.scale.set(CONFIG.blackHole.haloScale * 0.78, CONFIG.blackHole.haloScale * 0.78, 1);
+    warmHalo.position.set(0, -0.5, 0);
+    blackHoleGroup.add(warmHalo);
+  }
 
   var warpField = createWarpField();
   var warpWaterfall = createWarpWaterfallState(warpField);
@@ -251,7 +270,9 @@
     var audioFeatures = audioReactive.getFeatures();
 
     updateCamera(elapsed);
-    updateBlackHole(elapsed, delta, audioBoost, audioFeatures);
+    if (!CONFIG.brbBlackholeReplacement.enabled) {
+      updateBlackHole(elapsed, delta, audioBoost, audioFeatures);
+    }
     updateWarpField(elapsed, delta, audioBoost, audioFeatures);
 
     stars.rotation.y += delta * 0.0028;

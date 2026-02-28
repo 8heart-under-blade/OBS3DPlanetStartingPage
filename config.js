@@ -105,6 +105,10 @@
     overlayBRB: {
       title: "BE RIGHT BACK",
       subtitle: "Crossing the event horizon. Return imminent."
+    },
+    brbBlackholeReplacement: {
+      enabled: true,
+      pointerEvents: "auto"
     }
   };
 

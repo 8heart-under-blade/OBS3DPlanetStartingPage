@@ -79,9 +79,23 @@ body::after {
 #scene {
   position: absolute;
   inset: 0;
+  z-index: 1;
 }
 
 #scene canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+#blackholeLayer {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  pointer-events: auto;
+}
+
+#blackholeLayer canvas {
   display: block;
   width: 100%;
   height: 100%;
