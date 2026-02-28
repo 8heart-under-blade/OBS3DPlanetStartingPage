@@ -104,11 +104,28 @@
     },
     overlayBRB: {
       title: "BE RIGHT BACK",
-      subtitle: "Crossing the event horizon. Return imminent."
+      subtitle: "Crossing the event horizon. Return imminent.",
+      overlayTop: "4vh",
+      overlayTopMobile: "16px"
     },
     brbBlackholeReplacement: {
       enabled: true,
-      pointerEvents: "auto"
+      pointerEvents: "auto",
+      mouseControlEnabled: false,
+      cameraPosition: {
+        x: 0,
+        y: 1.5,
+        z: 22
+      },
+      cameraTarget: {
+        x: 0,
+        y: 0,
+        z: 0
+      },
+      sizeScale: 0.5,
+      useBloom: false,
+      fabricWellScale: 0.5,
+      fabricWellDepthScale: 1
     }
   };
 

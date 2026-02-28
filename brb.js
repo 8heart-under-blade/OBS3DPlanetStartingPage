@@ -67,7 +67,15 @@
       warpWaveAmp: 0.74
     },
     brbBlackholeReplacement: {
-      enabled: pickDefined(blackHoleReplacementOverrides.enabled, true)
+      enabled: pickDefined(blackHoleReplacementOverrides.enabled, true),
+      sizeScale: clampRange(Number(pickDefined(blackHoleReplacementOverrides.sizeScale, 1)), 0.2, 2, 1),
+      fabricWellScale: clampRange(
+        Number(pickDefined(blackHoleReplacementOverrides.fabricWellScale, pickDefined(blackHoleReplacementOverrides.sizeScale, 1))),
+        0.2,
+        2,
+        1
+      ),
+      fabricWellDepthScale: clampRange(Number(pickDefined(blackHoleReplacementOverrides.fabricWellDepthScale, 1)), 0.2, 2.5, 1)
     },
     audioReactive: {
       enabled: pickDefined(audioOverrides.enabled, true),
@@ -245,7 +253,7 @@
     blackHoleGroup.add(warmHalo);
   }
 
-  var warpField = createWarpField();
+  var warpField = createTimeFabricMesh();
   var warpWaterfall = createWarpWaterfallState(warpField);
   var audioReactive = createAudioReactiveController(CONFIG.audioReactive);
   var clock = new THREE.Clock();
@@ -352,8 +360,14 @@
     var base = warpField.base;
     var rms = audioFeatures && isFinite(audioFeatures.rms) ? clamp01(audioFeatures.rms) : audioBoost;
     var transient = audioFeatures && isFinite(audioFeatures.transient) ? clamp01(audioFeatures.transient) : 0;
+    var wellRadiusScale = CONFIG.brbBlackholeReplacement.enabled ? CONFIG.brbBlackholeReplacement.fabricWellScale : 1;
+    var wellDepthScale = CONFIG.brbBlackholeReplacement.enabled ? CONFIG.brbBlackholeReplacement.fabricWellDepthScale : 1;
+    var eventHorizonRadius = CONFIG.blackHole.eventHorizonRadius * wellRadiusScale;
+    var fabricWellDepth = CONFIG.blackHole.warpWellDepth * wellDepthScale;
 
-    warpField.fill.material.opacity = 0.24 + audioBoost * 0.1;
+    var fillBaseOpacity = CONFIG.brbBlackholeReplacement.enabled ? 0.09 : 0.24;
+    var fillAudioOpacity = CONFIG.brbBlackholeReplacement.enabled ? 0.05 : 0.1;
+    warpField.fill.material.opacity = fillBaseOpacity + audioBoost * fillAudioOpacity;
     warpField.wire.material.opacity = 0.16 + audioBoost * 0.2 + transient * 0.07;
 
     for (var i = 0; i < positions.length; i += 3) {
@@ -362,8 +376,8 @@
       var radius = Math.sqrt(x * x + z * z) + 0.0001;
       var angle = Math.atan2(z, x);
 
-      var radialInfluence = CONFIG.blackHole.warpWellDepth / Math.pow(1 + radius * 0.082, 1.22);
-      var centerClamp = 1 - smoothRange(CONFIG.blackHole.eventHorizonRadius * 0.7, CONFIG.blackHole.eventHorizonRadius * 2.2, radius);
+      var radialInfluence = fabricWellDepth / Math.pow(1 + radius * 0.082, 1.22);
+      var centerClamp = 1 - smoothRange(eventHorizonRadius * 0.7, eventHorizonRadius * 2.2, radius);
       var centerDip = centerClamp * (1.05 + audioBoost * 0.6);
 
       var ringWave = Math.sin(radius * 0.34 - elapsed * (1.45 + audioBoost * 2.35) + angle * 2.2);
@@ -421,9 +435,15 @@
 
     var rms = audioFeatures && isFinite(audioFeatures.rms) ? clamp01(audioFeatures.rms) : audioBoost;
     var transient = audioFeatures && isFinite(audioFeatures.transient) ? clamp01(audioFeatures.transient) : 0;
+    var wellRadiusScale = CONFIG.brbBlackholeReplacement.enabled ? CONFIG.brbBlackholeReplacement.fabricWellScale : 1;
+    var wellDepthScale = CONFIG.brbBlackholeReplacement.enabled ? CONFIG.brbBlackholeReplacement.fabricWellDepthScale : 1;
+    var eventHorizonRadius = CONFIG.blackHole.eventHorizonRadius * wellRadiusScale;
+    var fabricWellDepth = CONFIG.blackHole.warpWellDepth * wellDepthScale;
 
     warpField.wire.material.opacity = 0.22 + audioBoost * 0.24;
-    warpField.fill.material.opacity = 0.22 + audioBoost * 0.16;
+    var waterfallFillBaseOpacity = CONFIG.brbBlackholeReplacement.enabled ? 0.08 : 0.22;
+    var waterfallFillAudioOpacity = CONFIG.brbBlackholeReplacement.enabled ? 0.08 : 0.16;
+    warpField.fill.material.opacity = waterfallFillBaseOpacity + audioBoost * waterfallFillAudioOpacity;
 
     for (var z = 0; z < zCount; z += 1) {
       var zNorm = z / Math.max(1, zCount - 1);
@@ -437,8 +457,8 @@
         var radius = Math.sqrt(xPos * xPos + zPos * zPos) + 0.0001;
         var angle = Math.atan2(zPos, xPos);
 
-        var radialInfluence = CONFIG.blackHole.warpWellDepth / Math.pow(1 + radius * 0.082, 1.22);
-        var centerClamp = 1 - smoothRange(CONFIG.blackHole.eventHorizonRadius * 0.7, CONFIG.blackHole.eventHorizonRadius * 2.2, radius);
+        var radialInfluence = fabricWellDepth / Math.pow(1 + radius * 0.082, 1.22);
+        var centerClamp = 1 - smoothRange(eventHorizonRadius * 0.7, eventHorizonRadius * 2.2, radius);
         var centerDip = centerClamp * (0.98 + audioBoost * 0.5);
         var rowEnergy = Math.pow(clamp01(history[historyIndex]), 0.76) * distanceFade;
         var ridge = rowEnergy * heightScale;
@@ -798,7 +818,7 @@
     return texture;
   }
 
-  function createWarpField() {
+  function createTimeFabricMesh() {
     var segmentCount = CONFIG.blackHole.warpSegments;
     var xCount = segmentCount + 1;
     var zCount = segmentCount + 1;
@@ -812,13 +832,13 @@
 
     var fill = new THREE.Mesh(
       geometry,
-      new THREE.MeshBasicMaterial({
-        color: 0x101929,
-        transparent: true,
-        opacity: 0.24,
-        side: THREE.DoubleSide,
-        depthWrite: false
-      })
+        new THREE.MeshBasicMaterial({
+          color: 0x101929,
+          transparent: true,
+          opacity: CONFIG.brbBlackholeReplacement.enabled ? 0.09 : 0.24,
+          side: THREE.DoubleSide,
+          depthWrite: false
+        })
     );
     fill.position.y = CONFIG.blackHole.warpBaseY;
     scene.add(fill);
@@ -1792,6 +1812,19 @@
     }
     if (value > 1) {
       return 1;
+    }
+    return value;
+  }
+
+  function clampRange(value, min, max, fallback) {
+    if (!isFinite(value)) {
+      return fallback;
+    }
+    if (value < min) {
+      return min;
+    }
+    if (value > max) {
+      return max;
     }
     return value;
   }

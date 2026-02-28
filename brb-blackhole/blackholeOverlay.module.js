@@ -144,7 +144,9 @@ vec4 traceBlackHole(vec3 ro, vec3 rd) {
   float minR = 1e8;
   float throughput = 1.0;
   float diskAlpha = 0.0;
+  float diskCoverage = 0.0;
   int hitCount = 0;
+  bool wasInsideSlab = false;
 
   const int STEPS = 232;
 
@@ -169,8 +171,10 @@ vec4 traceBlackHole(vec3 ro, vec3 rd) {
 
     bool crossesMidplane = (y0 > 0.0 && y1 <= 0.0) || (y0 < 0.0 && y1 >= 0.0);
     bool insideSlab = abs(0.5 * (y0 + y1)) <= uDiskThickness;
+    bool slabEntry = insideSlab && !wasInsideSlab;
+    bool crossingEvent = crossesMidplane || slabEntry;
 
-    if (crossesMidplane || insideSlab) {
+    if (crossingEvent || insideSlab) {
       float t = crossesMidplane ? clamp(y0 / (y0 - y1 + 1e-5), 0.0, 1.0) : 0.5;
       vec3 hit = mix(prevPos, pos, t);
       float yDist = abs(hit.y);
@@ -208,7 +212,13 @@ vec4 traceBlackHole(vec3 ro, vec3 rd) {
         float sideView = 1.0 + SIDE_VIEW_BOOST * (1.0 - smoothstep(0.12, 0.78, abs(toCam.y)));
         float grazing = 0.7 + 0.7 * pow(clamp(1.0 - abs(dir.y), 0.0, 1.0), 0.55);
         float multiImageBoost = primaryW * 1.0 + secondaryW * UPPER_ARC_BOOST + higherW * 0.62;
-        float sampleBlend = crossesMidplane ? 1.0 : 0.2;
+        float sampleBlend = crossingEvent ? 1.0 : 0.2;
+
+        float coverage = radialShape * thicknessWeight;
+        coverage *= (primaryW * 1.0 + secondaryW * 0.95 + higherW * 0.74);
+        coverage *= mix(0.62, 1.0, sampleBlend);
+        coverage *= (0.78 + 0.32 * sideView);
+        diskCoverage = max(diskCoverage, throughput * coverage);
 
         float emissive = (0.14 + flow * 1.04) * radialShape * grazing * thicknessWeight * sideView * sampleBlend;
         emissive *= doppler * uDiskIntensity * multiImageBoost;
@@ -218,7 +228,7 @@ vec4 traceBlackHole(vec3 ro, vec3 rd) {
         color += throughput * diskColor * emissive;
         diskAlpha = max(diskAlpha, throughput * emissive);
 
-        if (crossesMidplane) {
+        if (crossingEvent) {
           throughput *= 0.69;
           hitCount += 1;
 
@@ -228,6 +238,8 @@ vec4 traceBlackHole(vec3 ro, vec3 rd) {
         }
       }
     }
+
+    wasInsideSlab = insideSlab;
 
     if (r > 42.0 && i > 24) {
       break;
@@ -247,13 +259,20 @@ vec4 traceBlackHole(vec3 ro, vec3 rd) {
   color += vec3(0.004, 0.0012, 0.0003) * halo * haloMask;
 
   float shadowAlpha = 1.0 - shadowMask;
-  float diskMask = clamp(diskAlpha * 1.45, 0.0, 1.0);
+  float diskPresence = max(diskAlpha * 0.85, diskCoverage);
+  float diskMask = clamp(pow(max(diskPresence, 0.0), 0.46) * 1.08, 0.0, 1.0);
   float ringMask = clamp(ring * uRingIntensity * 1.4, 0.0, 1.0);
-  float haloAlpha = clamp(halo * haloMask * 0.55, 0.0, 1.0);
-  float colorMask = clamp(max(max(color.r, color.g), color.b), 0.0, 1.0);
+  float haloAlpha = clamp(halo * haloMask * 0.45, 0.0, 1.0);
+  float colorLuma = max(max(color.r, color.g), color.b);
+  float colorMask = smoothstep(0.045, 0.16, colorLuma);
   float alpha = max(shadowAlpha, max(diskMask, max(ringMask, max(haloAlpha, colorMask))));
+  alpha = clamp(alpha, 0.0, 1.0);
 
-  return vec4(max(color, vec3(0.0)), clamp(alpha, 0.0, 1.0));
+  if (alpha < 0.002) {
+    discard;
+  }
+
+  return vec4(max(color, vec3(0.0)), alpha);
 }
 
 void main() {
@@ -296,7 +315,16 @@ export function mountBlackholeOverlay() {
   const pointerEvents = typeof replacementConfig.pointerEvents === "string"
     ? replacementConfig.pointerEvents.toLowerCase()
     : "auto";
-  layer.style.pointerEvents = pointerEvents === "none" ? "none" : "auto";
+  const rawSizeScale = Number(replacementConfig.sizeScale);
+  const sizeScale = Number.isFinite(rawSizeScale)
+    ? Math.min(Math.max(rawSizeScale, 0.2), 2)
+    : 1;
+  const useBloom = replacementConfig.useBloom === true;
+  const mouseControlEnabled = replacementConfig.mouseControlEnabled !== false;
+  const cameraPosition = readVector3Config(replacementConfig.cameraPosition, 0, 5.2, 22);
+  const cameraTarget = readVector3Config(replacementConfig.cameraTarget, 0, 0, 0);
+  const resolvedPointerEvents = pointerEvents === "none" || !mouseControlEnabled ? "none" : "auto";
+  layer.style.pointerEvents = resolvedPointerEvents;
 
   const renderer = new THREE.WebGLRenderer({
     antialias: true,
@@ -304,19 +332,22 @@ export function mountBlackholeOverlay() {
     powerPreference: "high-performance"
   });
   renderer.setClearColor(0x000000, 0);
+  renderer.setClearAlpha(0);
   renderer.outputColorSpace = THREE.SRGBColorSpace;
   renderer.toneMapping = THREE.ACESFilmicToneMapping;
   renderer.toneMappingExposure = 0.94;
+  renderer.domElement.style.transformOrigin = "50% 50%";
+  renderer.domElement.style.transform = sizeScale === 1 ? "none" : "scale(" + String(sizeScale) + ")";
   layer.appendChild(renderer.domElement);
 
   const raytraceScene = new THREE.Scene();
   const quadCamera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0, 1);
 
   const viewCamera = new THREE.PerspectiveCamera(46, 1, 0.1, 100);
-  viewCamera.position.set(0.0, 5.2, 22.0);
-  viewCamera.lookAt(0, 0, 0);
+  viewCamera.position.set(cameraPosition.x, cameraPosition.y, cameraPosition.z);
+  viewCamera.lookAt(cameraTarget.x, cameraTarget.y, cameraTarget.z);
 
-  const controls = createOrbitControls(viewCamera, renderer.domElement);
+  const controls = mouseControlEnabled ? createOrbitControls(viewCamera, renderer.domElement, cameraTarget) : null;
 
   const params = {
     shadowRadius: 0.62,
@@ -364,18 +395,26 @@ export function mountBlackholeOverlay() {
   const quad = new THREE.Mesh(quadGeometry, material);
   raytraceScene.add(quad);
 
-  const composer = new EffectComposer(renderer);
-  composer.addPass(new RenderPass(raytraceScene, quadCamera));
+  let composer = null;
+  let bloomPass = null;
+  if (useBloom) {
+    composer = new EffectComposer(renderer);
+    const renderPass = new RenderPass(raytraceScene, quadCamera);
+    renderPass.clear = true;
+    renderPass.clearColor = new THREE.Color(0x000000);
+    renderPass.clearAlpha = 0;
+    composer.addPass(renderPass);
 
-  const bloomPass = new UnrealBloomPass(
-    new THREE.Vector2(1, 1),
-    0.11,
-    0.28,
-    1.1
-  );
-  bloomPass.blendMaterial.blendSrcAlpha = THREE.ZeroFactor;
-  bloomPass.blendMaterial.blendDstAlpha = THREE.OneFactor;
-  composer.addPass(bloomPass);
+    bloomPass = new UnrealBloomPass(
+      new THREE.Vector2(1, 1),
+      0.11,
+      0.28,
+      1.1
+    );
+    bloomPass.blendMaterial.blendSrcAlpha = THREE.ZeroFactor;
+    bloomPass.blendMaterial.blendDstAlpha = THREE.OneFactor;
+    composer.addPass(bloomPass);
+  }
 
   const camRight = new THREE.Vector3();
   const camUp = new THREE.Vector3();
@@ -405,9 +444,12 @@ export function mountBlackholeOverlay() {
 
     renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
     renderer.setSize(width, height, false);
-    composer.setSize(width, height);
-
-    bloomPass.setSize(width, height);
+    if (composer) {
+      composer.setSize(width, height);
+    }
+    if (bloomPass) {
+      bloomPass.setSize(width, height);
+    }
 
     viewCamera.aspect = width / height;
     viewCamera.updateProjectionMatrix();
@@ -417,11 +459,18 @@ export function mountBlackholeOverlay() {
   }
 
   function tick() {
-    controls.update();
+    renderer.setClearColor(0x000000, 0);
+    if (controls) {
+      controls.update();
+    }
     uniforms.uTime.value = clock.getElapsedTime();
     updateCameraUniforms();
 
-    composer.render();
+    if (composer) {
+      composer.render();
+    } else {
+      renderer.render(raytraceScene, quadCamera);
+    }
     rafId = window.requestAnimationFrame(tick);
   }
 
@@ -437,8 +486,12 @@ export function mountBlackholeOverlay() {
       resizeObserver = null;
     }
 
-    controls.dispose();
-    composer.dispose();
+    if (controls) {
+      controls.dispose();
+    }
+    if (composer) {
+      composer.dispose();
+    }
     quadGeometry.dispose();
     material.dispose();
     renderer.dispose();
@@ -463,7 +516,7 @@ export function mountBlackholeOverlay() {
   };
 }
 
-function createOrbitControls(camera, domElement) {
+function createOrbitControls(camera, domElement, target) {
   const controls = new OrbitControls(camera, domElement);
 
   controls.enableDamping = true;
@@ -474,7 +527,7 @@ function createOrbitControls(camera, domElement) {
   controls.enablePan = false;
   controls.minDistance = 5.8;
   controls.maxDistance = 32.0;
-  controls.target.set(0, 0, 0);
+  controls.target.set(target.x, target.y, target.z);
 
   controls.mouseButtons = {
     LEFT: THREE.MOUSE.ROTATE,
@@ -487,4 +540,19 @@ function createOrbitControls(camera, domElement) {
   });
 
   return controls;
+}
+
+function readVector3Config(value, fallbackX, fallbackY, fallbackZ) {
+  const source = value && typeof value === "object" ? value : {};
+
+  return {
+    x: readNumber(source.x, fallbackX),
+    y: readNumber(source.y, fallbackY),
+    z: readNumber(source.z, fallbackZ)
+  };
+}
+
+function readNumber(value, fallback) {
+  const parsed = Number(value);
+  return Number.isFinite(parsed) ? parsed : fallback;
 }

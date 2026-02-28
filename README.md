@@ -10,6 +10,7 @@ It includes:
 - Animated planets and orbital paths
 - Dynamic sun glow and solar-cycle sunspot activity
 - Dedicated BRB black-hole scene with event horizon and accretion disk
+- BRB BlackHole replacement overlay (transparent canvas) with optional fixed camera
 - A top text overlay (title + subtitle)
 - Live local date/time with timezone in both scenes
 - Automatic asset loading (local file first, then CDN fallback)
@@ -23,6 +24,7 @@ It includes:
 - `brb.css` - BRB visual styling and overlay layout
 - `main.js` - 3D scene logic and animation
 - `brb.js` - BRB black-hole scene logic and animation
+- `brb-blackhole/blackholeOverlay.module.js` - BlackHole demo overlay renderer for BRB scene
 - `vendor/three.min.js` - local Three.js dependency for offline mode
 
 ## How to use
@@ -102,10 +104,41 @@ Edit `config.js`:
 - Audio reactivity: `STREAM_CONFIG.audioReactive.*`
 - Overlay text: `STREAM_CONFIG.overlay.title`, `STREAM_CONFIG.overlay.subtitle`
 - BRB overlay text (optional): `STREAM_CONFIG.overlayBRB.title`, `STREAM_CONFIG.overlayBRB.subtitle`
+- BRB overlay position: `STREAM_CONFIG.overlayBRB.overlayTop`, `STREAM_CONFIG.overlayBRB.overlayTopMobile`
 - Overlay fonts: `STREAM_CONFIG.overlay.titleFontFamily`, `STREAM_CONFIG.overlay.subtitleFontFamily`
 - Overlay font style: `titleFontWeight`, `subtitleFontWeight`, `titleTextTransform`, `subtitleTextTransform`
 - Overlay position: `overlayTop`, `overlayTopMobile`, `titleOffsetX`, `titleOffsetY`, `subtitleOffsetX`, `subtitleOffsetY`
 - Overlay kerning: `titleKerning`, `subtitleKerning`
+- BRB BlackHole replacement: `STREAM_CONFIG.brbBlackholeReplacement.*`
+
+## BRB BlackHole replacement (overlay mode)
+
+The BRB scene keeps the original time-fabric/audio-reactive mesh in `brb.js`, while the black hole itself is rendered by `brb-blackhole/blackholeOverlay.module.js` on a transparent overlay canvas.
+
+Default config in `config.js`:
+
+```js
+window.STREAM_CONFIG = {
+  brbBlackholeReplacement: {
+    enabled: true,
+    pointerEvents: "auto",
+    mouseControlEnabled: false,
+    cameraPosition: { x: 0, y: 5.2, z: 22 },
+    cameraTarget: { x: 0, y: 0, z: 0 },
+    sizeScale: 0.5,
+    useBloom: false,
+    fabricWellScale: 0.5,
+    fabricWellDepthScale: 1
+  }
+};
+```
+
+Notes:
+- Set `mouseControlEnabled: false` to lock the black-hole shot (recommended for OBS).
+- Set `mouseControlEnabled: true` to re-enable OrbitControls (mouse rotate/zoom).
+- `cameraPosition` and `cameraTarget` control the fixed framing.
+- `sizeScale` scales the overlay canvas visual size.
+- `fabricWellScale` and `fabricWellDepthScale` tune how the audio-reactive fabric well matches the replacement black hole.
 
 Edit `main.js` only for simulation/visual behavior:
 
