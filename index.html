@@ -37,6 +37,10 @@
         redirectToScene("brb.html", params, "brb");
         return;
       }
+      if (requestedScene === "thanks") {
+        redirectToScene("thanks.html", params, "thanks");
+        return;
+      }
 
       var requestedMode = (params.get("assets") || "").toLowerCase();
       var configMode = typeof assetConfig.mode === "string" ? assetConfig.mode.toLowerCase() : "";
@@ -54,6 +58,17 @@
         }
         if (normalized === "start" || normalized === "soon") {
           return "starting";
+        }
+        if (
+          normalized === "thanks" ||
+          normalized === "thankyou" ||
+          normalized === "thank-you" ||
+          normalized === "thanks-for-watching" ||
+          normalized === "ty4w" ||
+          normalized === "ending" ||
+          normalized === "end"
+        ) {
+          return "thanks";
         }
         return normalized;
       }

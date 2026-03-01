@@ -3,18 +3,17 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Stream Be Right Back - Event Horizon</title>
-  <link rel="stylesheet" href="brb.css">
+  <title>Stream End - Thank You For Watching</title>
+  <link rel="stylesheet" href="thanks.css">
 </head>
 <body>
   <div id="scene" aria-hidden="true"></div>
-  <div id="blackholeLayer" aria-hidden="true"></div>
 
   <div class="overlay">
-    <p class="eyebrow">Transmission Pause</p>
-    <h1 id="title">BE RIGHT BACK</h1>
+    <p class="eyebrow">Transmission Complete</p>
+    <h1 id="title">THANK YOU FOR WATCHING</h1>
     <p id="datetime" class="datetime" aria-live="off"></p>
-    <p id="subtitle">Crossing the event horizon. Return imminent.</p>
+    <p id="subtitle">See You Next Time</p>
   </div>
 
   <p id="bootError" class="boot-error" hidden></p>
@@ -28,15 +27,14 @@
       }
 
       var assetConfig = pageConfig.assets && typeof pageConfig.assets === "object" ? pageConfig.assets : {};
-
       var params = new URLSearchParams(window.location.search);
       var requestedScene = normalizeScene(params.get("scene"));
       if (requestedScene === "starting") {
         redirectToScene("index.html", params, "starting");
         return;
       }
-      if (requestedScene === "thanks") {
-        redirectToScene("thanks.html", params, "thanks");
+      if (requestedScene === "brb") {
+        redirectToScene("brb.html", params, "brb");
         return;
       }
 
@@ -147,31 +145,18 @@
           }
         }
 
-        await loadScript("brb.js");
+        await loadScript("thanks.js");
       }
 
       boot().catch(function (error) {
         console.error(error);
         if (mode === "offline") {
-          showBootError("Offline mode selected, but local assets could not be loaded. Keep the vendor folder next to brb.html, or switch to ?assets=auto.");
+          showBootError("Offline mode selected, but local assets could not be loaded. Keep the vendor folder next to thanks.html, or switch to ?assets=auto.");
         } else {
           showBootError("Could not load rendering assets. Check network access or local vendor files.");
         }
       });
     })();
-  </script>
-  <script type="importmap">
-    {
-      "imports": {
-        "three": "https://unpkg.com/three@0.181.0/build/three.module.js",
-        "three/examples/jsm/": "https://unpkg.com/three@0.181.0/examples/jsm/"
-      }
-    }
-  </script>
-  <script type="module">
-    import { mountBlackholeOverlay } from "./brb-blackhole/blackholeOverlay.module.js";
-
-    mountBlackholeOverlay();
   </script>
 </body>
 </html>

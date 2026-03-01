@@ -2,7 +2,9 @@
 
 This page renders a looping 3D solar-system style animation for a "starting soon" scene.
 
-It also includes a dedicated "Be Right Back" black-hole scene with an event horizon.
+It also includes:
+- a dedicated "Be Right Back" black-hole scene with an event horizon
+- a dedicated "Thank You For Watching" Earth + Moon ending scene
 
 Project creation note: this project was created in OpenCode 1.2.10 (CLI) via Vibe Coding using GPT-5.3 Codex (high/xhigh).
 
@@ -11,8 +13,9 @@ It includes:
 - Dynamic sun glow and solar-cycle sunspot activity
 - Dedicated BRB black-hole scene with event horizon and accretion disk
 - BRB BlackHole replacement overlay (transparent canvas) with optional fixed camera
+- Dedicated TY4W Earth scene with dynamic atmosphere, moving clouds, Northern Lights, and an orbiting moon
 - A top text overlay (title + subtitle)
-- Live local date/time with timezone in both scenes
+- Live local date/time with timezone in all scenes
 - Automatic asset loading (local file first, then CDN fallback)
 
 ## Files
@@ -20,11 +23,15 @@ It includes:
 - `config.js` - runtime settings (assets, overlay text, custom fonts)
 - `index.html` - page shell + asset boot loader
 - `brb.html` - BRB page shell + asset boot loader
+- `thanks.html` - TY4W page shell + asset boot loader
 - `styles.css` - visual styling and overlay layout
 - `brb.css` - BRB visual styling and overlay layout
+- `thanks.css` - TY4W visual styling and overlay layout
 - `main.js` - 3D scene logic and animation
 - `brb.js` - BRB black-hole scene logic and animation
+- `thanks.js` - TY4W Earth + Moon scene logic and animation
 - `brb-blackhole/blackholeOverlay.module.js` - BlackHole demo overlay renderer for BRB scene
+- `TY4Watching.md` - TY4W implementation plan
 - `vendor/three.min.js` - local Three.js dependency for offline mode
 
 ## How to use
@@ -53,11 +60,18 @@ For BRB directly:
 http://localhost:8080/brb.html
 ```
 
+For TY4W directly:
+
+```text
+http://localhost:8080/thanks.html
+```
+
 Use scene switching with one URL pattern:
 
 ```text
 http://localhost:8080/?scene=starting
 http://localhost:8080/?scene=brb
+http://localhost:8080/?scene=thanks
 ```
 
 ## Asset modes
@@ -94,6 +108,7 @@ Examples for scene switching in OBS:
 ```text
 http://localhost:8080/?scene=starting&assets=offline
 http://localhost:8080/?scene=brb&assets=offline
+http://localhost:8080/?scene=thanks&assets=offline
 ```
 
 ## Basic customization
@@ -104,11 +119,15 @@ Edit `config.js`:
 - Audio reactivity: `STREAM_CONFIG.audioReactive.*`
 - Overlay text: `STREAM_CONFIG.overlay.title`, `STREAM_CONFIG.overlay.subtitle`
 - BRB overlay text (optional): `STREAM_CONFIG.overlayBRB.title`, `STREAM_CONFIG.overlayBRB.subtitle`
+- TY4W overlay text (optional): `STREAM_CONFIG.overlayThanks.title`, `STREAM_CONFIG.overlayThanks.subtitle`
 - BRB overlay position: `STREAM_CONFIG.overlayBRB.overlayTop`, `STREAM_CONFIG.overlayBRB.overlayTopMobile`
+- TY4W overlay position: `STREAM_CONFIG.overlayThanks.overlayTop`, `STREAM_CONFIG.overlayThanks.overlayTopMobile`
 - Overlay fonts: `STREAM_CONFIG.overlay.titleFontFamily`, `STREAM_CONFIG.overlay.subtitleFontFamily`
+- TY4W fonts: `STREAM_CONFIG.overlayThanks.titleFontFamily`, `STREAM_CONFIG.overlayThanks.subtitleFontFamily`
 - Overlay font style: `titleFontWeight`, `subtitleFontWeight`, `titleTextTransform`, `subtitleTextTransform`
 - Overlay position: `overlayTop`, `overlayTopMobile`, `titleOffsetX`, `titleOffsetY`, `subtitleOffsetX`, `subtitleOffsetY`
 - Overlay kerning: `titleKerning`, `subtitleKerning`
+- TY4W scene tuning: `STREAM_CONFIG.thanksScene.*`
 - BRB BlackHole replacement: `STREAM_CONFIG.brbBlackholeReplacement.*`
 
 ## BRB BlackHole replacement (overlay mode)
@@ -283,6 +302,10 @@ Tuning tips:
 
 Notes:
 - `customFontFaces[].src` accepts `@oracles.woff`, direct paths/URLs (`fonts/oracles.woff2`), or full CSS `url(...)` syntax.
+- TY4W subtitle defaults to `See You Next Time` with `@twigs.woff` (`overlayThanks.subtitleFontFamily = "'Twigs', serif"`).
+- TY4W aurora is constrained to north/south polar regions and is strongest on the night side.
+- TY4W supports real-world texture maps via `STREAM_CONFIG.thanksScene.useRealWorldMaps` and map URLs (`earthDayMapUrl`, `earthNightMapUrl`, `earthCloudMapUrl`, `earthWaterMaskUrl`, `moonMapUrl`).
+- TY4W aurora audio response can be tuned with `thanksScene.auroraAudioInfluence`, `thanksScene.auroraTransientInfluence`, and `thanksScene.auroraBeatResponse`.
 - `externalFontStylesheets` is for web-hosted font CSS (for example Google Fonts).
 - Keep local font files next to `index.html` (or use relative paths).
 
