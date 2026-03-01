@@ -305,6 +305,7 @@ Notes:
 - TY4W subtitle defaults to `See You Next Time` with `@twigs.woff` (`overlayThanks.subtitleFontFamily = "'Twigs', serif"`).
 - TY4W aurora is constrained to north/south polar regions and is strongest on the night side.
 - TY4W supports real-world texture maps via `STREAM_CONFIG.thanksScene.useRealWorldMaps` and map URLs (`earthDayMapUrl`, `earthNightMapUrl`, `earthCloudMapUrl`, `earthWaterMaskUrl`, `moonMapUrl`).
+- For faster startup, keep TY4W maps local (for example `textures/planets/*.jpg|png`) instead of remote URLs.
 - TY4W aurora audio response can be tuned with `thanksScene.auroraAudioInfluence`, `thanksScene.auroraTransientInfluence`, and `thanksScene.auroraBeatResponse`.
 - `externalFontStylesheets` is for web-hosted font CSS (for example Google Fonts).
 - Keep local font files next to `index.html` (or use relative paths).
