@@ -8,12 +8,15 @@ It also includes:
 
 Project creation note: this project was created in OpenCode 1.2.10 (CLI) via Vibe Coding using GPT-5.3 Codex (high/xhigh).
 
+Live demonstration channel: `https://www.twitch.tv/decipher1429`
+
 It includes:
 - Animated planets and orbital paths
 - Dynamic sun glow and solar-cycle sunspot activity
 - Dedicated BRB black-hole scene with event horizon and accretion disk
 - BRB BlackHole replacement overlay (transparent canvas) with optional fixed camera
-- Dedicated TY4W Earth scene with dynamic atmosphere, moving clouds, Northern Lights, and an orbiting moon
+- Dedicated "Thank You For Watching" (TY4W) Earth scene with dynamic atmosphere, moving clouds, Northern Lights, and an orbiting moon
+- Live OBS scene demonstrations on Twitch: `https://www.twitch.tv/decipher1429`
 - A top text overlay (title + subtitle)
 - Live local date/time with timezone in all scenes
 - Automatic asset loading (local file first, then CDN fallback)
@@ -23,15 +26,16 @@ It includes:
 - `config.js` - runtime settings (assets, overlay text, custom fonts)
 - `index.html` - page shell + asset boot loader
 - `brb.html` - BRB page shell + asset boot loader
-- `thanks.html` - TY4W page shell + asset boot loader
+- `thanks.html` - "Thank You For Watching" page shell + asset boot loader
 - `styles.css` - visual styling and overlay layout
 - `brb.css` - BRB visual styling and overlay layout
-- `thanks.css` - TY4W visual styling and overlay layout
+- `thanks.css` - "Thank You For Watching" visual styling and overlay layout
 - `main.js` - 3D scene logic and animation
 - `brb.js` - BRB black-hole scene logic and animation
-- `thanks.js` - TY4W Earth + Moon scene logic and animation
+- `thanks.js` - "Thank You For Watching" Earth + Moon scene logic and animation
 - `brb-blackhole/blackholeOverlay.module.js` - BlackHole demo overlay renderer for BRB scene
 - `TY4Watching.md` - TY4W implementation plan
+- `textures/planets/` - local Earth/Moon texture assets used by TY4W
 - `vendor/three.min.js` - local Three.js dependency for offline mode
 
 ## How to use
@@ -142,7 +146,7 @@ window.STREAM_CONFIG = {
     enabled: true,
     pointerEvents: "auto",
     mouseControlEnabled: false,
-    cameraPosition: { x: 0, y: 5.2, z: 22 },
+    cameraPosition: { x: 0, y: 1.5, z: 22 },
     cameraTarget: { x: 0, y: 0, z: 0 },
     sizeScale: 0.5,
     useBloom: false,
@@ -306,6 +310,7 @@ Notes:
 - TY4W aurora is constrained to north/south polar regions and is strongest on the night side.
 - TY4W supports real-world texture maps via `STREAM_CONFIG.thanksScene.useRealWorldMaps` and map URLs (`earthDayMapUrl`, `earthNightMapUrl`, `earthCloudMapUrl`, `earthWaterMaskUrl`, `moonMapUrl`).
 - For faster startup, keep TY4W maps local (for example `textures/planets/*.jpg|png`) instead of remote URLs.
+- Current TY4W defaults already use local texture files in `textures/planets/`.
 - TY4W aurora audio response can be tuned with `thanksScene.auroraAudioInfluence`, `thanksScene.auroraTransientInfluence`, and `thanksScene.auroraBeatResponse`.
 - `externalFontStylesheets` is for web-hosted font CSS (for example Google Fonts).
 - Keep local font files next to `index.html` (or use relative paths).
