@@ -134,44 +134,42 @@
 
       async function boot() {
         var sources = window.STREAM_ASSET_SOURCES;
+        var resolvedMode = mode;
 
         if (mode === "cdn") {
           await loadScript(sources.cdnThree);
+          resolvedMode = "cdn";
         } else if (mode === "offline") {
           await loadScript(sources.localThree);
+          resolvedMode = "offline";
         } else {
           try {
             await loadScript(sources.localThree);
+            resolvedMode = "offline";
           } catch (error) {
             await loadScript(sources.cdnThree);
+            resolvedMode = "cdn";
           }
         }
 
+        window.STREAM_ASSET_RESOLVED_MODE = resolvedMode;
         await loadScript("brb.js");
+
+        var overlayModule = await import("./brb-blackhole/blackholeOverlay.module.js");
+        if (overlayModule && typeof overlayModule.mountBlackholeOverlay === "function") {
+          await overlayModule.mountBlackholeOverlay();
+        }
       }
 
       boot().catch(function (error) {
         console.error(error);
         if (mode === "offline") {
-          showBootError("Offline mode selected, but local assets could not be loaded. Keep the vendor folder next to brb.html, or switch to ?assets=auto.");
+          showBootError("Offline mode selected, but local BRB assets could not be loaded. Keep the vendor folder and BRB overlay modules next to brb.html, or switch to ?assets=auto.");
         } else {
           showBootError("Could not load rendering assets. Check network access or local vendor files.");
         }
       });
     })();
-  </script>
-  <script type="importmap">
-    {
-      "imports": {
-        "three": "https://unpkg.com/three@0.181.0/build/three.module.js",
-        "three/examples/jsm/": "https://unpkg.com/three@0.181.0/examples/jsm/"
-      }
-    }
-  </script>
-  <script type="module">
-    import { mountBlackholeOverlay } from "./brb-blackhole/blackholeOverlay.module.js";
-
-    mountBlackholeOverlay();
   </script>
 </body>
 </html>

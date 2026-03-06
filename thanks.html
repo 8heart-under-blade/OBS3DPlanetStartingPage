@@ -132,19 +132,25 @@
 
       async function boot() {
         var sources = window.STREAM_ASSET_SOURCES;
+        var resolvedMode = mode;
 
         if (mode === "cdn") {
           await loadScript(sources.cdnThree);
+          resolvedMode = "cdn";
         } else if (mode === "offline") {
           await loadScript(sources.localThree);
+          resolvedMode = "offline";
         } else {
           try {
             await loadScript(sources.localThree);
+            resolvedMode = "offline";
           } catch (error) {
             await loadScript(sources.cdnThree);
+            resolvedMode = "cdn";
           }
         }
 
+        window.STREAM_ASSET_RESOLVED_MODE = resolvedMode;
         await loadScript("thanks.js");
       }
 

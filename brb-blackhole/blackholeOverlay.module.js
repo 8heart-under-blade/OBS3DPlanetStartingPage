@@ -1,8 +1,19 @@
-import * as THREE from "three";
-import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
-import { EffectComposer } from "three/examples/jsm/postprocessing/EffectComposer.js";
-import { RenderPass } from "three/examples/jsm/postprocessing/RenderPass.js";
-import { UnrealBloomPass } from "three/examples/jsm/postprocessing/UnrealBloomPass.js";
+const LOCAL_THREE_ROOT = new URL("../vendor/three-0.181.0/", import.meta.url);
+const LOCAL_RUNTIME_URLS = {
+  three: new URL("build/three.module.js", LOCAL_THREE_ROOT).href,
+  orbitControls: new URL("examples/jsm/controls/OrbitControls.js", LOCAL_THREE_ROOT).href,
+  effectComposer: new URL("examples/jsm/postprocessing/EffectComposer.js", LOCAL_THREE_ROOT).href,
+  renderPass: new URL("examples/jsm/postprocessing/RenderPass.js", LOCAL_THREE_ROOT).href,
+  unrealBloomPass: new URL("examples/jsm/postprocessing/UnrealBloomPass.js", LOCAL_THREE_ROOT).href
+};
+const CDN_RUNTIME_URLS = {
+  three: "https://unpkg.com/three@0.181.0/build/three.module.js?module",
+  orbitControls: "https://unpkg.com/three@0.181.0/examples/jsm/controls/OrbitControls.js?module",
+  effectComposer: "https://unpkg.com/three@0.181.0/examples/jsm/postprocessing/EffectComposer.js?module",
+  renderPass: "https://unpkg.com/three@0.181.0/examples/jsm/postprocessing/RenderPass.js?module",
+  unrealBloomPass: "https://unpkg.com/three@0.181.0/examples/jsm/postprocessing/UnrealBloomPass.js?module"
+};
+let overlayRuntimePromise = null;
 
 const vertexShader = `varying vec2 vUv;
 
@@ -292,11 +303,80 @@ void main() {
   float vignette = 1.0 - smoothstep(0.55, 1.5, length(screen));
   color *= mix(0.96, 1.0, vignette);
 
-  gl_FragColor = vec4(color, traced.a);
+gl_FragColor = vec4(color, traced.a);
 }
 `;
 
-export function mountBlackholeOverlay() {
+function getOverlayAssetPreference() {
+  const requestedMode = typeof window.STREAM_ASSET_MODE === "string" ? window.STREAM_ASSET_MODE.toLowerCase() : "auto";
+  const resolvedMode = typeof window.STREAM_ASSET_RESOLVED_MODE === "string" ? window.STREAM_ASSET_RESOLVED_MODE.toLowerCase() : "";
+
+  if (requestedMode === "offline" || requestedMode === "cdn") {
+    return {
+      requestedMode: requestedMode,
+      preferredMode: requestedMode
+    };
+  }
+
+  return {
+    requestedMode: "auto",
+    preferredMode: resolvedMode === "cdn" ? "cdn" : "offline"
+  };
+}
+
+async function importOverlayRuntime(urls) {
+  const modules = await Promise.all([
+    import(urls.three),
+    import(urls.orbitControls),
+    import(urls.effectComposer),
+    import(urls.renderPass),
+    import(urls.unrealBloomPass)
+  ]);
+
+  return {
+    THREE: modules[0],
+    OrbitControls: modules[1].OrbitControls,
+    EffectComposer: modules[2].EffectComposer,
+    RenderPass: modules[3].RenderPass,
+    UnrealBloomPass: modules[4].UnrealBloomPass
+  };
+}
+
+async function loadOverlayRuntime() {
+  if (overlayRuntimePromise) {
+    return overlayRuntimePromise;
+  }
+
+  overlayRuntimePromise = (async function () {
+    var preference = getOverlayAssetPreference();
+    var requestedMode = preference.requestedMode;
+    var preferredMode = preference.preferredMode;
+
+    if (requestedMode === "cdn") {
+      return importOverlayRuntime(CDN_RUNTIME_URLS);
+    }
+    if (requestedMode === "offline") {
+      return importOverlayRuntime(LOCAL_RUNTIME_URLS);
+    }
+
+    try {
+      return await importOverlayRuntime(preferredMode === "cdn" ? CDN_RUNTIME_URLS : LOCAL_RUNTIME_URLS);
+    } catch (localError) {
+      console.warn("BRB overlay preferred module load failed, falling back to the alternate source.", localError);
+      return importOverlayRuntime(preferredMode === "cdn" ? LOCAL_RUNTIME_URLS : CDN_RUNTIME_URLS);
+    }
+  })();
+
+  return overlayRuntimePromise;
+}
+
+export async function mountBlackholeOverlay() {
+  const runtime = await loadOverlayRuntime();
+  const THREE = runtime.THREE;
+  const OrbitControls = runtime.OrbitControls;
+  const EffectComposer = runtime.EffectComposer;
+  const RenderPass = runtime.RenderPass;
+  const UnrealBloomPass = runtime.UnrealBloomPass;
   const streamConfig = window.STREAM_CONFIG && typeof window.STREAM_CONFIG === "object" ? window.STREAM_CONFIG : {};
   const replacementConfig = streamConfig.brbBlackholeReplacement && typeof streamConfig.brbBlackholeReplacement === "object"
     ? streamConfig.brbBlackholeReplacement
@@ -347,7 +427,7 @@ export function mountBlackholeOverlay() {
   viewCamera.position.set(cameraPosition.x, cameraPosition.y, cameraPosition.z);
   viewCamera.lookAt(cameraTarget.x, cameraTarget.y, cameraTarget.z);
 
-  const controls = mouseControlEnabled ? createOrbitControls(viewCamera, renderer.domElement, cameraTarget) : null;
+  const controls = mouseControlEnabled ? createOrbitControls(THREE, OrbitControls, viewCamera, renderer.domElement, cameraTarget) : null;
 
   const params = {
     shadowRadius: 0.62,
@@ -516,7 +596,7 @@ export function mountBlackholeOverlay() {
   };
 }
 
-function createOrbitControls(camera, domElement, target) {
+function createOrbitControls(THREE, OrbitControls, camera, domElement, target) {
   const controls = new OrbitControls(camera, domElement);
 
   controls.enableDamping = true;
@@ -534,10 +614,6 @@ function createOrbitControls(camera, domElement, target) {
     MIDDLE: THREE.MOUSE.DOLLY,
     RIGHT: null
   };
-
-  domElement.addEventListener("contextmenu", function (event) {
-    event.preventDefault();
-  });
 
   return controls;
 }

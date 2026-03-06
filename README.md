@@ -36,7 +36,8 @@ It includes:
 - `brb-blackhole/blackholeOverlay.module.js` - BlackHole demo overlay renderer for BRB scene
 - `TY4Watching.md` - TY4W implementation plan
 - `textures/planets/` - local Earth/Moon texture assets used by TY4W
-- `vendor/three.min.js` - local Three.js dependency for offline mode
+- `vendor/three.min.js` - local classic Three.js dependency for starting/TY4W offline mode
+- `vendor/three-0.181.0/` - local ESM Three.js modules used by the BRB overlay in offline/auto mode
 
 ## How to use
 
@@ -88,8 +89,13 @@ Asset mode can be set in `config.js` (`STREAM_CONFIG.assets.mode`) or by URL que
 Available modes:
 
 - `?assets=auto` (default) - try local `vendor/three.min.js`, fallback to CDN
-- `?assets=offline` - local only (requires `vendor/three.min.js`)
+- `?assets=offline` - local only (BRB also requires `vendor/three-0.181.0/` for the overlay)
 - `?assets=cdn` - CDN only
+
+Notes:
+
+- Treat `config.js` as the live tuned preset for this project.
+- The README examples show supported settings and representative values; your local `config.js` can intentionally differ.
 
 Examples:
 
@@ -264,6 +270,8 @@ In OBS:
 
 ### 2) Configure `config.js`
 
+The example below is illustrative. Your current `config.js` may use different tuned values.
+
 ```js
 window.STREAM_CONFIG = {
   audioReactive: {
@@ -291,14 +299,16 @@ window.STREAM_CONFIG = {
 ```
 
 Tuning tips:
-- `mode: "gravityWarp"` keeps the current implementation as the default effect.
+- Use `mode: "gravityWarp"` for the fabric gravity-warp presentation.
 - Set `mode: "waterfallGraph"` to switch to waterfall graph on the fabric.
 - Waterfall mode now keeps the gravity wells and layers waterfall ridges on top.
 - Mode matching is case-insensitive (`"waterfallGraph"`, `"waterfallgraph"`, `"waterfall"`).
 - Increase `gain` for stronger response.
 - Lower `noiseFloorDb` (for example `-64`) to ignore quiet noise.
 - Raise `attack` for quicker peaks, lower `release` for longer decay.
-- Raise `maxBoost`/`waveInfluence` if you want more dramatic movement.
+- Raise `maxBoost`/`waveInfluence` if you want more dramatic fabric motion.
+- Raise `speedInfluence` to make gravity-warp motion travel faster on supported scenes.
+- Raise `glowInfluence` to push emissive response such as sun glow, BRB halo/light energy, and TY4W atmosphere/aurora lighting.
 - `waterfallFlowSpeed` is the main speed knob (lower = slower flow).
 - For waterfall mode, adjust `waterfallHeight`, `waterfallRowsPerSecond`, and `waterfallTrailDecay`.
 - `waterfallTrailDecay` must be in `0..1` (higher = longer travel across the full fabric).
@@ -320,6 +330,6 @@ Notes:
 - If you see a boot error about assets, verify `vendor/three.min.js` exists or switch to `?assets=cdn`.
 - If the page looks stale after changes, hard refresh with `Ctrl+F5`.
 - If local fonts do not apply, serve over `http://localhost` instead of opening with `file://`, then refresh cache in OBS/browser.
-- If audio reactivity does not respond, verify `targetInputs` names exactly match your OBS mixer input names.
+- If audio reactivity does not respond, verify `targetInputs` names match your OBS mixer input names; if none match, the scenes log a warning and fall back to all active inputs.
 - If OBS requires auth, set the same password in `STREAM_CONFIG.audioReactive.password`.
-- If using offline mode, keep `index.html`, `main.js`, `styles.css`, and `vendor/` together.
+- If using offline mode, keep the scene HTML/JS/CSS files, `brb-blackhole/`, `vendor/`, and `vendor/three-0.181.0/` together.

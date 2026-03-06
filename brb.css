@@ -92,7 +92,7 @@ body::after {
   position: absolute;
   inset: 0;
   z-index: 2;
-  pointer-events: auto;
+  pointer-events: none;
 }
 
 #blackholeLayer canvas {

@@ -89,6 +89,9 @@
       attack: pickDefined(audioOverrides.attack, 0.5),
       release: pickDefined(audioOverrides.release, 0.08),
       maxBoost: pickDefined(audioOverrides.maxBoost, 0.9),
+      waveInfluence: pickDefined(audioOverrides.waveInfluence, 0.6),
+      speedInfluence: pickDefined(audioOverrides.speedInfluence, 1.2),
+      glowInfluence: pickDefined(audioOverrides.glowInfluence, 0.3),
       waterfallFlowSpeed: pickDefined(audioOverrides.waterfallFlowSpeed, 0.65),
       waterfallRowsPerSecond: pickDefined(audioOverrides.waterfallRowsPerSecond, 46),
       waterfallHeight: pickDefined(audioOverrides.waterfallHeight, 2.2),
@@ -278,6 +281,7 @@
     var audioFeatures = audioReactive.getFeatures();
 
     updateCamera(elapsed);
+    updateSceneAtmosphere(elapsed, audioBoost, audioFeatures);
     if (!CONFIG.brbBlackholeReplacement.enabled) {
       updateBlackHole(elapsed, delta, audioBoost, audioFeatures);
     }
@@ -293,6 +297,7 @@
     var rms = audioFeatures && isFinite(audioFeatures.rms) ? clamp01(audioFeatures.rms) : audioBoost;
     var peak = audioFeatures && isFinite(audioFeatures.peak) ? clamp01(audioFeatures.peak) : audioBoost;
     var transient = audioFeatures && isFinite(audioFeatures.transient) ? clamp01(audioFeatures.transient) : 0;
+    var glowBoost = CONFIG.audioReactive.glowInfluence * audioBoost;
 
     shadowDisk.quaternion.copy(camera.quaternion);
     photonRing.quaternion.copy(camera.quaternion);
@@ -333,17 +338,25 @@
       1
     );
     warmHalo.scale.set(
-      CONFIG.blackHole.haloScale * 0.78 * haloPulse * (0.98 + audioBoost * 0.16 + transient * 0.1),
-      CONFIG.blackHole.haloScale * 0.78 * haloPulse * (0.98 + audioBoost * 0.16 + transient * 0.1),
+      CONFIG.blackHole.haloScale * 0.78 * haloPulse * (0.98 + audioBoost * 0.08 + glowBoost * 0.26 + transient * 0.1),
+      CONFIG.blackHole.haloScale * 0.78 * haloPulse * (0.98 + audioBoost * 0.08 + glowBoost * 0.26 + transient * 0.1),
       1
     );
 
-    coolHalo.material.opacity = 0.06 + audioBoost * 0.13 + rms * 0.06;
-    warmHalo.material.opacity = 0.19 + audioBoost * 0.22 + peak * 0.1;
+    coolHalo.material.opacity = 0.06 + audioBoost * 0.06 + glowBoost * 0.18 + rms * 0.06;
+    warmHalo.material.opacity = 0.19 + audioBoost * 0.1 + glowBoost * 0.28 + peak * 0.1;
 
-    stars.material.opacity = 0.57 + rms * 0.12 + Math.sin(elapsed * 0.3) * 0.03;
-    diskLight.intensity = 4.8 + audioBoost * 2.7 + peak * 1.4;
-    backLight.intensity = 1.8 + rms * 0.7;
+  }
+
+  function updateSceneAtmosphere(elapsed, audioBoost, audioFeatures) {
+    var rms = audioFeatures && isFinite(audioFeatures.rms) ? clamp01(audioFeatures.rms) : audioBoost;
+    var peak = audioFeatures && isFinite(audioFeatures.peak) ? clamp01(audioFeatures.peak) : audioBoost;
+    var transient = audioFeatures && isFinite(audioFeatures.transient) ? clamp01(audioFeatures.transient) : 0;
+    var glowBoost = CONFIG.audioReactive.glowInfluence * audioBoost;
+
+    stars.material.opacity = 0.55 + rms * 0.08 + glowBoost * 0.16 + Math.sin(elapsed * 0.3) * 0.03;
+    diskLight.intensity = 4.4 + audioBoost * 1.4 + glowBoost * 4.1 + peak * 1.2;
+    backLight.intensity = 1.65 + rms * 0.45 + glowBoost * 0.95 + transient * 0.18;
   }
 
   function updateWarpField(elapsed, delta, audioBoost, audioFeatures) {
@@ -360,6 +373,8 @@
     var base = warpField.base;
     var rms = audioFeatures && isFinite(audioFeatures.rms) ? clamp01(audioFeatures.rms) : audioBoost;
     var transient = audioFeatures && isFinite(audioFeatures.transient) ? clamp01(audioFeatures.transient) : 0;
+    var waveBoost = CONFIG.audioReactive.waveInfluence * audioBoost;
+    var speedBoost = 1 + CONFIG.audioReactive.speedInfluence * audioBoost;
     var wellRadiusScale = CONFIG.brbBlackholeReplacement.enabled ? CONFIG.brbBlackholeReplacement.fabricWellScale : 1;
     var wellDepthScale = CONFIG.brbBlackholeReplacement.enabled ? CONFIG.brbBlackholeReplacement.fabricWellDepthScale : 1;
     var eventHorizonRadius = CONFIG.blackHole.eventHorizonRadius * wellRadiusScale;
@@ -380,11 +395,11 @@
       var centerClamp = 1 - smoothRange(eventHorizonRadius * 0.7, eventHorizonRadius * 2.2, radius);
       var centerDip = centerClamp * (1.05 + audioBoost * 0.6);
 
-      var ringWave = Math.sin(radius * 0.34 - elapsed * (1.45 + audioBoost * 2.35) + angle * 2.2);
+      var ringWave = Math.sin(radius * 0.34 - elapsed * (1.45 * speedBoost + audioBoost * 1.45) + angle * 2.2);
       var waveFalloff = Math.exp(-radius * 0.03);
-      var waveHeight = ringWave * CONFIG.blackHole.warpWaveAmp * (0.12 + rms * 0.74 + transient * 0.3) * waveFalloff;
+      var waveHeight = ringWave * CONFIG.blackHole.warpWaveAmp * (0.12 + rms * 0.52 + transient * 0.3 + waveBoost * 0.6) * waveFalloff;
 
-      var swirl = Math.sin(angle * 4.6 + elapsed * (0.9 + transient * 3.2) - radius * 0.12) * 0.09 * waveFalloff;
+      var swirl = Math.sin(angle * 4.6 + elapsed * (0.9 + transient * 3.2) * speedBoost - radius * 0.12) * (0.09 + waveBoost * 0.08) * waveFalloff;
 
       positions[i + 1] = base[i + 1] - radialInfluence * (1 + audioBoost * 0.5) - centerDip + waveHeight + swirl;
     }

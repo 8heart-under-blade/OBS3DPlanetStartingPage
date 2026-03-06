@@ -352,6 +352,7 @@
     var rms = audioFeatures && isFinite(audioFeatures.rms) ? clamp01(audioFeatures.rms) : audioBoost;
     var peak = audioFeatures && isFinite(audioFeatures.peak) ? clamp01(audioFeatures.peak) : rms;
     var transient = audioFeatures && isFinite(audioFeatures.transient) ? clamp01(audioFeatures.transient) : 0;
+    var glowBoost = CONFIG.audioReactive.glowInfluence * audioBoost;
     var auroraDrive = clamp01(
       (level * 0.52 + rms * 0.44 + peak * 0.5) * CONFIG.earth.auroraAudioInfluence +
       transient * CONFIG.earth.auroraTransientInfluence
@@ -371,7 +372,7 @@
 
     moonPivot.rotation.y += delta * CONFIG.moon.orbitSpeed * (1 + rms * CONFIG.moon.orbitAudioInfluence + transient * 0.42);
     moon.rotation.y += delta * (CONFIG.moon.spinSpeed + rms * 0.015);
-    moonHalo.material.opacity = 0.16 + rms * 0.14;
+    moonHalo.material.opacity = 0.16 + rms * 0.09 + glowBoost * 0.18;
 
     earth.getWorldPosition(earthWorldPosition);
 
@@ -379,15 +380,15 @@
     earthMaterial.uniforms.uSunPos.value.copy(keyLight.position);
 
     atmosphereMaterial.uniforms.uTime.value = elapsed;
-    atmosphereMaterial.uniforms.uAudio.value = rms;
-    atmosphereMaterial.uniforms.uIntensity.value = CONFIG.earth.atmosphereIntensity;
+    atmosphereMaterial.uniforms.uAudio.value = clamp01(rms + glowBoost * 0.35);
+    atmosphereMaterial.uniforms.uIntensity.value = CONFIG.earth.atmosphereIntensity * (1 + glowBoost * 0.18);
     atmosphereMaterial.uniforms.uSunPos.value.copy(keyLight.position);
 
     auroraMaterial.uniforms.uTime.value = elapsed;
     auroraMaterial.uniforms.uAudio.value = auroraDrive;
     auroraMaterial.uniforms.uTransient.value = transient;
     auroraMaterial.uniforms.uBeat.value = auroraBeat;
-    auroraMaterial.uniforms.uIntensity.value = CONFIG.earth.auroraIntensity;
+    auroraMaterial.uniforms.uIntensity.value = CONFIG.earth.auroraIntensity * (1 + glowBoost * 0.22);
     auroraMaterial.uniforms.uSunPos.value.copy(keyLight.position);
   }
 
@@ -636,14 +637,15 @@
   function updateLights(elapsed, audioBoost, audioFeatures) {
     var rms = audioFeatures && isFinite(audioFeatures.rms) ? clamp01(audioFeatures.rms) : audioBoost;
     var transient = audioFeatures && isFinite(audioFeatures.transient) ? clamp01(audioFeatures.transient) : 0;
+    var glowBoost = CONFIG.audioReactive.glowInfluence * audioBoost;
 
     keyLight.position.x = 34 + Math.sin(elapsed * 0.11) * 3.2;
     keyLight.position.y = 24 + Math.sin(elapsed * 0.13) * 1.8;
     keyLight.position.z = 28 + Math.cos(elapsed * 0.1) * 2.8;
-    keyLight.intensity = CONFIG.lights.keyIntensity + rms * CONFIG.lights.keyAudioInfluence;
+    keyLight.intensity = CONFIG.lights.keyIntensity + rms * CONFIG.lights.keyAudioInfluence + glowBoost * 0.28;
 
-    fillLight.intensity = CONFIG.lights.fillIntensity + rms * 0.28;
-    rimLight.intensity = CONFIG.lights.rimIntensity + rms * CONFIG.lights.rimAudioInfluence + transient * 0.35;
+    fillLight.intensity = CONFIG.lights.fillIntensity + rms * 0.28 + glowBoost * 0.16;
+    rimLight.intensity = CONFIG.lights.rimIntensity + rms * CONFIG.lights.rimAudioInfluence + transient * 0.35 + glowBoost * 0.72;
     rimLight.position.x = Math.sin(elapsed * 0.35) * 6;
   }
 
