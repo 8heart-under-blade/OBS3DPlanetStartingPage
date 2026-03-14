@@ -195,8 +195,8 @@
       },
       sizeScale: 0.5,
       useBloom: false,
-      fabricWellScale: 0.5,
-      fabricWellDepthScale: 1
+      fabricWellScale: 0.8,
+      fabricWellDepthScale: 1.25
     }
   };
 

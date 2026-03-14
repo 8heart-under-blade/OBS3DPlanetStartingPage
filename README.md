@@ -10,6 +10,8 @@ Project creation note: this project was created in OpenCode 1.2.10 (CLI) via Vib
 
 Live demonstration channel: `https://www.twitch.tv/decipher1429`
 
+Additional video demo: `https://www.twitch.tv/videos/2711092069`
+
 It includes:
 - Animated planets and orbital paths
 - Dynamic sun glow and solar-cycle sunspot activity
@@ -17,6 +19,7 @@ It includes:
 - BRB BlackHole replacement overlay (transparent canvas) with optional fixed camera
 - Dedicated "Thank You For Watching" (TY4W) Earth scene with dynamic atmosphere, moving clouds, Northern Lights, and an orbiting moon
 - Live OBS scene demonstrations on Twitch: `https://www.twitch.tv/decipher1429`
+- Additional recorded project demo on Twitch: `https://www.twitch.tv/videos/2711092069`
 - A top text overlay (title + subtitle)
 - Live local date/time with timezone in all scenes
 - Automatic asset loading (local file first, then CDN fallback)
