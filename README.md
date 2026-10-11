@@ -2,6 +2,16 @@
 
 This page renders a looping 3D solar-system style animation for a "starting soon" scene.
 
+> **Production work in progress:** the P0 foundation adds contributor checks, preview packaging,
+> and asset/baseline documentation; it does not yet provide a no-code editor or a qualified
+> end-user installer. The existing scenes and tuned configuration are preserved.
+> See [the production roadmap](docs/PRODUCTION_ROADMAP.md),
+> [baseline qualification record](docs/BASELINE.md), and [asset attribution audit](ATTRIBUTIONS.md).
+> Unresolved third-party asset rights block public redistribution.
+>
+> **Credential safety:** never publish an OBS password in `config.js`. The committed value is
+> blank; preview builds must reject a nonblank value. A separate credential/setup path is planned.
+
 It also includes:
 - a dedicated "Be Right Back" black-hole scene with an event horizon
 - a dedicated "Thank You For Watching" Earth + Moon ending scene
@@ -24,9 +34,31 @@ It includes:
 - Live local date/time with timezone in all scenes
 - Automatic asset loading (local file first, then CDN fallback)
 
+## Contributor checks and preview packaging
+
+Node.js 22+ is required **only for contributor tooling**, not hosted scene playback.
+There are no third-party npm dependencies.
+
+```bash
+npm ci
+npm run check
+npm run baseline:verify
+npm run assets:check
+npm test
+npm run build
+```
+
+`npm run package` creates a reproducible **local preview** archive using GNU tar (Linux/CI).
+It is not an installer. `npm run release:check` currently fails intentionally because asset
+redistribution rights are unresolved; CI skips artifact publication until that gate passes.
+See [CONTRIBUTING.md](CONTRIBUTING.md) for commands, safeguards, and limitations.
+
 ## Files
 
-- `config.js` - runtime settings (assets, overlay text, custom fonts)
+- `config.js` - runtime settings (assets, overlay text, custom fonts; never publish credentials)
+- `docs/source-baseline.json` - byte hashes preserving the current runtime during P0
+- `docs/asset-inventory.json` - third-party asset hashes, rights evidence, and release blockers
+- `ATTRIBUTIONS.md` - third-party notices and unresolved permissions
 - `index.html` - page shell + asset boot loader
 - `brb.html` - BRB page shell + asset boot loader
 - `thanks.html` - "Thank You For Watching" page shell + asset boot loader

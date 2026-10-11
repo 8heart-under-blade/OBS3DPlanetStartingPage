@@ -1,0 +1,20 @@
+{
+  "name": "obs3dplanetstartingpage",
+  "version": "0.1.0",
+  "private": true,
+  "description": "OBS 3D planet starting/BRB/thanks scenes - contributor tooling (P0 production foundation, build preview only)",
+  "license": "MIT",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "check": "node scripts/check.mjs",
+    "baseline:verify": "node scripts/baseline.mjs",
+    "assets:check": "node scripts/assets.mjs",
+    "release:check": "node scripts/check.mjs && node scripts/assets.mjs --release",
+    "test": "node --test tests/*.test.mjs",
+    "build": "node scripts/build.mjs",
+    "package": "node scripts/package.mjs",
+    "clean": "node -e \"Promise.all([import('node:fs').then(function (fs) { return Promise.all([fs.promises.rm('dist', { recursive: true, force: true }), fs.promises.rm('release', { recursive: true, force: true })]); })]).catch(function (e) { console.error(e); process.exit(1); })\""
+  }
+}

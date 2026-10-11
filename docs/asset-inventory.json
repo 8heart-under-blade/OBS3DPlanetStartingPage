@@ -1,0 +1,241 @@
+{
+  "schemaVersion": 1,
+  "auditDate": "2026-10-11",
+  "repository": "OBS3DPlanetStartingPage",
+  "branch": "feature/production-foundation",
+  "sourceCommit": "ea5fb4c866e48b9c8ba4981191437d1ff61780c6",
+  "hashAlgorithm": "sha256",
+  "scope": "Third-party binary/bundled assets: all vendor/** files, all textures/** files, and all root *.woff files. First-party source code is NOT listed here (see repositoryCode).",
+  "statusLegend": {
+    "verified": "A license and its applicability are established by evidence contained in the repository (e.g. an embedded license notice); attribution requirements are recorded.",
+    "unresolved": "The asset is present but no in-repo evidence establishes its license or redistribution rights. Treated as a release blocker until provenance/license is documented."
+  },
+  "repositoryCode": {
+    "path": "LICENSE",
+    "license": "MIT",
+    "copyright": "Copyright (c) 2026 8heart-under-blade",
+    "appliesTo": "First-party source files (HTML/CSS/JS) authored for this project.",
+    "doesNotCover": "vendor/** (Three.js is separately MIT), textures/** and *.woff (separate provenance; see assets). The repository MIT license does not, by itself, grant rights to bundled third-party files."
+  },
+  "assets": [
+    {
+      "path": "vendor/three-0.181.0/build/three.core.js",
+      "sha256": "03fb6e9fa08628385a9096948593251ae473239c7039496d7c280cba73d84631",
+      "status": "verified",
+      "source": "three.js r181 ESM core build (build/three.core.js), from the three.js project (https://threejs.org).",
+      "license": "MIT (Three.js project)",
+      "evidence": "Embedded @license header in file: 'Copyright 2010-2025 Three.js Authors' and 'SPDX-License-Identifier: MIT' (vendor/three-0.181.0/build/three.core.js and three.module.js, lines 1-4).",
+      "notes": "Attribution notice embedded (Copyright 2010-2025 Three.js Authors) and must be preserved. Loaded by BRB overlay offline/auto mode."
+    },
+    {
+      "path": "vendor/three-0.181.0/build/three.module.js",
+      "sha256": "99b94b6829da8e751ef48147e3a7eebae861bd4087dbcb7c3a85af03a4210933",
+      "status": "verified",
+      "source": "three.js r181 ESM entry module (build/three.module.js), from the three.js project (https://threejs.org).",
+      "license": "MIT (Three.js project)",
+      "evidence": "Embedded @license header in file: 'Copyright 2010-2025 Three.js Authors' and 'SPDX-License-Identifier: MIT' (vendor/three-0.181.0/build/three.core.js and three.module.js, lines 1-4).",
+      "notes": "Attribution notice embedded (Copyright 2010-2025 Three.js Authors) and must be preserved."
+    },
+    {
+      "path": "vendor/three-0.181.0/examples/jsm/controls/OrbitControls.js",
+      "sha256": "5e74b0793159d8c7aa670fdca9e2d3f4fbf79471731ed18cf208671149b9c26d",
+      "status": "verified",
+      "source": "three.js r181 example addon module (controls/OrbitControls.js), from the three.js project (https://threejs.org/addons).",
+      "license": "MIT (Three.js project)",
+      "evidence": "Part of the three.js r181 distribution. No per-file @license header is present in the bundled copy; the MIT grant is conveyed by the sibling distribution notice in vendor/three-0.181.0/build/three.core.js and three.module.js ('Copyright 2010-2025 Three.js Authors', 'SPDX-License-Identifier: MIT'), and the file imports from ../../../build/three.module.js. Byte-identity to an upstream r181 tag was NOT checked offline.",
+      "notes": "MIT applies because this is an upstream three.js addon; upstream attribution requirement applies. No standalone LICENSE file is bundled in vendor/."
+    },
+    {
+      "path": "vendor/three-0.181.0/examples/jsm/postprocessing/EffectComposer.js",
+      "sha256": "af8ca6b6bb92a77a8d5e38a612253d7138784aba1821dc35f381f0793238fef0",
+      "status": "verified",
+      "source": "three.js r181 example addon module (postprocessing/EffectComposer.js), from the three.js project (https://threejs.org/addons).",
+      "license": "MIT (Three.js project)",
+      "evidence": "Part of the three.js r181 distribution. No per-file @license header is present in the bundled copy; the MIT grant is conveyed by the sibling distribution notice in vendor/three-0.181.0/build/three.core.js and three.module.js ('Copyright 2010-2025 Three.js Authors', 'SPDX-License-Identifier: MIT'), and the file imports from ../../../build/three.module.js. Byte-identity to an upstream r181 tag was NOT checked offline.",
+      "notes": "MIT applies because this is an upstream three.js addon; upstream attribution requirement applies. No standalone LICENSE file is bundled in vendor/."
+    },
+    {
+      "path": "vendor/three-0.181.0/examples/jsm/postprocessing/MaskPass.js",
+      "sha256": "7cd08eee9d5d6f5578beaddbdcbe9c384f6873810af27f22ab7db3ceeb127aa3",
+      "status": "verified",
+      "source": "three.js r181 example addon module (postprocessing/MaskPass.js), from the three.js project (https://threejs.org/addons).",
+      "license": "MIT (Three.js project)",
+      "evidence": "Part of the three.js r181 distribution. No per-file @license header is present in the bundled copy; the MIT grant is conveyed by the sibling distribution notice in vendor/three-0.181.0/build/three.core.js and three.module.js ('Copyright 2010-2025 Three.js Authors', 'SPDX-License-Identifier: MIT'), and the file imports from ../../../build/three.module.js. Byte-identity to an upstream r181 tag was NOT checked offline.",
+      "notes": "MIT applies because this is an upstream three.js addon; upstream attribution requirement applies. No standalone LICENSE file is bundled in vendor/."
+    },
+    {
+      "path": "vendor/three-0.181.0/examples/jsm/postprocessing/Pass.js",
+      "sha256": "f873ec11f08728ee1301aae7d47e1243574d124ee108213ef93c5c10458afc5b",
+      "status": "verified",
+      "source": "three.js r181 example addon module (postprocessing/Pass.js), from the three.js project (https://threejs.org/addons).",
+      "license": "MIT (Three.js project)",
+      "evidence": "Part of the three.js r181 distribution. No per-file @license header is present in the bundled copy; the MIT grant is conveyed by the sibling distribution notice in vendor/three-0.181.0/build/three.core.js and three.module.js ('Copyright 2010-2025 Three.js Authors', 'SPDX-License-Identifier: MIT'), and the file imports from ../../../build/three.module.js. Byte-identity to an upstream r181 tag was NOT checked offline.",
+      "notes": "MIT applies because this is an upstream three.js addon; upstream attribution requirement applies. No standalone LICENSE file is bundled in vendor/."
+    },
+    {
+      "path": "vendor/three-0.181.0/examples/jsm/postprocessing/RenderPass.js",
+      "sha256": "42ca9467b143aec15320ea688b2a8b736899ae967cdf0cb30bba8bb3516a5552",
+      "status": "verified",
+      "source": "three.js r181 example addon module (postprocessing/RenderPass.js), from the three.js project (https://threejs.org/addons).",
+      "license": "MIT (Three.js project)",
+      "evidence": "Part of the three.js r181 distribution. No per-file @license header is present in the bundled copy; the MIT grant is conveyed by the sibling distribution notice in vendor/three-0.181.0/build/three.core.js and three.module.js ('Copyright 2010-2025 Three.js Authors', 'SPDX-License-Identifier: MIT'), and the file imports from ../../../build/three.module.js. Byte-identity to an upstream r181 tag was NOT checked offline.",
+      "notes": "MIT applies because this is an upstream three.js addon; upstream attribution requirement applies. No standalone LICENSE file is bundled in vendor/."
+    },
+    {
+      "path": "vendor/three-0.181.0/examples/jsm/postprocessing/ShaderPass.js",
+      "sha256": "5df4d3e1384f5cb108fa23ecf7f534edd10e1631cd3db06c0dda557372dc7e8f",
+      "status": "verified",
+      "source": "three.js r181 example addon module (postprocessing/ShaderPass.js), from the three.js project (https://threejs.org/addons).",
+      "license": "MIT (Three.js project)",
+      "evidence": "Part of the three.js r181 distribution. No per-file @license header is present in the bundled copy; the MIT grant is conveyed by the sibling distribution notice in vendor/three-0.181.0/build/three.core.js and three.module.js ('Copyright 2010-2025 Three.js Authors', 'SPDX-License-Identifier: MIT'), and the file imports from ../../../build/three.module.js. Byte-identity to an upstream r181 tag was NOT checked offline.",
+      "notes": "MIT applies because this is an upstream three.js addon; upstream attribution requirement applies. No standalone LICENSE file is bundled in vendor/."
+    },
+    {
+      "path": "vendor/three-0.181.0/examples/jsm/postprocessing/UnrealBloomPass.js",
+      "sha256": "2f116c7bbf1268cbdc0b359e2d48ab067ad4600c80b347e226c18e78a15c8292",
+      "status": "verified",
+      "source": "three.js r181 example addon module (postprocessing/UnrealBloomPass.js), from the three.js project (https://threejs.org/addons).",
+      "license": "MIT (Three.js project)",
+      "evidence": "Part of the three.js r181 distribution. No per-file @license header is present in the bundled copy; the MIT grant is conveyed by the sibling distribution notice in vendor/three-0.181.0/build/three.core.js and three.module.js ('Copyright 2010-2025 Three.js Authors', 'SPDX-License-Identifier: MIT'), and the file imports from ../../../build/three.module.js. Byte-identity to an upstream r181 tag was NOT checked offline.",
+      "notes": "MIT applies because this is an upstream three.js addon; upstream attribution requirement applies. No standalone LICENSE file is bundled in vendor/."
+    },
+    {
+      "path": "vendor/three-0.181.0/examples/jsm/shaders/CopyShader.js",
+      "sha256": "a33057d5ac91c43304c186ac0e8816e62bb2ed471d3a00ff3018dfd5c0389718",
+      "status": "verified",
+      "source": "three.js r181 example addon module (shaders/CopyShader.js), from the three.js project (https://threejs.org/addons).",
+      "license": "MIT (Three.js project)",
+      "evidence": "Part of the three.js r181 distribution. No per-file @license header is present in the bundled copy; the MIT grant is conveyed by the sibling distribution notice in vendor/three-0.181.0/build/three.core.js and three.module.js ('Copyright 2010-2025 Three.js Authors', 'SPDX-License-Identifier: MIT'), and the file imports from ../../../build/three.module.js. Byte-identity to an upstream r181 tag was NOT checked offline.",
+      "notes": "MIT applies because this is an upstream three.js addon; upstream attribution requirement applies. No standalone LICENSE file is bundled in vendor/."
+    },
+    {
+      "path": "vendor/three-0.181.0/examples/jsm/shaders/LuminosityHighPassShader.js",
+      "sha256": "3db5f13c9cab9f05cb572710a9fdb809a32ad0f2c7e68b2e261817c198ba813e",
+      "status": "verified",
+      "source": "three.js r181 example addon module (shaders/LuminosityHighPassShader.js), from the three.js project (https://threejs.org/addons).",
+      "license": "MIT (Three.js project)",
+      "evidence": "Part of the three.js r181 distribution. No per-file @license header is present in the bundled copy; the MIT grant is conveyed by the sibling distribution notice in vendor/three-0.181.0/build/three.core.js and three.module.js ('Copyright 2010-2025 Three.js Authors', 'SPDX-License-Identifier: MIT'), and the file imports from ../../../build/three.module.js. Byte-identity to an upstream r181 tag was NOT checked offline.",
+      "notes": "MIT applies because this is an upstream three.js addon; upstream attribution requirement applies. No standalone LICENSE file is bundled in vendor/."
+    },
+    {
+      "path": "vendor/three.min.js",
+      "sha256": "170c6789f43217c96b3170f4b42fafe135de7f7cd48497a4218f9757ee1d49fa",
+      "status": "verified",
+      "source": "three.js classic/minified build (build/three.min.js) r160, from the three.js project (https://threejs.org). REVISION string in file is '160'.",
+      "license": "MIT (Three.js project)",
+      "evidence": "Embedded @license header in file: 'Copyright 2010-2023 Three.js Authors' and 'SPDX-License-Identifier: MIT' (vendor/three.min.js, lines 2-4). File also carries the r150+ deprecation notice pointing to threejs.org installation docs, consistent with an official upstream build.",
+      "notes": "Attribution notice is embedded and must be preserved. This is a DIFFERENT major revision (r160, Copyright 2010-2023) from vendor/three-0.181.0/ (r181). Two Three.js revisions are bundled; both are MIT. No standalone LICENSE file accompanies the vendored copy."
+    },
+    {
+      "path": "textures/planets/earth_clouds_1024.png",
+      "sha256": "7d3b82ef6b3feb506fc06f02a744aed3d864e23e7417075005f4082a7ff935a4",
+      "status": "unresolved",
+      "source": "Unknown. No provenance recorded in repo. The only lead is the code default in thanks.js (lines 128-130): https://threejs.org/examples/textures/planets/earth_clouds_1024.png.",
+      "license": "Unknown / not documented",
+      "evidence": "PNG contains no tEXt/iTXt/rights metadata. A remote URL in code does not establish a license for the bundled copy.",
+      "notes": "Redistribution rights not documented. RELEASE BLOCKER."
+    },
+    {
+      "path": "textures/planets/earth_clouds_2k_solarsystemscope.jpg",
+      "sha256": "fffd7f68d41b37274822150e54a6ef605af1d3ec35624d9f628c3b896bfa42ed",
+      "status": "unresolved",
+      "source": "Unknown. Filename suggests Solar System Scope (solarsystemscope.com); file contains Adobe XMP Core 5.6 metadata only.",
+      "license": "Unknown / not documented",
+      "evidence": "XMP packet contains only the Adobe toolkit identifier and no rights/creator fields. Filename text is not license evidence. Solar System Scope publishes many planet textures under CC BY 4.0, but neither the origin of this file nor the applicable terms are confirmed in-repo.",
+      "notes": "If CC BY 4.0 genuinely applies, attribution is required and the exact source URL must be recorded. Until then rights are unresolved. RELEASE BLOCKER."
+    },
+    {
+      "path": "textures/planets/earth_day_2048.jpg",
+      "sha256": "2faa400d1eade3bc44caf6750d1b772bd9bbb6d87362c02bc7c3304e78fa0a9d",
+      "status": "unresolved",
+      "source": "Unknown. Metadata indicates GIMP 2.6.7 and a 2010-06-08 timestamp plus an Adobe Photoshop DocumentID; origin not recorded in repo.",
+      "license": "Unknown / not documented",
+      "evidence": "EXIF/XMP contain no copyright, creator, or license fields.",
+      "notes": "Redistribution rights not documented. RELEASE BLOCKER."
+    },
+    {
+      "path": "textures/planets/earth_night_2048.png",
+      "sha256": "3cc6972d1d5b6310f33ea6ef4cc14a38f1dd141a91d26888206889327d983d7b",
+      "status": "unresolved",
+      "source": "Unknown. tEXt chunk records 'Software: Adobe ImageReady'; origin not recorded in repo.",
+      "license": "Unknown / not documented",
+      "evidence": "Only a software tag is present; no copyright or license metadata.",
+      "notes": "Redistribution rights not documented. RELEASE BLOCKER."
+    },
+    {
+      "path": "textures/planets/earth_specular_2048.jpg",
+      "sha256": "2df48906732d7a458b2d0a7cdec51a829262307c6bdee4cfdf079a4dd7c71c69",
+      "status": "unresolved",
+      "source": "Unknown. Bare JFIF file; origin not recorded in repo.",
+      "license": "Unknown / not documented",
+      "evidence": "Only an APP0 JFIF segment is present; no EXIF/XMP rights metadata.",
+      "notes": "Redistribution rights not documented. RELEASE BLOCKER."
+    },
+    {
+      "path": "textures/planets/moon_1024.jpg",
+      "sha256": "fcb0f1f5548e6e18d40063dd55c6aacd3daedf2407b181dab85b61e22bf9fe57",
+      "status": "unresolved",
+      "source": "Unknown. No provenance recorded in repo. The only lead is the code default in thanks.js: https://threejs.org/examples/textures/planets/moon_1024.jpg.",
+      "license": "Unknown / not documented",
+      "evidence": "Bare JFIF file with no EXIF/XMP rights metadata. A remote URL in code does not establish a license for the bundled copy.",
+      "notes": "Redistribution rights not documented. RELEASE BLOCKER."
+    },
+    {
+      "path": "oracles.woff",
+      "sha256": "e67bab2c78b6a535c3638ea629ba803a4ba03a1aa580f750de80c7bec6503c8b",
+      "status": "unresolved",
+      "source": "Heroglyphs (font foundry). Webfont converted via the Font Squirrel webfont generator (name table fields).",
+      "license": "Unknown / proprietary - 'All rights reserved', no redistribution grant documented",
+      "evidence": "WOFF name table (read from the file): copyright 'Copyright (c) 2016 by Heroglyphs. All rights reserved.'; trademark 'Oracles is a trademark of Heroglyphs.'; manufacturer/designer 'Heroglyphs'; description 'Copyright (c) 2016 by faqih. All rights reserved.'; nameID 55555 'Font Squirrel'; version 'Version 1.000'.",
+      "notes": "Embedded notices assert full reservation of rights; no license granting redistribution/embedding is bundled. Font Squirrel generation alone does not grant redistribution rights - the foundry's terms govern. RELEASE BLOCKER."
+    },
+    {
+      "path": "twigs.woff",
+      "sha256": "9cc9b45211ff5172f68909686e46c2188f59196c2bb34c46a42e97ba28772978",
+      "status": "unresolved",
+      "source": "Heroglyphs (font foundry). Webfont converted via the Font Squirrel webfont generator (name table fields).",
+      "license": "Unknown / proprietary - 'All rights reserved', no redistribution grant documented",
+      "evidence": "WOFF name table (read from the file): copyright 'Copyright (c) 2016 by Heroglyphs. All rights reserved.'; trademark 'The Twigs is a trademark of Heroglyphs.'; manufacturer/designer 'Heroglyphs'; description 'Copyright (c) 2016 by faqih. All rights reserved.'; nameID 55555 'Font Squirrel'; version 'Version 1.000'.",
+      "notes": "Embedded notices assert full reservation of rights; no license granting redistribution/embedding is bundled. Font Squirrel generation alone does not grant redistribution rights - the foundry's terms govern. RELEASE BLOCKER."
+    }
+  ],
+  "releaseBlockers": [
+    {
+      "path": "textures/planets/earth_clouds_1024.png",
+      "reason": "Redistribution rights unresolved. No license grant is documented in-repo; clear written permission/attribution before redistribution."
+    },
+    {
+      "path": "textures/planets/earth_clouds_2k_solarsystemscope.jpg",
+      "reason": "Redistribution rights unresolved. No license grant is documented in-repo; clear written permission/attribution before redistribution."
+    },
+    {
+      "path": "textures/planets/earth_day_2048.jpg",
+      "reason": "Redistribution rights unresolved. No license grant is documented in-repo; clear written permission/attribution before redistribution."
+    },
+    {
+      "path": "textures/planets/earth_night_2048.png",
+      "reason": "Redistribution rights unresolved. No license grant is documented in-repo; clear written permission/attribution before redistribution."
+    },
+    {
+      "path": "textures/planets/earth_specular_2048.jpg",
+      "reason": "Redistribution rights unresolved. No license grant is documented in-repo; clear written permission/attribution before redistribution."
+    },
+    {
+      "path": "textures/planets/moon_1024.jpg",
+      "reason": "Redistribution rights unresolved. No license grant is documented in-repo; clear written permission/attribution before redistribution."
+    },
+    {
+      "path": "oracles.woff",
+      "reason": "Redistribution rights unresolved. No license grant is documented in-repo; clear written permission/attribution before redistribution."
+    },
+    {
+      "path": "twigs.woff",
+      "reason": "Redistribution rights unresolved. No license grant is documented in-repo; clear written permission/attribution before redistribution."
+    }
+  ],
+  "counts": {
+    "total": 20,
+    "verified": 12,
+    "unresolved": 8
+  }
+}

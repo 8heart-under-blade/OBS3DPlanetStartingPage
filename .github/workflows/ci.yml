@@ -1,0 +1,55 @@
+# P0 production foundation: static checks, tests, and preview build.
+# No deploy step yet. Artifacts are build previews only; public release
+# requires the separate licensing gate.
+name: ci
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  check-test-build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+
+      - name: Install (lockfile only, no runtime dependencies)
+        run: npm ci
+
+      - name: Static checks (syntax, asset links, password safeguard)
+        run: npm run check
+
+      - name: Baseline preservation (P0)
+        run: npm run baseline:verify
+
+      - name: Asset inventory integrity
+        run: npm run assets:check
+
+      - name: Tests
+        run: npm test
+
+      - name: Preview build
+        run: npm run build
+
+      # Do not publish downloadable bundled assets while their rights are unresolved.
+      - name: Redistribution eligibility (expected blocked until asset rights cleared)
+        id: redistribution
+        continue-on-error: true
+        run: npm run release:check
+
+      - name: Upload preview artifact (rights cleared only; no deploy)
+        if: steps.redistribution.outcome == 'success'
+        uses: actions/upload-artifact@v4
+        with:
+          name: obs3dplanetstartingpage-preview
+          path: dist/
+          if-no-files-found: error
