@@ -74,6 +74,19 @@ Gate: first-time nontechnical testers produce all three personalized OBS sources
 
 ### P3 — Qualified release/deployment
 
+Started on feature/qualified-release from accepted local P2 checkpoint `1d28784`.
+Slice 1 adds candidate content-addressed namespaces, retained local history,
+verified current aliases and local selection/rollback tooling. No push/deploy,
+remote CI result or runtime qualification is implied. A clean CI candidate does
+not contain deployed history; retention/real hosting remain work to do.
+Cloudflare Pages is selected; prepared output/headers/404 and read-only live-audit
+commands are implemented. Project cosmic-stream-scenes now has a p3-preview
+upload; public HTTP audits passed for 115 files and two retained namespaces on
+the specific deployment and preview alias. The user confirmed all three hosted
+links work in OBS (transfer/playback smoke acceptance). Detailed hosted workflow,
+rollout/rollback and production deployment/qualification remain pending. See [P3_CLOUDFLARE.md](P3_CLOUDFLARE.md).
+See [P3_RELEASE.md](P3_RELEASE.md) for slices, commands and limitations.
+
 Unit tests for config/audio/math; browser/visual regression; immutable/versioned asset paths; tested hosting at repository subpaths; artifacts/checksums/changelog/rollback and user support guide.
 
 Gate: tagged artifacts pass licensing and credentials gates, clean hosted deployment works, previous releases stay usable, identified GPU/OBS machines pass sustained playback tests. HTML `?v=` alone is not asset cache busting.
@@ -90,8 +103,9 @@ Accounts/cloud sync/database, public galleries, marketplaces, automatic OBS scen
 
 ## Next implementation step
 
-Save the accepted P2 implementation locally, then implement P3 versioned release
-files/packaging, browser regression coverage and hosting/subpath verification.
+P2 is saved locally as `1d28784`. Complete review/validation of the P3 candidate
+namespace foundation, then add browser/visual regression, release artifact/support
+procedures and verified history-preserving hosting/subpath deployment.
 Keep unperformed P0/P1 production qualification visible; asset rights and static
 checks do not replace it. P3 still needs real deployment and measured sustained
 playback before its gate passes. P4 is the supported local/offline product phase.

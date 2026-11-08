@@ -169,6 +169,111 @@ qualification is still pending. See P1_RUNTIME.md for the current architecture.
   Deferred P1 production tests remain open.
 - Local editor: http://127.0.0.1:8080/editor.html (existing loopback server).
 
+## P3 slice 1 — candidate namespace foundation
+
+- P2 saved locally at `1d28784` after user-reported editor/OBS smoke acceptance;
+  started `feature/qualified-release`. Nothing pushed or deployed.
+- Candidate site tooling copies the unchanged accepted runtime into full-manifest
+  SHA-256 namespaces; byte changes get a new identity even without a version bump.
+- Versioned editor links stay inside their renderer/asset namespace. Mutable root
+  aliases retain legacy scene query/hash routing. Existing namespaces are verified,
+  never overwritten or deleted; local selection supports candidate rollback.
+- Input/credential/rights gates run before publication into candidate output.
+  Integrity verification refuses missing/extra/tampered files, noncanonical metadata,
+  symlinks/nonregular output, traversal and unrelated output ownership.
+- Added deterministic/retention/rollback/failure tests plus root/subpath alias and
+  HTTP asset resolution tests. These are not real-browser/CEF graphics tests.
+- CI configuration builds/verifies/uploads candidate sites only; no deploy/write
+  permissions. A clean CI artifact has no prior history; real deployment must
+  restore/retain old namespaces, verify the complete tree and qualify hosting.
+- Read-only review found verifier self-consistency did not enforce the approved
+  file set. Parent fixed exact PACKAGE_FILES verification, tested recomputed-ID
+  crafted payload/missing-notice manifests and preserved order-independent checks.
+  No delegated re-review is claimed.
+- Local validation: 217 tests / 213 passed / four explicit platform skips / zero
+  failures. Static, 44-file runtime baseline, 19 assets, build, redistribution,
+  candidate build/verification and diff checks pass; candidate editor alias HTTP 200.
+  No browser/OBS render or real deployment result is inferred.
+- See P3_RELEASE.md. P3 is not passed; sustained playback/scene transitions remain
+  deferred, and P4 (supported signed local/offline edition) is still separate.
+
+## P3 slice 2 — local browser regression
+
+- Added pinned contributor-only Playwright/pngjs/pixelmatch and a separate browser
+  command/isolated loopback fixture. Runtime/public packaging remains dependency-free.
+- Nine local Chrome 156.0.8078.49 tests pass: editor edits/drafts/JSON/clipboard,
+  invalid inputs/fallback, mobile/keyboard basics, hosted/iframe audio isolation,
+  synthetic no-auth/auth session UI and accepted-P2 scene comparisons.
+- Visual state fixes Date/RNG and two RAF steps with reduced motion. Starting and
+  Thanks are 1920×1080; BRB is a 480×270 software-rendered shader sample, not
+  full-resolution OBS/GPU qualification. Comparison has a deliberate layout-shift
+  negative control. Browser contexts never connect to actual OBS.
+- Browser tests found hash-only iframe edits could keep the previous document.
+  Parent added a preview-only revision query marker and actual frame-title/unit
+  coverage. Copied links remain canonical; no credentials enter URLs.
+- Archived P2 source hashes; active 44-file baseline records editor-only change.
+  Renderer/shader/style/asset bytes are unchanged.
+- CI configuration adds Chromium/Ubuntu browser tests and report artifacts; remote
+  execution, hosted deployment, other engines/OS and deferred soak remain pending.
+- Full browser suite passed together twice, including after clean npm ci.
+  Node tests: 217 total / 213 pass / four explicit platform skips. Static/asset/
+  44-file baseline/build/redistribution/site-integrity/diff checks pass.
+- Read-only Crouton Alpha Free review of this browser slice reported no blockers
+  (static inspection only, not an independent browser/OBS run or certification).
+- See P3_BROWSER.md for exact evidence, fixture isolation and limitations.
+  This work was awaiting a local checkpoint; P2 checkpoint is 1d28784.
+  See the subsequent checkpoint/rollout record.
+
+## P3 Cloudflare hosting preparation
+
+- User selected Cloudflare Pages. No account access, project creation, publication
+  or push has occurred. First preview destination/account still need confirmation.
+- build:cloudflare prepares a sealed cf-dist from the cumulative site tree; verify
+  enforces copied release seals, explicit non-SPA 404 and generated cache/safety
+  headers. Prior prepared history cannot be dropped during replacement.
+- Immutable cache rules apply only to verified existing IDs; unknown future IDs
+  do not get year-long negative caching. Mutable root aliases/manifests revalidate.
+  Header/file/size limits fail closed instead of pruning old namespaces.
+- Added a credential-free, read-only pages.dev audit for bytes, cache/MIME,
+  same-origin/namespace canonical redirects, query/fragment safety and 404 behavior.
+  Tests use synthetic fetch fixtures; no real Cloudflare URL was contacted.
+- CI only uploads preparation artifacts. Direct Upload is proposed for controlled
+  preview publishing; project mode implications, credentials and history restoration
+  requirements are explicit in P3_CLOUDFLARE.md. No auto-deploy exists.
+
+## Cloudflare publisher readiness after pause
+
+- Resumed after the no-blocker Cloudflare review. No configured Cloudflare token,
+  account environment or standard Wrangler login file was found in this session.
+- Pinned contributor-only Wrangler 4.158.0 (Node >=22); version/deploy-help work.
+  No npm install-script permissions were relaxed. esbuild/workerd postinstalls
+  remain blocked by the existing policy; actual static upload is still untested.
+- User approved Pages project name cosmic-stream-scenes; availability has not
+  been checked. Secure API-token/account-ID prompts timed out without submission.
+  Account authorization is still pending. No login, project creation, upload or
+  push has occurred; no credentials were received.
+
+## First Cloudflare preview upload
+
+- User retried secure authorization and supplied the intended account ID/token.
+  Values were consumed only in the publisher command, not project files/artifacts.
+- Verified source/asset/password/site/CF gates, created Direct Upload project
+  cosmic-stream-scenes (production branch main), confirmed no prior deployments,
+  and uploaded only branch p3-preview with pinned Wrangler 4.158.0. The static
+  upload worked without relaxing blocked npm install-script permissions.
+- Confirmed API deployment environment preview, branch p3-preview. URLs:
+  https://a36c7c4a.cosmic-stream-scenes.pages.dev/editor
+  https://p3-preview.cosmic-stream-scenes.pages.dev/editor
+- Retained two namespaces. Public HTTP audit passed on both origins: 115 files
+  each, two releases, byte/cache/MIME/redirect/query/404 checks. Initial TLS probes
+  failed; subsequent default-TLS checks succeeded without disabling verification.
+- User subsequently confirmed "3 links is all working in OBS". Record all-three
+  hosted scene URL transfer/playback smoke acceptance; no exact OBS/CEF versions,
+  resolution, duration or exhaustive settings coverage was provided.
+- No production upload or git push requested. Rollout/rollback and deferred
+  hardware/soak qualification remain pending. The user authorized a local P3
+  checkpoint followed by preview-only rollout/rollback validation; nothing pushed.
+
 ## Original P1 handoff (at checkpoint)
 
 1. Inspect duplicated configuration and asset boot loading across the three scenes.

@@ -39,7 +39,8 @@ It includes:
 ## Contributor checks and preview packaging
 
 Node.js 22+ is required **only for contributor tooling**, not hosted scene playback.
-There are no third-party npm dependencies.
+There are no runtime npm dependencies. Browser regression uses pinned
+contributor-only Playwright/image-comparison devDependencies.
 
 ```bash
 npm ci
@@ -55,6 +56,30 @@ It is not an installer. `npm run release:check` verifies static redistribution e
 and currently passes for the replacement asset set. CI uploads previews only when that gate
 passes; there is no production deployment or browser/OBS certification.
 See [CONTRIBUTING.md](CONTRIBUTING.md) for commands, safeguards, and limitations.
+
+## P3 candidate release layout (in progress)
+
+P2 is saved locally as `1d28784` after user-reported editor/OBS acceptance.
+`npm run build:site` creates a content-addressed candidate under `site/releases/`;
+`npm run site:verify` checks every retained namespace and current compatibility
+alias. The versioned editor generates pinned scene links. Earlier namespaces are
+not overwritten by later builds, and `site:select` can change the current candidate.
+
+This does **not** publish or qualify a release. A clean CI artifact has no previous
+deployment history: retain/restore old namespaces before a real deployment.
+`npm run clean` deliberately keeps `site/`. See [P3_RELEASE.md](docs/P3_RELEASE.md)
+for commands, retention/rollback limitations and remaining P3 gates. P4 remains the
+supported local/offline launcher phase.
+
+`npm run test:browser` now exercises the editor and compares scene frames with
+accepted P2 in a real browser. Browser install, evidence and scope limits are in
+[P3_BROWSER.md](docs/P3_BROWSER.md). These are not OBS/GPU soak results.
+
+Cloudflare Pages is the selected hosting target. `npm run build:cloudflare` prepares
+`cf-dist/` with retained release namespaces, cache rules and a non-SPA 404 page;
+`npm run cloudflare:verify` checks it. No upload/account access is performed.
+See [P3_CLOUDFLARE.md](docs/P3_CLOUDFLARE.md) before any deployment—fresh CI artifacts
+must not overwrite deployed history.
 
 ## No-code editor (P2 candidate)
 

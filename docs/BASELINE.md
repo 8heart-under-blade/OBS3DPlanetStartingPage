@@ -2,9 +2,13 @@
 
 ## What this baseline establishes
 
-The active `source-baseline.json` records 44 runtime files for the P2 editor
-candidate. P1 is saved at commit `36d66c6`; its 36-file manifest is retained in
-`source-baseline-p1-complete.json`. P2 browser/OBS acceptance is pending. The pre-P1 licensed-asset manifest (31 files)
+The active `source-baseline.json` records 44 runtime files for the P3 browser
+candidate, deliberately adding an editor-only preview document-navigation marker.
+Accepted P2 is saved at `1d28784`, with its prior 44-file hashes retained in
+`source-baseline-p2-complete.json`. The user reported editor/OBS acceptance;
+scoped local Chrome automation is recorded in P3_BROWSER.md, not full qualification.
+P1 is saved at commit `36d66c6`; its 36-file manifest is retained in
+`source-baseline-p1-complete.json`. The pre-P1 licensed-asset manifest (31 files)
 is retained in `source-baseline-assets.json`; the first P1 bootstrap manifest is
 retained in `source-baseline-p1-boot.json`, and the pre-audio extraction manifest
 in `source-baseline-p1-overlay.json`. The three scene scripts now call shared

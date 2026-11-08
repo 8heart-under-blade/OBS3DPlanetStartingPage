@@ -64,7 +64,7 @@ test('editor starts with three validated snapshot links, a full-size scaled prev
   const f = fixture();
   for (const scene of ['starting', 'brb', 'thanks']) assert.deepEqual(decodeLink(f, scene), f.api.getSnapshot());
   assert.equal(f.controls['scene-preview'].style.transform, 'scale(0.5)');
-  assert.ok(f.controls['scene-preview'].src.includes('/repo/index.html?assets=offline#preset='));
+  assert.ok(f.controls['scene-preview'].src.includes('/repo/index.html?assets=offline&preview=1#preset='));
   assert.doesNotMatch(html, /<script[^>]+src="config\.js"/);
   assert.equal(f.saved.length, 0);
 });
@@ -74,6 +74,9 @@ test('Unicode edits autosave only validated state and copied URLs retain snapsho
   await f.edit('title-input', '星空 café 😀'); f.runTimers();
   assert.equal(f.api.getSnapshot().scenes.starting.title, '星空 café 😀');
   assert.equal(f.saved.length, 1);
+  const preview = new URL(f.controls['scene-preview'].src), oldPreview = new URL(old);
+  assert.notEqual(preview.search, oldPreview.search, 'preview document URL must change, not just the preset fragment');
+  assert.equal(new URL(f.controls['link-starting'].value).searchParams.has('preview'), false);
   assert.equal(decodeLink(f, 'thanks').scenes.starting.title, '星空 café 😀');
   assert.equal(snapshots.fromHash(new URL(old).hash).scenes.starting.title, 'STREAM STARTING SOON');
   assert.equal(Object.hasOwn(JSON.parse(f.saved[0]), 'audioReactive'), false);

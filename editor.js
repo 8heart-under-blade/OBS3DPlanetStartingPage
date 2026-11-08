@@ -120,7 +120,11 @@
     controls["preview-open"].removeAttribute("aria-disabled");
     controls["scene-preview"].title = "Live " + currentScene + " scene preview";
     previewSerial++;
-    previewUrl = urls[currentScene];
+    // Hash-only iframe navigation does not rerun the scene bootstrap. Give every
+    // preview revision a distinct document URL; copied/open OBS links stay canonical.
+    var previewTarget = new URL(urls[currentScene]);
+    previewTarget.searchParams.set("preview", String(previewSerial));
+    previewUrl = previewTarget.href;
     controls["scene-preview"].src = previewUrl;
     linksValid = true; controls["export-button"].disabled = false;
     status(storageWarning ? "Links are ready. Draft storage needs attention; you can export a backup." : "Links are ready. Preview updating; copied OBS links remain independent snapshots.");

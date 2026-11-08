@@ -1,8 +1,8 @@
 {
   "schemaVersion": 1,
-  "baseCommit": "36d66c6",
-  "revision": "p2-editor-session-audio-2026-11-08",
-  "purpose": "P2 candidate: strict nonsecret snapshots, editor/drafts/preview, local-only session audio. Historical P1 hashes retained. Source bytes only, not browser/OBS acceptance.",
+  "baseCommit": "1d28784928846cf58d75230c26fec09807ea5c0b",
+  "revision": "p3-browser-preview-navigation-2026-11-08",
+  "purpose": "P3 browser regression slice: renderer bytes retained; editor preview adds a nonsecret per-revision query marker to force document bootstrap after preset-fragment edits. Copied OBS URLs remain canonical. P2 hashes archived separately. Not production/GPU qualification.",
   "files": [
     {
       "path": "brb-blackhole/blackholeOverlay.module.js",
@@ -51,8 +51,8 @@
     },
     {
       "path": "editor.js",
-      "bytes": 16360,
-      "sha256": "90e53009f67a8a825f8539046715ad32ec516f0e43cbb09d0bbc3b48ac0c729e"
+      "bytes": 16652,
+      "sha256": "2061f2926bc1df79942673dd0ba8f83adff8da239e6a3d7cc0c439ed1ca7d950"
     },
     {
       "path": "index.html",

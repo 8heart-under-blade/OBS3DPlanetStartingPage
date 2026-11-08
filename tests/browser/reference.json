@@ -1,0 +1,7 @@
+{
+  "schemaVersion": 1,
+  "commit": "1d28784928846cf58d75230c26fec09807ea5c0b",
+  "reason": "Accepted P2 editor/OBS smoke checkpoint. Compare this committed runtime with the candidate in the same browser, not against auto-updated golden images.",
+  "seed": 1429,
+  "fixedTime": "2026-11-08T12:00:00.000Z"
+}
