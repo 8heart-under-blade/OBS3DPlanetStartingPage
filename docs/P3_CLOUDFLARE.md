@@ -160,9 +160,11 @@ The drill completed on p3-preview only:
 - A first preflight rejected an unsupported API pagination setting before uploads;
   using Cloudflare's default pagination succeeded. No credentials were logged.
 
-Machine-readable nonsecret evidence: docs/p3-preview-rollout.json. Actual OBS
-refresh/recheck after this drill remains user acceptance to collect. No production
-upload, remote CI run, git push or production qualification is implied.
+Machine-readable nonsecret evidence: docs/p3-preview-rollout.json. After the
+request to refresh the original three OBS sources, the user confirmed "its working".
+Record user-reported post-rollback OBS playback smoke acceptance, without inferring
+exact refresh steps, versions, duration or sustained-playback coverage. No production
+upload, remote CI run, git push or full production qualification is implied.
 
 ## History must survive clean deploys
 

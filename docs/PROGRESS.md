@@ -305,6 +305,16 @@ qualification is still pending. See P1_RUNTIME.md for the current architecture.
 - Updated local gates: 225 Node tests / 221 pass / four skips, nine Chrome tests;
   static/source/asset/build/redistribution/CF preparation and integrity checks pass.
 
+## User acceptance after preview rollback
+
+- After being asked to refresh the original three OBS sources following the live
+  rollout/rollback drill, the user confirmed "its working". Record user-reported
+  post-rollback OBS playback smoke acceptance. Do not infer exact refresh steps,
+  versions, duration, exhaustive settings or sustained-playback coverage.
+- Source checkpoint 62b2ae1 and the verified local three-namespace artifact backup
+  remain available. Remote CI, durable off-machine history and production promotion
+  are still pending. Deferred soak/GPU/transition qualification remains open.
+
 ## Original P1 handoff (at checkpoint)
 
 1. Inspect duplicated configuration and asset boot loading across the three scenes.
