@@ -40,7 +40,7 @@ reachable; the browser reference must not silently regenerate from current sourc
 ## Outputs
 
 - `dist/`: exactly allowlisted runtime files, root license, attribution/audit notices, and deterministic `build-manifest.json` with SHA-256 hashes, sizes and `previewOnly: true`. No scene transformations.
-- `release/obs3dplanetstartingpage-preview-v0.1.0.tar.gz` and matching `.sha256`: local developer preview, not an end-user installer or public release.
+- `release/obs3dplanetstartingpage-preview-v<package-version>.tar.gz` and matching `.sha256`: local developer preview, not an end-user installer or public release.
 - `cf-dist/`: prepared Cloudflare Pages candidate, generated from cumulative site/
   plus sealed cache/404 policy and metadata. No uploader/secret is included; see
   [P3_CLOUDFLARE.md](docs/P3_CLOUDFLARE.md). Kept by npm clean; preserve history.

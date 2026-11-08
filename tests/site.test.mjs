@@ -33,7 +33,8 @@ function fixture(t) {
 test('candidate namespace is deterministic, exact-allowlisted and byte-for-byte source content', t => {
   const f = fixture(t); f.run();
   const id = f.current(), release = join(f.site, 'releases', id);
-  assert.match(id, /^v0\.1\.0-[a-f0-9]{64}$/);
+  const version = JSON.parse(readFileSync(join(f.root, 'package.json'), 'utf8')).version;
+  assert.ok(id.startsWith('v' + version + '-')); assert.match(id.slice(-64), /^[a-f0-9]{64}$/);
   assert.deepEqual(tree(release), [...PACKAGE_FILES, 'build-manifest.json', 'release-manifest.json'].sort());
   for (const path of PACKAGE_FILES) assert.equal(sha256File(join(release, path)), sha256File(join(f.root, path)), path);
   const first = f.hashes(); f.run(); assert.equal(f.current(), id); assert.deepEqual(f.hashes(), first);

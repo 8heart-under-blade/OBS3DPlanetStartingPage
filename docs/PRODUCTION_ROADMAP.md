@@ -84,7 +84,10 @@ commands are implemented. Project cosmic-stream-scenes now has a p3-preview
 upload; public HTTP audits passed for 115 files and two retained namespaces on
 the specific deployment and preview alias. The user confirmed all three hosted
 links work in OBS (transfer/playback smoke acceptance). Detailed hosted workflow,
-rollout/rollback and production deployment/qualification remain pending. See [P3_CLOUDFLARE.md](P3_CLOUDFLARE.md).
+A preview-only nonvisual rollout and accepted-current restoration now pass live
+HTTP verification, preserving three namespaces. Native OBS recheck after the drill,
+durable deployment history, production deployment and full qualification remain
+pending. See [P3_CLOUDFLARE.md](P3_CLOUDFLARE.md).
 See [P3_RELEASE.md](P3_RELEASE.md) for slices, commands and limitations.
 
 Unit tests for config/audio/math; browser/visual regression; immutable/versioned asset paths; tested hosting at repository subpaths; artifacts/checksums/changelog/rollback and user support guide.

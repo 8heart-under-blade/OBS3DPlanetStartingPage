@@ -15,8 +15,8 @@ function fixture(t) {
   for (const path of [...PACKAGE_FILES, 'package.json']) {
     mkdirSync(dirname(join(root, path)), {recursive: true}); copyFileSync(join(ROOT, path), join(root, path));
   }
-  function run(command = 'build', ok = true) {
-    const result = spawnSync(process.execPath, [join(ROOT, 'scripts/cloudflare.mjs'), command, '--root', root], {encoding: 'utf8'});
+  function run(command = 'build', ok = true, args = []) {
+    const result = spawnSync(process.execPath, [join(ROOT, 'scripts/cloudflare.mjs'), command, '--root', root, ...args], {encoding: 'utf8'});
     if (ok) assert.equal(result.status, 0, result.stdout + result.stderr); else assert.notEqual(result.status, 0);
     return result;
   }
@@ -94,6 +94,24 @@ test('Cloudflare preparation refuses to drop previously prepared history when th
   const before = f.hashes(); rmSync(f.site, {recursive: true, force: true});
   f.run('build', false); assert.deepEqual(f.hashes(), before);
   assert.ok(verifyCloudflare(f.output).releases.includes(old));
+});
+
+test('preview rollback selects an old current release without removing the newer pinned namespace', async t => {
+  const f = fixture(t); f.run(); const old = verifyCloudflare(f.output).current;
+  const originalFiles = f.hashes();
+  writeFileSync(join(f.root, 'editor.css'), readFileSync(join(f.root, 'editor.css'), 'utf8') + '\n/* new rollout candidate */\n');
+  f.run(); const next = verifyCloudflare(f.output).current; assert.notEqual(next, old);
+  f.run('build', true, ['--release', old]);
+  const rolledBack = verifyCloudflare(f.output);
+  assert.equal(rolledBack.current, old); assert.deepEqual(new Set(rolledBack.releases), new Set([old, next]));
+  for (const [path, hash] of Object.entries(originalFiles)) if (path.startsWith('releases/')) assert.equal(sha256File(join(f.output, path)), hash);
+  const live = await auditCloudflare(f.output, 'https://example-test.pages.dev/', mockPages(f).fetchMock);
+  assert.equal(live.current, old); assert.equal(live.releases, 2);
+  const unchanged = f.hashes();
+  for (const args of [['--release', 'v0.0.0-' + '0'.repeat(64)], ['--release', '../outside'], ['--release', old, '--release', next]]) {
+    f.run('build', false, args); assert.deepEqual(f.hashes(), unchanged);
+  }
+  f.run('verify', false, ['--release', old]); assert.deepEqual(f.hashes(), unchanged);
 });
 
 test('read-only HTTP audit follows canonical clean URLs and checks complete retention, bytes, MIME, caching and 404 behavior', async t => {

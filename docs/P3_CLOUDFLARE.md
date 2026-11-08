@@ -1,4 +1,4 @@
-# P3 Cloudflare Pages target — first preview uploaded, not production-qualified
+# P3 Cloudflare Pages target — preview rollout/rollback verified, not production-qualified
 
 The user selected **Cloudflare Pages** and approved project name
 **cosmic-stream-scenes**. The intended account was authorized through secure inputs;
@@ -35,6 +35,8 @@ needed. Future publishing still requires authorization and retained history.
 ```sh
 npm run build:cloudflare
 npm run cloudflare:verify
+# Prepare a retained older release as current without deleting newer namespaces:
+npm run build:cloudflare -- --release <existing-release-id>
 # Only after a preview actually exists:
 npm run cloudflare:check-live -- --url https://<preview>.<project>.pages.dev/
 ```
@@ -120,6 +122,47 @@ chat, source files, command-line literals, presets or public artifacts. Cloudfla
 documents a token scoped to the intended account with Account / Cloudflare Pages /
 Edit. Account ID and project destination must be confirmed separately.
 No secret/account values are needed by build or public read-only audit commands.
+
+## Preview rollout/rollback drill preparation
+
+Accepted P3 source is saved locally at 6a4e284. A verified backup of both site/
+and cf-dist/ (two namespaces) is stored outside the repository under
+../checkpoints/p3-6a4e284/. It is a local backup, not an off-machine history store.
+
+The drill uses version 0.1.0-p3.1 to create a distinct content-addressed candidate
+without changing scene code/visuals. build:cloudflare --release selects only an
+already verified retained namespace, after building/retaining the source candidate.
+Invalid/missing selections fail before source aliases are changed. The prepared
+folder may point to an older current renderer while retaining every newer pin.
+
+This is NOT Cloudflare's platform rollback-to-an-old-deployment operation: it is
+a fresh preview upload of the full cumulative tree with the accepted renderer
+selected as current. That distinction preserves links issued during the rollout.
+The actual preview results are recorded below; no production approval or deferred
+soak result is implied. A plain build:cloudflare selects the current source version
+again; use --release explicitly when preparing an accepted-current restoration.
+
+### Live preview drill results
+
+The drill completed on p3-preview only:
+- Rollout deployment: https://feb46cda.cosmic-stream-scenes.pages.dev
+- Accepted-current restoration: https://f3c8b40d.cosmic-stream-scenes.pages.dev
+- Each specific deployment and the stable preview alias passed public audits:
+  169 files, three retained renderer namespaces, correct current selection,
+  checksums/cache/MIME/canonical query redirects and missing-path 404 behavior.
+- The stable alias finishes on the previously user-accepted renderer. The newer
+  0.1.0-p3.1 pin remains available, as do both older pins.
+- Original a36c7c4a deployment was re-audited after the drill: all its 115 expected
+  files and two namespaces still pass. This is HTTP integrity/availability proof,
+  not a native OBS refresh or sustained-playback result.
+- Source/static/asset/build/retention gates pass, with 225 Node tests (221 pass,
+  four platform skips) and nine local Chrome tests after the selection change.
+- A first preflight rejected an unsupported API pagination setting before uploads;
+  using Cloudflare's default pagination succeeded. No credentials were logged.
+
+Machine-readable nonsecret evidence: docs/p3-preview-rollout.json. Actual OBS
+refresh/recheck after this drill remains user acceptance to collect. No production
+upload, remote CI run, git push or production qualification is implied.
 
 ## History must survive clean deploys
 

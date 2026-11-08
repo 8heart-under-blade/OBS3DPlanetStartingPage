@@ -4,16 +4,19 @@ import { copyFileSync, existsSync, mkdirSync, mkdtempSync, readFileSync, renameS
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { assertNotSymlink, assertRegularFile, repoRoot } from './lib.mjs';
-import { json, tree, verifySite } from './site-lib.mjs';
+import { json, selectRelease, tree, validId, verifySite } from './site-lib.mjs';
 import { cloudflareManifest, headersFile, NOT_FOUND, verifyCloudflare } from './cloudflare-lib.mjs';
 try {
   const args = process.argv.slice(2), command = args.shift();
-  let root = repoRoot();
-  if (args.length) {
-    if (args.length !== 2 || args[0] !== '--root' || !args[1] || args[1].startsWith('--')) throw new Error('Invalid Cloudflare arguments');
-    root = resolve(args[1]);
+  const options = {};
+  while (args.length) {
+    const key = args.shift(), value = args.shift();
+    if (!['--root', '--release'].includes(key) || !value || value.startsWith('--') || options[key] !== undefined) throw new Error('Invalid Cloudflare arguments');
+    options[key] = value;
   }
-  if (!['build', 'verify'].includes(command)) throw new Error('Invalid Cloudflare command');
+  const root = options['--root'] ? resolve(options['--root']) : repoRoot();
+  if (!['build', 'verify'].includes(command) || (options['--release'] !== undefined && command !== 'build')) throw new Error('Invalid Cloudflare command');
+  if (options['--release'] !== undefined && !validId(options['--release'])) throw new Error('Invalid release selection');
   const output = join(root, 'cf-dist');
   assertNotSymlink(output);
   if (command === 'verify') {
@@ -21,8 +24,13 @@ try {
     console.log(`cloudflare: verified ${verified.releases.length} retained namespace(s), current ${verified.current}`);
   } else {
     const prior = existsSync(output) ? verifyCloudflare(output) : null;
+    const site = join(root, 'site');
+    // Selection is only for already verified retained releases. Fail before the
+    // source build can change aliases when the requested namespace is missing.
+    if (options['--release'] && !verifySite(site).releases.includes(options['--release'])) throw new Error('Selected release is not retained');
     execFileSync(process.execPath, [join(dirname(fileURLToPath(import.meta.url)), 'site.mjs'), 'build', '--root', root], {stdio: 'inherit'});
-    const site = join(root, 'site'), verified = verifySite(site);
+    if (options['--release']) selectRelease(site, options['--release']);
+    const verified = verifySite(site);
     if (prior && prior.releases.some(id => !verified.releases.includes(id))) throw new Error('Refusing to drop previously prepared Cloudflare history; restore trusted site history');
     // Fully validate the policy/limits before replacing the prepared folder.
     const headers = headersFile(verified.releases);

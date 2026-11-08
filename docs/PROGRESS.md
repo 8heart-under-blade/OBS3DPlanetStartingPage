@@ -274,6 +274,37 @@ qualification is still pending. See P1_RUNTIME.md for the current architecture.
   hardware/soak qualification remain pending. The user authorized a local P3
   checkpoint followed by preview-only rollout/rollback validation; nothing pushed.
 
+## P3 checkpoint and preview rollback preparation
+
+- Saved accepted P3 source locally as 6a4e284 after all gates, 224 Node tests
+  (220 pass/four skips) and nine local Chrome tests passed again. Nothing pushed.
+- Verified separate local site/cf-dist backup under ../checkpoints/p3-6a4e284/,
+  retaining both published namespaces. This is not off-machine disaster recovery.
+- Added explicit existing-release selection to Cloudflare preparation and a
+  regression test covering rollback while retaining the newer pin. Invalid,
+  duplicate, missing and verify-only selection arguments fail closed.
+- Prerelease version 0.1.0-p3.1 distinguishes the nonvisual rollout candidate.
+  Preview-only publish/restore validation needs fresh secure authorization;
+  no subsequent upload or production promotion has happened yet.
+
+## Live preview rollout/accepted-current restoration passed
+
+- Initial unsupported API pagination request stopped safely before uploads; using
+  the provider default fixed the preflight. Account/project/history checks passed.
+- Uploaded nonvisual 0.1.0-p3.1 only to p3-preview:
+  https://feb46cda.cosmic-stream-scenes.pages.dev
+- Then uploaded the complete cumulative tree selecting the prior accepted current:
+  https://f3c8b40d.cosmic-stream-scenes.pages.dev
+- Both specific deployments and the stable alias passed live HTTP audits, 169 files
+  and three namespaces each. The alias ends on the user-accepted renderer; the
+  new pin and both prior pins remain available. Original a36c7c4a deployment
+  separately re-audited successfully after the drill (115 files/two namespaces).
+- Public proof is recorded in docs/p3-preview-rollout.json without account/token
+  values. No production upload or git push. OBS refresh-after-drill, sustained
+  playback and GPU/CEF qualification are not inferred from HTTP checks.
+- Updated local gates: 225 Node tests / 221 pass / four skips, nine Chrome tests;
+  static/source/asset/build/redistribution/CF preparation and integrity checks pass.
+
 ## Original P1 handoff (at checkpoint)
 
 1. Inspect duplicated configuration and asset boot loading across the three scenes.

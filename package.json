@@ -1,6 +1,6 @@
 {
   "name": "obs3dplanetstartingpage",
-  "version": "0.1.0",
+  "version": "0.1.0-p3.1",
   "private": true,
   "description": "OBS 3D planet starting/BRB/thanks scenes - contributor tooling (P0 production foundation, build preview only)",
   "license": "MIT",

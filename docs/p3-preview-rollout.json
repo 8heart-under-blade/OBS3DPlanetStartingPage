@@ -1,0 +1,48 @@
+{
+  "schemaVersion": 1,
+  "checkpoint": "6a4e284",
+  "project": "cosmic-stream-scenes",
+  "branch": "p3-preview",
+  "productionRequested": false,
+  "initialDeployment": "https://a36c7c4a.cosmic-stream-scenes.pages.dev",
+  "acceptedRelease": "v0.1.0-6613f9a2f7269ed867f21986aa2dc412dadc3c55803c27286292f4a7fcf97fc1",
+  "rolloutRelease": "v0.1.0-p3.1-b648c84dc5a3eba693b63cf92c9fde49883cd30818344fb7f2859f186e5f8abd",
+  "before": {
+    "current": "v0.1.0-6613f9a2f7269ed867f21986aa2dc412dadc3c55803c27286292f4a7fcf97fc1",
+    "releases": 2,
+    "checkedFiles": 115
+  },
+  "rollout": {
+    "verified": true,
+    "deployment": "https://feb46cda.cosmic-stream-scenes.pages.dev",
+    "specific": {
+      "current": "v0.1.0-p3.1-b648c84dc5a3eba693b63cf92c9fde49883cd30818344fb7f2859f186e5f8abd",
+      "releases": 3,
+      "checkedFiles": 169
+    },
+    "alias": {
+      "current": "v0.1.0-p3.1-b648c84dc5a3eba693b63cf92c9fde49883cd30818344fb7f2859f186e5f8abd",
+      "releases": 3,
+      "checkedFiles": 169
+    }
+  },
+  "rollback": {
+    "verified": true,
+    "deployment": "https://f3c8b40d.cosmic-stream-scenes.pages.dev",
+    "specific": {
+      "current": "v0.1.0-6613f9a2f7269ed867f21986aa2dc412dadc3c55803c27286292f4a7fcf97fc1",
+      "releases": 3,
+      "checkedFiles": 169
+    },
+    "alias": {
+      "current": "v0.1.0-6613f9a2f7269ed867f21986aa2dc412dadc3c55803c27286292f4a7fcf97fc1",
+      "releases": 3,
+      "checkedFiles": 169
+    }
+  },
+  "retainedReleases": [
+    "v0.1.0-600261d16300c44261515963ab4e6154dd762f4c1815b91b0b87a622149198ba",
+    "v0.1.0-6613f9a2f7269ed867f21986aa2dc412dadc3c55803c27286292f4a7fcf97fc1",
+    "v0.1.0-p3.1-b648c84dc5a3eba693b63cf92c9fde49883cd30818344fb7f2859f186e5f8abd"
+  ]
+}
