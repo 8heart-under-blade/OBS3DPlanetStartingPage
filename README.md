@@ -56,16 +56,44 @@ and currently passes for the replacement asset set. CI uploads previews only whe
 passes; there is no production deployment or browser/OBS certification.
 See [CONTRIBUTING.md](CONTRIBUTING.md) for commands, safeguards, and limitations.
 
+## P1 quality and recovery
+
+Existing URLs use **tuned** quality by default, preserving the current settings.
+Optionally append `&quality=low`, `&quality=medium` or `&quality=high` to a scene
+URL (use `?` instead of `&` if it has no query yet):
+
+```text
+http://127.0.0.1:8080/?assets=offline&quality=low
+http://127.0.0.1:8080/brb.html?assets=offline&quality=medium
+http://127.0.0.1:8080/thanks.html?assets=offline&quality=tuned
+```
+
+Profiles cap pixel ratio, fabric segments and star density; they do not guarantee
+a particular FPS. An optional `quality` string in config.js supplies the default;
+the URL overrides it. Malformed known settings fall back to scene defaults, with
+fixed warning codes available in `window.STREAM_CONFIG_WARNINGS`. Config remains
+trusted JavaScript, not a safe untrusted-preset import format.
+
+Context loss pauses rendering; restoration reloads the same URL to rebuild.
+Failed textures retain procedural fallbacks and show a diagnostic. A script load
+taking longer than 15 seconds requires refresh rather than unsafe competing loads.
+See [P1 implementation and qualification status](docs/P1_RUNTIME.md).
+The user accepted all six P1 slices after an OBS visual/audio recheck; full
+production qualification and the deferred soak/transition checks remain outstanding.
+
 ## Files
 
 - `config.js` - runtime settings (assets, overlay text, custom fonts; never publish credentials)
-- `docs/source-baseline.json` - current source-byte hashes; original P0 hashes retained in `docs/source-baseline-p0.json`
+- `docs/source-baseline.json` - current source-byte hashes; historical P0 and pre-P1 hashes in `docs/source-baseline-p0.json` and `docs/source-baseline-assets.json`
 - `docs/asset-inventory.json` - third-party asset hashes, rights evidence, and release blockers
 - `ATTRIBUTIONS.md`, `credits.html`, `docs/licenses/` - third-party credits and bundled license terms
 - `cinzel-decorative.ttf`, `macondo.ttf` - local OFL fonts (no external font service required)
-- `index.html` - page shell + asset boot loader
-- `brb.html` - BRB page shell + asset boot loader
-- `thanks.html` - "Thank You For Watching" page shell + asset boot loader
+- `index.html`, `brb.html`, `thanks.html` - scene shells with fixed bootstrap scene identifiers
+- `runtime/boot.js` - shared scene routing and asset bootstrap ([P1 slice details](docs/P1_RUNTIME.md))
+- `runtime/overlay.js` - shared typography and local date/time ticker
+- `runtime/audio.js` - shared OBS WebSocket audio controller and meter processing
+- `runtime/settings.js` - trusted-JS config checks and opt-in quality profiles
+- `runtime/recovery.js` - lifecycle scopes, graphics/asset recovery and safe diagnostics
 - `styles.css` - visual styling and overlay layout
 - `brb.css` - BRB visual styling and overlay layout
 - `thanks.css` - "Thank You For Watching" visual styling and overlay layout

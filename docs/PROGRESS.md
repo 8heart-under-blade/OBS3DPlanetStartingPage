@@ -1,5 +1,8 @@
 # Progress checkpoint — before P1
 
+The saved pre-P1 checkpoint is commit `703dbc6`. P1 slice 1 subsequently started;
+see the progress sections below and P1_RUNTIME.md.
+
 Date: 2026-11-08
 Base: 7cd2c22 (production foundation)
 
@@ -46,7 +49,89 @@ This is an explicit exception to the roadmap's preferred baseline-before-refacto
 sequence. P0 is not fully qualified. P1 changes must remain incremental and must not
 claim measured visual parity or production certification from this smoke check.
 
-## Next step — P1 (not started at this checkpoint)
+## P1 progress — slice 1
+
+- Shared routing/asset bootstrap added in runtime/boot.js and wired into all three HTML shells.
+- BRB skips optional ESM imports when disabled or its layer is absent.
+- Numerical config, scene renderers, styles and all licensed assets remain byte-identical
+  to the pre-P1 checkpoint; source-baseline-assets.json retains that manifest.
+- OpenCode Beam Free audited compatibility; Flint 40B Free contributed routing tests.
+  No Flash models used for this P1 work.
+- Asset-mode, failure-path, browser-wrapper simulation and preservation regressions added.
+- P1 is partial; audio/text/lifecycle extraction and quality/failure recovery remain.
+- Validation: check, baseline:verify (32 runtime files), assets:check (19 assets),
+  test (51 total: 47 pass, 4 platform-related skips, zero failures), build
+  (40 allowlisted inputs plus manifest), release:check and git diff --check pass.
+- User subsequently accepted slice 1 with "LGTM lets continue" after the refresh/recheck
+  request. Exact scene coverage and new audio results were not separately reported.
+- Previously deferred production qualification remains not tested.
+
+## P1 progress — slice 2
+
+- Extracted byte-identical typography and clock helpers into runtime/overlay.js.
+- All HTML shells load config, overlay helpers, then bootstrap; missing helpers
+  fail visibly before renderer initialization.
+- Three scene files replace only two helper call sites and remove the extracted
+  definitions. Reconstruction tests restore original files and match their
+  pre-P1 hashes, including all original audio/rendering/cleanup code.
+- Beam Free contributed fake-clock tests. No Flash models used.
+- Validation: check, baseline:verify (33 runtime files), assets:check (19 assets),
+  test (70 total: 66 pass, 4 explicit skips, zero failures), build
+  (41 allowlisted inputs plus manifest), release:check and git diff --check pass.
+- User subsequently confirmed "all pages is ok" after the slice 2 refresh/font/clock
+  check request. Record all-page user acceptance, not a new measured performance,
+  lifecycle or audio-authentication result.
+- Audio/lifecycle extraction, quality presets and resource/context recovery remain.
+
+## P1 progress — slice 3
+
+- Extracted 13 identical controller/meter/auth helpers into runtime/audio.js.
+- Scene files call StreamAudio.createController; render-mode selection stays local.
+- The helper bodies, subscription mask, WebSocket subprotocol, meter math, reconnect
+  behavior and existing start/stop/unload call sites are preserved.
+- HTML loads config, overlay helpers, audio helpers, then bootstrap; missing audio
+  helpers fail visibly before renderer initialization.
+- Fake WebSocket/crypto/timer tests cover gates, Hello/Identify/auth, backoff/reset,
+  stop, filtering/fallback, linear/dB meters, smoothing/decay and malformed inputs.
+- Reconstruction tests match both the pre-audio slice and original pre-P1 scene
+  hashes, constraining extraction rather than broadly exempting changed renderers.
+- Beam Free provided a read-only compatibility audit; no Flash models used.
+- Validation: check, baseline:verify (34 runtime files), assets:check (19 assets),
+  test (85 total: 81 pass, 4 platform-related skips, zero failures), build
+  (42 allowlisted inputs plus manifest), release:check and git diff --check pass.
+- User subsequently confirmed "audio reactivity still works" after the slice 3
+  OBS refresh/recheck request. This is user-reported audio smoke acceptance, not
+  a measured authentication/reconnect, performance or lifecycle qualification.
+- Broader lifecycle hardening, quality presets and context/resource recovery remain.
+  At this slice, controller restart/auth-race behavior was not redesigned; slice 4 below addresses it.
+
+## P1 progress — slices 4–6 integrated
+
+All planned implementation slices are integrated; P1 acceptance/production
+qualification is still pending. See P1_RUNTIME.md for the current architecture.
+
+- Slice 4: generation-bound audio callbacks/reconnect/auth, clean start/stop and
+  zeroed meter state. Beam Free implemented the module and tests. Parent fixed
+  stale timer tracking and safe failed-Identify handling.
+- Slice 5: shared trusted-JS config checks, normalized runtime config, safe warning
+  codes, and opt-in tuned/low/medium/high quality caps. The tuned default leaves
+  rendering values unchanged. Flint hit its free usage limit; it was dropped,
+  with no retry. Parent completed this slice.
+- Slice 6: Crouton Alpha supplied recovery utilities/tests. Parent integrated
+  scopes into all scenes and the BRB overlay, including async mount cancellation,
+  context loss/reload, GPU/texture disposal, safe errors and script timeouts.
+- No Flash models were used. All delegated runs are terminal; no live child work remains.
+- Validation: check, baseline:verify (36 runtime files), assets:check (19 assets),
+  test (149 total: 145 pass, 4 platform-related skips, zero failures), build
+  (44 allowlisted inputs plus manifest), release:check and git diff --check pass.
+- After the final all-page OBS visual/audio recheck request, the user confirmed
+  "all is good". All six slices now have user-reported smoke acceptance. No specific
+  low/medium/high preset, induced context-loss or reconnect experiment was reported;
+  deferred live qualification has not been marked passed.
+- P1 is saved locally in the pre-P2 checkpoint commit containing this record.
+  Nothing has been pushed; production qualification remains outstanding.
+
+## Original P1 handoff (at checkpoint)
 
 1. Inspect duplicated configuration and asset boot loading across the three scenes.
 2. Extract shared runtime helpers incrementally, preserving existing entry points,

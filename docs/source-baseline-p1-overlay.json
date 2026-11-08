@@ -1,0 +1,173 @@
+{
+  "schemaVersion": 1,
+  "baseCommit": "703dbc6",
+  "revision": "p1-shared-boot-overlay-2026-11-08",
+  "purpose": "P1 slices 1-2: shared bootstrap, typography and clock. Renderer files change only by extraction of byte-identical helpers and two call substitutions, enforced by reconstruction tests. Numeric config, styles, assets, audio and render logic unchanged. Historical manifests retained; hashes are not visual/OBS qualification.",
+  "files": [
+    {
+      "path": "brb-blackhole/blackholeOverlay.module.js",
+      "bytes": 20745,
+      "sha256": "5b93de496cee313089475e70ae3702db7eb4d28c0c3409e3542e3b63c9c5e931"
+    },
+    {
+      "path": "brb.css",
+      "bytes": 5827,
+      "sha256": "a237f3c03a760c0b395a05c32e487287a1b0a29d4050583ab244dcce5dae5684"
+    },
+    {
+      "path": "brb.html",
+      "bytes": 997,
+      "sha256": "343f1c47f5bb596d6b5ac80cfefa7d23378d568934cce18216fa3ec9472da55b"
+    },
+    {
+      "path": "brb.js",
+      "bytes": 59287,
+      "sha256": "198398fbe214b091b13806c4b18e3e8f6c75d9158cfc045d3bc3df5dec2a28d1"
+    },
+    {
+      "path": "cinzel-decorative.ttf",
+      "bytes": 60408,
+      "sha256": "5b862be329103ad287a10f0a53e27a40e8cc519999253f1a0223e2dc330b10b8"
+    },
+    {
+      "path": "config.js",
+      "bytes": 5928,
+      "sha256": "1951ef80e37f35765de2b0e14cc182a3b6121596bad33c5815d77068b1ec7819"
+    },
+    {
+      "path": "credits.html",
+      "bytes": 1973,
+      "sha256": "c7670f78b4c0c95d7c9b7b6cfdbd108d1df9dc2bde5863a78a4a68647ec5f678"
+    },
+    {
+      "path": "index.html",
+      "bytes": 972,
+      "sha256": "421d1c2cdc1b62c939fdb86bddb84b27a8516b75c3ce954ddef5128ad5234c5e"
+    },
+    {
+      "path": "macondo.ttf",
+      "bytes": 48776,
+      "sha256": "1910fe29b60588799474ea6281b59e131e33e96c77bfb80722a4c7f8133db4aa"
+    },
+    {
+      "path": "main.js",
+      "bytes": 66980,
+      "sha256": "5ab0a1398d837ec7aa000090d12d1a12c59192ca6f795d820a163750727ec02f"
+    },
+    {
+      "path": "runtime/boot.js",
+      "bytes": 7069,
+      "sha256": "b02cfe4230a9f9b5b2af7f80e6bcef0a52bfd0890db86cbf2eb91772e96d6315"
+    },
+    {
+      "path": "runtime/overlay.js",
+      "bytes": 8615,
+      "sha256": "b9a903eaef7f73af6adfc0543eab4117b400696804bf9e87318b6f3e32ad34dd"
+    },
+    {
+      "path": "styles.css",
+      "bytes": 4988,
+      "sha256": "f63bea5bbc13a91f9566e194c5cf9198d90854b4e6545af2c9ecb027122403a4"
+    },
+    {
+      "path": "textures/planets/earth_clouds_2k_solarsystemscope.jpg",
+      "bytes": 965676,
+      "sha256": "fffd7f68d41b37274822150e54a6ef605af1d3ec35624d9f628c3b896bfa42ed"
+    },
+    {
+      "path": "textures/planets/earth_day_2048.jpg",
+      "bytes": 463087,
+      "sha256": "767ee1dc6eb3802699bfccf6f264880f8acd0b80de3191cd24984fe279b07b7c"
+    },
+    {
+      "path": "textures/planets/earth_night_2048.jpg",
+      "bytes": 255287,
+      "sha256": "c16fd1bc096ab91a5c5265c6ff9847c43f489f2e2ee790ccdbcbd03251cf3a5a"
+    },
+    {
+      "path": "textures/planets/earth_specular_2048.png",
+      "bytes": 275710,
+      "sha256": "f3c614db5ce764c291e9fa0eb67e6c8f19661e17bf951f22a52f013792751f6d"
+    },
+    {
+      "path": "textures/planets/moon_2048.jpg",
+      "bytes": 1053869,
+      "sha256": "2764ba6535ea0481a062846ee033cc7a909dae05b31a8fd13f3e98f3a7fd92bd"
+    },
+    {
+      "path": "thanks.css",
+      "bytes": 6264,
+      "sha256": "0b84ef50108b70b1ba2e7d840f58a15e92ef465f504ac276dbeccaba2602d678"
+    },
+    {
+      "path": "thanks.html",
+      "bytes": 1261,
+      "sha256": "876927b294c94b93f39a11a1f6cfe496b9b7d7e0df305f067531c2f82854cd1d"
+    },
+    {
+      "path": "thanks.js",
+      "bytes": 78406,
+      "sha256": "3ba4954f4862cdf52dcc3e727033c96a2faf73fe750008bd0a61b719e40fa9cf"
+    },
+    {
+      "path": "vendor/three-0.181.0/build/three.core.js",
+      "bytes": 1405971,
+      "sha256": "03fb6e9fa08628385a9096948593251ae473239c7039496d7c280cba73d84631"
+    },
+    {
+      "path": "vendor/three-0.181.0/build/three.module.js",
+      "bytes": 626216,
+      "sha256": "99b94b6829da8e751ef48147e3a7eebae861bd4087dbcb7c3a85af03a4210933"
+    },
+    {
+      "path": "vendor/three-0.181.0/examples/jsm/controls/OrbitControls.js",
+      "bytes": 38722,
+      "sha256": "5e74b0793159d8c7aa670fdca9e2d3f4fbf79471731ed18cf208671149b9c26d"
+    },
+    {
+      "path": "vendor/three-0.181.0/examples/jsm/postprocessing/EffectComposer.js",
+      "bytes": 8502,
+      "sha256": "af8ca6b6bb92a77a8d5e38a612253d7138784aba1821dc35f381f0793238fef0"
+    },
+    {
+      "path": "vendor/three-0.181.0/examples/jsm/postprocessing/MaskPass.js",
+      "bytes": 4694,
+      "sha256": "7cd08eee9d5d6f5578beaddbdcbe9c384f6873810af27f22ab7db3ceeb127aa3"
+    },
+    {
+      "path": "vendor/three-0.181.0/examples/jsm/postprocessing/Pass.js",
+      "bytes": 4243,
+      "sha256": "f873ec11f08728ee1301aae7d47e1243574d124ee108213ef93c5c10458afc5b"
+    },
+    {
+      "path": "vendor/three-0.181.0/examples/jsm/postprocessing/RenderPass.js",
+      "bytes": 4137,
+      "sha256": "42ca9467b143aec15320ea688b2a8b736899ae967cdf0cb30bba8bb3516a5552"
+    },
+    {
+      "path": "vendor/three-0.181.0/examples/jsm/postprocessing/ShaderPass.js",
+      "bytes": 3253,
+      "sha256": "5df4d3e1384f5cb108fa23ecf7f534edd10e1631cd3db06c0dda557372dc7e8f"
+    },
+    {
+      "path": "vendor/three-0.181.0/examples/jsm/postprocessing/UnrealBloomPass.js",
+      "bytes": 14604,
+      "sha256": "2f116c7bbf1268cbdc0b359e2d48ab067ad4600c80b347e226c18e78a15c8292"
+    },
+    {
+      "path": "vendor/three-0.181.0/examples/jsm/shaders/CopyShader.js",
+      "bytes": 729,
+      "sha256": "a33057d5ac91c43304c186ac0e8816e62bb2ed471d3a00ff3018dfd5c0389718"
+    },
+    {
+      "path": "vendor/three-0.181.0/examples/jsm/shaders/LuminosityHighPassShader.js",
+      "bytes": 1316,
+      "sha256": "3db5f13c9cab9f05cb572710a9fdb809a32ad0f2c7e68b2e261817c198ba813e"
+    },
+    {
+      "path": "vendor/three.min.js",
+      "bytes": 669884,
+      "sha256": "170c6789f43217c96b3170f4b42fafe135de7f7cd48497a4218f9757ee1d49fa"
+    }
+  ]
+}

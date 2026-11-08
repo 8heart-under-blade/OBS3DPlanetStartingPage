@@ -31,9 +31,14 @@ export const ALLOW_FILES = [
 ];
 
 // Directory names are retained for contract tests; only these exact files ship.
-export const ALLOW_DIRS = ["brb-blackhole", "textures", "vendor"];
+export const ALLOW_DIRS = ["brb-blackhole", "runtime", "textures", "vendor"];
 export const DIRECTORY_FILES = [
   "brb-blackhole/blackholeOverlay.module.js",
+  "runtime/boot.js",
+  "runtime/overlay.js",
+  "runtime/audio.js",
+  "runtime/recovery.js",
+  "runtime/settings.js",
   "textures/planets/earth_clouds_2k_solarsystemscope.jpg",
   "textures/planets/earth_day_2048.jpg",
   "textures/planets/earth_night_2048.jpg",
@@ -100,6 +105,11 @@ export const HTML_PAGES = ["index.html", "brb.html", "thanks.html", "credits.htm
 // First-party JS checked for syntax (vendor/ is third-party and excluded).
 export const FIRST_PARTY_JS = [
   "config.js",
+  "runtime/boot.js",
+  "runtime/overlay.js",
+  "runtime/audio.js",
+  "runtime/recovery.js",
+  "runtime/settings.js",
   "main.js",
   "brb.js",
   "thanks.js",

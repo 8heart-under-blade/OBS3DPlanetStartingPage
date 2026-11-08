@@ -48,9 +48,11 @@ test('directory allowlist never includes additional config/secret files', () => 
   try {
     writeFileSync(join(dir, 'vendor/config.local.json'), '{"password":"private"}');
     writeFileSync(join(dir, 'textures/.env.local'), 'private');
+    writeFileSync(join(dir, 'runtime/private.local.json'), '{"password":"private"}');
     run(build, dir);
     assert.equal(existsSync(join(dir, 'dist/vendor/config.local.json')), false);
     assert.equal(existsSync(join(dir, 'dist/textures/.env.local')), false);
+    assert.equal(existsSync(join(dir, 'dist/runtime/private.local.json')), false);
   } finally { rmSync(dir, { recursive: true, force: true }); }
 });
 

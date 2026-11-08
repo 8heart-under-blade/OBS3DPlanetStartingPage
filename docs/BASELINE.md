@@ -2,8 +2,17 @@
 
 ## What this baseline establishes
 
-The active `source-baseline.json` records 31 runtime files after the deliberate
-2026-11-08 openly licensed asset migration. Original P0 hashes at commit
+The active `source-baseline.json` records 36 runtime files after all six P1
+implementation slices. The acceptance gate is not complete. The pre-P1 licensed-asset manifest (31 files)
+is retained in `source-baseline-assets.json`; the first P1 bootstrap manifest is
+retained in `source-baseline-p1-boot.json`, and the pre-audio extraction manifest
+in `source-baseline-p1-overlay.json`. The three scene scripts now call shared
+typography/clock/audio helpers whose bodies are unchanged; tests reconstruct the
+original scene files and match their pre-P1 hashes after undoing explicit
+integration adapters and restoring archived helper definitions. Default tuned
+numerical config, styles, assets, audio meter processing/protocol, shaders and
+scene math remain unchanged; lifecycle and failure behavior intentionally differ. See [P1_RUNTIME.md](P1_RUNTIME.md). The asset migration itself was
+performed on 2026-11-08. Original P0 hashes at commit
 `ea5fb4c866e48b9c8ba4981191437d1ff61780c6` are retained unchanged in
 `source-baseline-p0.json`. The root code license and Markdown notices are outside
 the runtime source manifest but included in the build manifest.
@@ -15,7 +24,7 @@ texture credit plus a credits page. Scene numerical tuning is unchanged.
 Typography and texture appearance are intentionally different; no visual parity
 has been claimed or measured. See [asset audit](ASSET_AUDIT.md).
 
-## Checks performed for this migration
+## Checks performed for the licensed-asset migration (pre-P1)
 
 - Windows, Node v24.22.2: dependency installation, syntax/local references, all
   31 active runtime hashes, 19 asset hashes and license evidence hashes, build
@@ -36,7 +45,10 @@ A source-byte baseline does **not** establish visual parity, compatibility,
 asset permissions, security or performance. Never regenerate it merely to make
 an unexpected difference pass.
 
-## User-reported manual smoke check — 2026-11-08
+## User-reported manual smoke check — 2026-11-08 (pre-P1)
+
+This acceptance predates the shared-bootstrap extraction; see the subsequent P1
+feedback below. It is not qualification of later runtime changes.
 
 - Build: uncommitted licensed-asset replacement based on `7cd2c22`.
 - Local preview served on this Windows PC at `http://127.0.0.1:8080/`;
@@ -49,6 +61,44 @@ an unexpected difference pass.
 - This is user-reported evidence, not an assistant-observed or recorded test.
   It does not establish network-blocked offline operation, authentication failure/
   reconnect handling, repeated source transitions, context restoration or soak stability.
+
+## P1 slice 1 user feedback — 2026-11-08
+
+After the shared-bootstrap implementation and a request to refresh/recheck the
+scenes in OBS, the user responded "LGTM lets continue". Record this as user
+acceptance of slice 1, without inferring exact scene coverage, new audio results,
+versions, performance measurements or a completed lifecycle test.
+
+## P1 slice 2 user feedback — 2026-11-08
+
+After the typography/clock extraction and a request to refresh all three OBS
+sources and check fonts/clock updates, the user confirmed "all pages is ok".
+Record user acceptance of all three pages for slice 2. No new measurements,
+audio-specific retest, test duration or lifecycle qualification was reported.
+
+## P1 slice 3 — audio extraction qualification
+
+Dependency-free fake-WebSocket/crypto/timer tests cover the extracted controller.
+After the slice 3 OBS refresh/recheck request, the user confirmed "audio reactivity
+still works". Record user-reported audio smoke acceptance of the extracted
+controller. No assistant-observed recording, new environment details or measured
+network/authentication failure, reconnect or sustained lifecycle result was supplied.
+Those qualification gates remain separate from the deterministic controller tests.
+
+## Integrated P1 slices 4–6 — validation, not live qualification
+
+- Windows / Node v24.22.2: checks, 36 runtime hashes, 19 asset hashes, build and
+  static release eligibility pass. Tests: 149 total, 145 pass, four explicit
+  platform-related skips, zero failures.
+- Fake adapters exercise lifecycle generations, stale auth/reconnect callbacks,
+  quality validation, lost/restored context events, cancelled RAFs/listeners,
+  resource/late-texture disposal and safe failure diagnostics.
+- These simulations do not qualify actual WebGL drivers, CEF context recovery,
+  hosted-to-loopback policies or production OBS source lifecycle behavior.
+- After the final all-page OBS visual/audio recheck request, the user confirmed
+  "all is good". Record user-reported smoke acceptance of the integrated six slices.
+  No specific quality-preset, context-loss/restoration or reconnect exercise was
+  reported. The deferred soak and transition tests remain NOT TESTED.
 
 ## Candidate support matrix — NOT yet qualified
 

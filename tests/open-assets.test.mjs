@@ -3,6 +3,8 @@ import assert from 'node:assert/strict';
 import { readFileSync, existsSync } from 'node:fs';
 import { join } from 'node:path';
 import vm from 'node:vm';
+import { createHash } from 'node:crypto';
+import { restoreIntegration } from './helpers/restore-integration.mjs';
 import { repoRoot, RUNTIME_FILES, NOTICE_FILES, sha256File } from '../scripts/lib.mjs';
 const root = repoRoot();
 const read = p => readFileSync(join(root, p), 'utf8');
@@ -58,11 +60,14 @@ test('unchanged P0 runtime files retain their original source bytes', () => {
   const old = JSON.parse(read('docs/source-baseline-p0.json'));
   const intentionalChanges = new Set([
     'config.js', 'thanks.js', 'thanks.html', 'thanks.css', 'oracles.woff', 'twigs.woff',
+    'index.html', 'brb.html', 'main.js', 'brb.js', // P1 boot/overlay extraction; renderer-preservation tests constrain changes.
     'textures/planets/earth_clouds_1024.png', 'textures/planets/earth_day_2048.jpg',
     'textures/planets/earth_night_2048.png', 'textures/planets/earth_specular_2048.jpg',
     'textures/planets/moon_1024.jpg',
   ]);
   for (const file of old.files) {
-    if (!intentionalChanges.has(file.path)) assert.equal(sha256File(join(root, file.path)), file.sha256, file.path);
+    if (file.path === 'brb-blackhole/blackholeOverlay.module.js') {
+      assert.equal(createHash('sha256').update(restoreIntegration(read(file.path), file.path)).digest('hex'), file.sha256, file.path);
+    } else if (!intentionalChanges.has(file.path)) assert.equal(sha256File(join(root, file.path)), file.sha256, file.path);
   }
 });

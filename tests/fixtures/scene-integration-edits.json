@@ -1,0 +1,230 @@
+{
+  "main.js": [
+    {
+      "oldText": "  var stopDateTimeTicker = window.StreamOverlay.startClock(dateTimeEl);",
+      "newText": "  var stopDateTimeTicker = window.StreamOverlay.startClock(dateTimeEl);\n  var runtimeScope = window.StreamRecovery.createScope();\n  var ownedTextures = [];\n  var contextWatcher = null;\n  runtimeScope.add(stopDateTimeTicker);\n  runtimeScope.add(function () {\n    window.StreamRecovery.disposeScene(scene, renderer, ownedTextures);\n    if (renderer && renderer.domElement && renderer.domElement.parentNode) {\n      renderer.domElement.parentNode.removeChild(renderer.domElement);\n    }\n  });\n  runtimeScope.add(function () { if (audioReactive) audioReactive.stop(); });\n  window.StreamRuntime = { dispose: function () { runtimeScope.dispose(); } };"
+    },
+    {
+      "oldText": "  if (!container) {\n    return;\n  }",
+      "newText": "  if (!container) {\n    runtimeScope.dispose();\n    return;\n  }"
+    },
+    {
+      "oldText": "  } catch (error) {\n    var errorEl = document.getElementById(\"bootError\");\n    if (errorEl) {\n      errorEl.textContent = \"WebGL could not be initialized in this browser source.\";\n      errorEl.hidden = false;\n    }\n    return;\n  }",
+      "newText": "  } catch (error) {\n    window.StreamRecovery.report(\"webgl-unavailable\");\n    runtimeScope.dispose();\n    return;\n  }"
+    },
+    {
+      "oldText": "  renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, CONFIG.renderer.maxPixelRatio));\n  renderer.setSize(window.innerWidth, window.innerHeight);",
+      "newText": "  contextWatcher = window.StreamRecovery.observeRenderer(renderer, {\n    onLost: function () {\n      if (audioReactive) audioReactive.stop();\n      stopDateTimeTicker();\n    }\n  });\n  runtimeScope.add(contextWatcher.dispose);\n  renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, CONFIG.renderer.maxPixelRatio));\n  renderer.setSize(window.innerWidth, window.innerHeight);"
+    },
+    {
+      "oldText": "  window.addEventListener(\"resize\", onResize);\n  window.addEventListener(\"beforeunload\", function () {\n    audioReactive.stop();\n    stopDateTimeTicker();\n  });",
+      "newText": "  runtimeScope.listen(window, \"resize\", onResize);\n  runtimeScope.listen(window, \"beforeunload\", function () { runtimeScope.dispose(); });\n  runtimeScope.listen(window, \"pagehide\", function (event) {\n    if (!event.persisted) runtimeScope.dispose();\n  });"
+    },
+    {
+      "oldText": "  function animate() {\n    requestAnimationFrame(animate);",
+      "newText": "  function animate() {\n    if (runtimeScope.isDisposed() || contextWatcher.isLost()) return;\n    runtimeScope.requestFrame(animate);"
+    },
+    {
+      "oldText": "  window.StreamRuntime = { dispose: function () { runtimeScope.dispose(); } };",
+      "newText": "  window.StreamRuntime = { dispose: function () { runtimeScope.dispose(); }, isDisposed: runtimeScope.isDisposed };"
+    },
+    {
+      "oldText": "  var streamConfig = window.STREAM_CONFIG && typeof window.STREAM_CONFIG === \"object\" ? window.STREAM_CONFIG : {};",
+      "newText": "  var configuredStream = window.STREAM_RUNTIME_CONFIG || window.STREAM_CONFIG;\n  var streamConfig = configuredStream && typeof configuredStream === \"object\" ? configuredStream : {};"
+    },
+    {
+      "oldText": "  window.StreamOverlay.applyTypography(CONFIG.overlay);",
+      "newText": "  window.StreamSettings.applyQuality(CONFIG, window.STREAM_QUALITY || \"tuned\");\n  window.StreamOverlay.applyTypography(CONFIG.overlay);"
+    },
+    {
+      "oldText": "  var stars = createStars(window.innerWidth < 1000 ? 2500 : 3800, 220, 720);",
+      "newText": "  var stars = createStars(window.StreamSettings.limit(\"stars\", window.innerWidth < 1000 ? 2500 : 3800, window.STREAM_QUALITY || \"tuned\"), 220, 720);"
+    },
+    {
+      "oldText": "    renderer.render(scene, camera);",
+      "newText": "    try {\n      renderer.render(scene, camera);\n    } catch (error) {\n      window.StreamRecovery.report(\"boot-failed\");\n      runtimeScope.dispose();\n    }"
+    }
+  ],
+  "brb.js": [
+    {
+      "oldText": "  var stopDateTimeTicker = window.StreamOverlay.startClock(dateTimeEl);",
+      "newText": "  var stopDateTimeTicker = window.StreamOverlay.startClock(dateTimeEl);\n  var runtimeScope = window.StreamRecovery.createScope();\n  var ownedTextures = [];\n  var contextWatcher = null;\n  runtimeScope.add(stopDateTimeTicker);\n  runtimeScope.add(function () {\n    window.StreamRecovery.disposeScene(scene, renderer, ownedTextures);\n    if (renderer && renderer.domElement && renderer.domElement.parentNode) {\n      renderer.domElement.parentNode.removeChild(renderer.domElement);\n    }\n  });\n  runtimeScope.add(function () { if (audioReactive) audioReactive.stop(); });\n  window.StreamRuntime = { dispose: function () { runtimeScope.dispose(); } };"
+    },
+    {
+      "oldText": "  if (!container) {\n    return;\n  }",
+      "newText": "  if (!container) {\n    runtimeScope.dispose();\n    return;\n  }"
+    },
+    {
+      "oldText": "  } catch (error) {\n    var errorEl = document.getElementById(\"bootError\");\n    if (errorEl) {\n      errorEl.textContent = \"WebGL could not be initialized in this browser source.\";\n      errorEl.hidden = false;\n    }\n    return;\n  }",
+      "newText": "  } catch (error) {\n    window.StreamRecovery.report(\"webgl-unavailable\");\n    runtimeScope.dispose();\n    return;\n  }"
+    },
+    {
+      "oldText": "  renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, CONFIG.renderer.maxPixelRatio));\n  renderer.setSize(window.innerWidth, window.innerHeight);",
+      "newText": "  contextWatcher = window.StreamRecovery.observeRenderer(renderer, {\n    onLost: function () {\n      if (audioReactive) audioReactive.stop();\n      stopDateTimeTicker();\n    }\n  });\n  runtimeScope.add(contextWatcher.dispose);\n  renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, CONFIG.renderer.maxPixelRatio));\n  renderer.setSize(window.innerWidth, window.innerHeight);"
+    },
+    {
+      "oldText": "  window.addEventListener(\"resize\", onResize);\n  window.addEventListener(\"beforeunload\", function () {\n    audioReactive.stop();\n    stopDateTimeTicker();\n  });",
+      "newText": "  runtimeScope.listen(window, \"resize\", onResize);\n  runtimeScope.listen(window, \"beforeunload\", function () { runtimeScope.dispose(); });\n  runtimeScope.listen(window, \"pagehide\", function (event) {\n    if (!event.persisted) runtimeScope.dispose();\n  });"
+    },
+    {
+      "oldText": "  function animate() {\n    requestAnimationFrame(animate);",
+      "newText": "  function animate() {\n    if (runtimeScope.isDisposed() || contextWatcher.isLost()) return;\n    runtimeScope.requestFrame(animate);"
+    },
+    {
+      "oldText": "  window.StreamRuntime = { dispose: function () { runtimeScope.dispose(); } };",
+      "newText": "  window.StreamRuntime = { dispose: function () { runtimeScope.dispose(); }, isDisposed: runtimeScope.isDisposed };"
+    },
+    {
+      "oldText": "  var streamConfig = window.STREAM_CONFIG && typeof window.STREAM_CONFIG === \"object\" ? window.STREAM_CONFIG : {};",
+      "newText": "  var configuredStream = window.STREAM_RUNTIME_CONFIG || window.STREAM_CONFIG;\n  var streamConfig = configuredStream && typeof configuredStream === \"object\" ? configuredStream : {};"
+    },
+    {
+      "oldText": "  window.StreamOverlay.applyTypography(CONFIG.overlay);",
+      "newText": "  window.StreamSettings.applyQuality(CONFIG, window.STREAM_QUALITY || \"tuned\");\n  window.StreamOverlay.applyTypography(CONFIG.overlay);"
+    },
+    {
+      "oldText": "  var stars = createStars(window.innerWidth < 900 ? 3000 : 4600, 180, 900);",
+      "newText": "  var stars = createStars(window.StreamSettings.limit(\"stars\", window.innerWidth < 900 ? 3000 : 4600, window.STREAM_QUALITY || \"tuned\"), 180, 900);"
+    },
+    {
+      "oldText": "    renderer.render(scene, camera);",
+      "newText": "    try {\n      renderer.render(scene, camera);\n    } catch (error) {\n      window.StreamRecovery.report(\"boot-failed\");\n      runtimeScope.dispose();\n    }"
+    }
+  ],
+  "thanks.js": [
+    {
+      "oldText": "  var stopDateTimeTicker = window.StreamOverlay.startClock(dateTimeEl);",
+      "newText": "  var stopDateTimeTicker = window.StreamOverlay.startClock(dateTimeEl);\n  var runtimeScope = window.StreamRecovery.createScope();\n  var ownedTextures = [];\n  var contextWatcher = null;\n  runtimeScope.add(stopDateTimeTicker);\n  runtimeScope.add(function () {\n    window.StreamRecovery.disposeScene(scene, renderer, ownedTextures);\n    if (renderer && renderer.domElement && renderer.domElement.parentNode) {\n      renderer.domElement.parentNode.removeChild(renderer.domElement);\n    }\n  });\n  runtimeScope.add(function () { if (audioReactive) audioReactive.stop(); });\n  window.StreamRuntime = { dispose: function () { runtimeScope.dispose(); } };"
+    },
+    {
+      "oldText": "  if (!container) {\n    return;\n  }",
+      "newText": "  if (!container) {\n    runtimeScope.dispose();\n    return;\n  }"
+    },
+    {
+      "oldText": "  } catch (error) {\n    var errorEl = document.getElementById(\"bootError\");\n    if (errorEl) {\n      errorEl.textContent = \"WebGL could not be initialized in this browser source.\";\n      errorEl.hidden = false;\n    }\n    return;\n  }",
+      "newText": "  } catch (error) {\n    window.StreamRecovery.report(\"webgl-unavailable\");\n    runtimeScope.dispose();\n    return;\n  }"
+    },
+    {
+      "oldText": "  renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, CONFIG.renderer.maxPixelRatio));\n  renderer.setSize(window.innerWidth, window.innerHeight);",
+      "newText": "  contextWatcher = window.StreamRecovery.observeRenderer(renderer, {\n    onLost: function () {\n      if (audioReactive) audioReactive.stop();\n      stopDateTimeTicker();\n    }\n  });\n  runtimeScope.add(contextWatcher.dispose);\n  renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, CONFIG.renderer.maxPixelRatio));\n  renderer.setSize(window.innerWidth, window.innerHeight);"
+    },
+    {
+      "oldText": "  window.addEventListener(\"resize\", onResize);\n  window.addEventListener(\"beforeunload\", function () {\n    audioReactive.stop();\n    stopDateTimeTicker();\n  });",
+      "newText": "  runtimeScope.listen(window, \"resize\", onResize);\n  runtimeScope.listen(window, \"beforeunload\", function () { runtimeScope.dispose(); });\n  runtimeScope.listen(window, \"pagehide\", function (event) {\n    if (!event.persisted) runtimeScope.dispose();\n  });"
+    },
+    {
+      "oldText": "  function animate() {\n    requestAnimationFrame(animate);",
+      "newText": "  function animate() {\n    if (runtimeScope.isDisposed() || contextWatcher.isLost()) return;\n    runtimeScope.requestFrame(animate);"
+    },
+    {
+      "oldText": "  var earthTextures = createEarthTextures(renderer, CONFIG.earth.textureSize);",
+      "newText": "  var earthTextures = createEarthTextures(renderer, CONFIG.earth.textureSize);\n  Object.keys(earthTextures).forEach(function (key) { ownedTextures.push(earthTextures[key]); });"
+    },
+    {
+      "oldText": "  var moonTextures = createMoonTextures(renderer, CONFIG.moon.textureSize);",
+      "newText": "  var moonTextures = createMoonTextures(renderer, CONFIG.moon.textureSize);\n  Object.keys(moonTextures).forEach(function (key) { ownedTextures.push(moonTextures[key]); });"
+    },
+    {
+      "oldText": "    var loader = new THREE.TextureLoader();",
+      "newText": "    var loader = new THREE.TextureLoader(window.StreamRecovery.createLoadingManager(THREE, function () { return !runtimeScope.isDisposed(); }));"
+    },
+    {
+      "oldText": "      loader.load(\n        resolvedUrl,",
+      "newText": "      var pendingTexture = loader.load(\n        resolvedUrl,"
+    },
+    {
+      "oldText": "        function (texture) {\n          if (colorSpace) {",
+      "newText": "        function (texture) {\n          if (runtimeScope.isDisposed()) {\n            texture.dispose();\n            reject(new Error(\"Scene was disposed.\"));\n            return;\n          }\n          if (colorSpace) {"
+    },
+    {
+      "oldText": "          reject(error || new Error(\"Failed loading texture: \" + resolvedUrl));\n        }\n      );",
+      "newText": "          reject(new Error(\"Configured texture could not load.\"));\n        }\n      );\n      ownedTextures.push(pendingTexture);"
+    },
+    {
+      "oldText": "        console.warn(\"TY4W earth day map fallback to procedural:\", error);",
+      "newText": "        if (!runtimeScope.isDisposed()) window.StreamRecovery.report(\"asset-failed\"); // day map keeps its procedural fallback."
+    },
+    {
+      "oldText": "        console.warn(\"TY4W earth night map fallback to procedural:\", error);",
+      "newText": "        if (!runtimeScope.isDisposed()) window.StreamRecovery.report(\"asset-failed\"); // night map keeps its procedural fallback."
+    },
+    {
+      "oldText": "        console.warn(\"TY4W earth water mask fallback to procedural:\", error);",
+      "newText": "        if (!runtimeScope.isDisposed()) window.StreamRecovery.report(\"asset-failed\"); // water map keeps its procedural fallback."
+    },
+    {
+      "oldText": "        console.warn(\"TY4W cloud map fallback to procedural:\", error);",
+      "newText": "        if (!runtimeScope.isDisposed()) window.StreamRecovery.report(\"asset-failed\"); // cloud map keeps its procedural fallback."
+    },
+    {
+      "oldText": "        console.warn(\"TY4W moon map fallback to procedural:\", error);",
+      "newText": "        if (!runtimeScope.isDisposed()) window.StreamRecovery.report(\"asset-failed\"); // moon map keeps its procedural fallback."
+    },
+    {
+      "oldText": "  window.StreamRuntime = { dispose: function () { runtimeScope.dispose(); } };",
+      "newText": "  window.StreamRuntime = { dispose: function () { runtimeScope.dispose(); }, isDisposed: runtimeScope.isDisposed };"
+    },
+    {
+      "oldText": "  var streamConfig = window.STREAM_CONFIG && typeof window.STREAM_CONFIG === \"object\" ? window.STREAM_CONFIG : {};",
+      "newText": "  var configuredStream = window.STREAM_RUNTIME_CONFIG || window.STREAM_CONFIG;\n  var streamConfig = configuredStream && typeof configuredStream === \"object\" ? configuredStream : {};"
+    },
+    {
+      "oldText": "  window.StreamOverlay.applyTypography(CONFIG.overlay);",
+      "newText": "  window.StreamSettings.applyQuality(CONFIG, window.STREAM_QUALITY || \"tuned\");\n  window.StreamOverlay.applyTypography(CONFIG.overlay);"
+    },
+    {
+      "oldText": "    renderer.render(scene, camera);",
+      "newText": "    try {\n      renderer.render(scene, camera);\n    } catch (error) {\n      window.StreamRecovery.report(\"boot-failed\");\n      runtimeScope.dispose();\n    }"
+    }
+  ],
+  "brb-blackhole/blackholeOverlay.module.js": [
+    {
+      "oldText": "export async function mountBlackholeOverlay() {\n  const runtime = await loadOverlayRuntime();\n  const THREE = runtime.THREE;\n  const OrbitControls = runtime.OrbitControls;\n  const EffectComposer = runtime.EffectComposer;\n  const RenderPass = runtime.RenderPass;\n  const UnrealBloomPass = runtime.UnrealBloomPass;\n  const streamConfig = window.STREAM_CONFIG && typeof window.STREAM_CONFIG === \"object\" ? window.STREAM_CONFIG : {};\n  const replacementConfig = streamConfig.brbBlackholeReplacement && typeof streamConfig.brbBlackholeReplacement === \"object\"\n    ? streamConfig.brbBlackholeReplacement\n    : {};\n  const enabled = replacementConfig.enabled !== false;\n\n  if (!enabled) {\n    return null;\n  }\n\n  const layer = document.getElementById(\"blackholeLayer\");\n  if (!layer) {\n    return null;\n  }\n\n",
+      "newText": "export async function mountBlackholeOverlay() {\n  const streamConfig = window.STREAM_RUNTIME_CONFIG || window.STREAM_CONFIG || {};\n  const replacementConfig = streamConfig.brbBlackholeReplacement && typeof streamConfig.brbBlackholeReplacement === \"object\"\n    ? streamConfig.brbBlackholeReplacement : {};\n  if (replacementConfig.enabled === false) return null;\n  const layer = document.getElementById(\"blackholeLayer\");\n  if (!layer) return null;\n\n  const runtimeScope = window.StreamRecovery.createScope();\n  runtimeScope.listen(window, \"beforeunload\", function () { runtimeScope.dispose(); });\n  let runtime;\n  try {\n    runtime = await loadOverlayRuntime();\n  } catch (error) {\n    runtimeScope.dispose();\n    throw error;\n  }\n  if (runtimeScope.isDisposed() || (window.StreamRuntime && window.StreamRuntime.isDisposed())) {\n    runtimeScope.dispose();\n    return null;\n  }\n  const THREE = runtime.THREE;\n  const OrbitControls = runtime.OrbitControls;\n  const EffectComposer = runtime.EffectComposer;\n  const RenderPass = runtime.RenderPass;\n  const UnrealBloomPass = runtime.UnrealBloomPass;\n\n"
+    },
+    {
+      "oldText": "  const renderer = new THREE.WebGLRenderer({\n    antialias: true,\n    alpha: true,\n    powerPreference: \"high-performance\"\n  });",
+      "newText": "  let renderer;\n  try {\n    renderer = new THREE.WebGLRenderer({\n      antialias: true,\n      alpha: true,\n      powerPreference: \"high-performance\"\n    });\n  } catch (error) {\n    runtimeScope.dispose();\n    window.StreamRecovery.report(\"webgl-unavailable\");\n    throw new Error(\"BRB WebGL initialization failed.\");\n  }"
+    },
+    {
+      "oldText": "  let resizeObserver = null;",
+      "newText": "  let resizeObserver = null;\n  const contextWatcher = window.StreamRecovery.observeRenderer(renderer, {\n    onLost: function () {\n      if (window.StreamRuntime) window.StreamRuntime.dispose();\n    }\n  });"
+    },
+    {
+      "oldText": "  function onResize() {\n    const bounds",
+      "newText": "  function onResize() {\n    if (runtimeScope.isDisposed() || contextWatcher.isLost()) return;\n    const bounds"
+    },
+    {
+      "oldText": "  function tick() {\n    renderer.setClearColor",
+      "newText": "  function tick() {\n    if (runtimeScope.isDisposed() || contextWatcher.isLost()) return;\n    renderer.setClearColor"
+    },
+    {
+      "oldText": "    rafId = window.requestAnimationFrame(tick);",
+      "newText": "    rafId = runtimeScope.requestFrame(tick);"
+    },
+    {
+      "oldText": "  function dispose() {\n    if (rafId) {\n      window.cancelAnimationFrame(rafId);\n      rafId = 0;\n    }\n\n    window.removeEventListener(\"resize\", onResize);\n    if (resizeObserver) {\n      resizeObserver.disconnect();\n      resizeObserver = null;\n    }\n\n    if (controls) {\n      controls.dispose();\n    }\n    if (composer) {\n      composer.dispose();\n    }\n    quadGeometry.dispose();\n    material.dispose();\n    renderer.dispose();\n\n    if (renderer.domElement.parentElement === layer) {\n      layer.removeChild(renderer.domElement);\n    }\n  }\n\n",
+      "newText": "  function dispose() {\n    runtimeScope.dispose();\n  }\n\n  runtimeScope.add(function () {\n    window.StreamRecovery.disposeScene(raytraceScene, renderer);\n    if (renderer.domElement.parentElement === layer) layer.removeChild(renderer.domElement);\n  });\n  runtimeScope.add(function () { if (controls) controls.dispose(); });\n  runtimeScope.add(function () { if (composer) composer.dispose(); });\n  runtimeScope.add(function () { if (bloomPass && bloomPass.dispose) bloomPass.dispose(); });\n  runtimeScope.add(function () { contextWatcher.dispose(); });\n  runtimeScope.add(function () {\n    if (resizeObserver) { resizeObserver.disconnect(); resizeObserver = null; }\n  });\n\n"
+    },
+    {
+      "oldText": "  window.addEventListener(\"resize\", onResize);",
+      "newText": "  runtimeScope.listen(window, \"resize\", onResize);"
+    },
+    {
+      "oldText": "  window.addEventListener(\"beforeunload\", dispose, { once: true });",
+      "newText": "  runtimeScope.listen(window, \"pagehide\", function (event) { if (!event.persisted) dispose(); });"
+    },
+    {
+      "oldText": "    renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));",
+      "newText": "    renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, window.StreamSettings.limit(\"pixelRatio\", 2, window.STREAM_QUALITY || \"tuned\")));"
+    },
+    {
+      "oldText": "  const runtimeScope = window.StreamRecovery.createScope();",
+      "newText": "  if (window.StreamRuntime && window.StreamRuntime.isDisposed()) return null;\n  const runtimeScope = window.StreamRecovery.createScope();"
+    },
+    {
+      "oldText": "  onResize();\n  tick();",
+      "newText": "  try {\n    onResize();\n    tick();\n  } catch (error) {\n    dispose();\n    window.StreamRecovery.report(\"boot-failed\");\n    throw new Error(\"BRB renderer could not start.\");\n  }"
+    }
+  ]
+}

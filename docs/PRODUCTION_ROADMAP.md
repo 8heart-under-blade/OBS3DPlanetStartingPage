@@ -43,6 +43,14 @@ Gate: static checks/tests pass, preview artifacts contain only intended files, r
 
 ### P1 — Shared runtime
 
+Implementation slices 1–6 are integrated: shared boot/overlay/audio, audio lifecycle
+hardening, config validation/opt-in quality caps and failure/resource recovery.
+Default tuned settings and shaders are preserved; lifecycle behavior deliberately
+changes. The user accepted the integrated pages after the final OBS visual/audio
+recheck request; all six slices have user-reported smoke acceptance. Full P1 runtime
+qualification and the deferred soak/transition checks remain outstanding. See [P1_RUNTIME.md](P1_RUNTIME.md).
+This is implementation completion, **not** a passed P1 acceptance gate.
+
 Extract boot/config/audio/text/lifecycle incrementally. Lazy-load optional BRB modules, handle failed assets/context loss, add quality presets. Preserve current look and routes.
 
 Gate: real browser and OBS smoke tests, network-blocked offline test, repeated mounts/source transitions, recorded visual comparison and measured memory/CPU. Do not use visibilitychange as the sole source-visibility signal.
