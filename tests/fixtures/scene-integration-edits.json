@@ -43,6 +43,14 @@
     {
       "oldText": "    renderer.render(scene, camera);",
       "newText": "    try {\n      renderer.render(scene, camera);\n    } catch (error) {\n      window.StreamRecovery.report(\"boot-failed\");\n      runtimeScope.dispose();\n    }"
+    },
+    {
+      "oldText": "    var delta = Math.min(clock.getDelta(), 0.05);\n    var elapsed = clock.getElapsedTime();",
+      "newText": "    var delta = window.STREAM_REDUCED_MOTION ? 0 : Math.min(clock.getDelta(), 0.05);\n    var elapsed = window.STREAM_REDUCED_MOTION ? 0 : clock.getElapsedTime();"
+    },
+    {
+      "oldText": "  var audioReactive = window.StreamAudio.createController(CONFIG.audioReactive);",
+      "newText": "  var audioReactive = window.StreamAudioSession.bind(window.StreamAudio.createController(CONFIG.audioReactive), CONFIG.audioReactive, runtimeScope);"
     }
   ],
   "brb.js": [
@@ -89,6 +97,14 @@
     {
       "oldText": "    renderer.render(scene, camera);",
       "newText": "    try {\n      renderer.render(scene, camera);\n    } catch (error) {\n      window.StreamRecovery.report(\"boot-failed\");\n      runtimeScope.dispose();\n    }"
+    },
+    {
+      "oldText": "    var delta = Math.min(clock.getDelta(), 0.05);\n    var elapsed = clock.getElapsedTime();",
+      "newText": "    var delta = window.STREAM_REDUCED_MOTION ? 0 : Math.min(clock.getDelta(), 0.05);\n    var elapsed = window.STREAM_REDUCED_MOTION ? 0 : clock.getElapsedTime();"
+    },
+    {
+      "oldText": "  var audioReactive = window.StreamAudio.createController(CONFIG.audioReactive);",
+      "newText": "  var audioReactive = window.StreamAudioSession.bind(window.StreamAudio.createController(CONFIG.audioReactive), CONFIG.audioReactive, runtimeScope);"
     }
   ],
   "thanks.js": [
@@ -175,6 +191,14 @@
     {
       "oldText": "    renderer.render(scene, camera);",
       "newText": "    try {\n      renderer.render(scene, camera);\n    } catch (error) {\n      window.StreamRecovery.report(\"boot-failed\");\n      runtimeScope.dispose();\n    }"
+    },
+    {
+      "oldText": "    var delta = Math.min(clock.getDelta(), 0.05);\n    var elapsed = clock.getElapsedTime();",
+      "newText": "    var delta = window.STREAM_REDUCED_MOTION ? 0 : Math.min(clock.getDelta(), 0.05);\n    var elapsed = window.STREAM_REDUCED_MOTION ? 0 : clock.getElapsedTime();"
+    },
+    {
+      "oldText": "  var audioReactive = window.StreamAudio.createController(CONFIG.audioReactive);",
+      "newText": "  var audioReactive = window.StreamAudioSession.bind(window.StreamAudio.createController(CONFIG.audioReactive), CONFIG.audioReactive, runtimeScope);"
     }
   ],
   "brb-blackhole/blackholeOverlay.module.js": [
@@ -225,6 +249,10 @@
     {
       "oldText": "  onResize();\n  tick();",
       "newText": "  try {\n    onResize();\n    tick();\n  } catch (error) {\n    dispose();\n    window.StreamRecovery.report(\"boot-failed\");\n    throw new Error(\"BRB renderer could not start.\");\n  }"
+    },
+    {
+      "oldText": "    uniforms.uTime.value = clock.getElapsedTime();",
+      "newText": "    uniforms.uTime.value = window.STREAM_REDUCED_MOTION ? 0 : clock.getElapsedTime();"
     }
   ]
 }

@@ -1,7 +1,8 @@
-# Progress checkpoint — before P1
+# Project progress and checkpoints
 
 The saved pre-P1 checkpoint is commit `703dbc6`. P1 slice 1 subsequently started;
-see the progress sections below and P1_RUNTIME.md.
+see the progress sections below, P1_RUNTIME.md and P2_EDITOR.md.
+P1 is now saved at `36d66c6`; P2 is on `feature/no-code-editor`.
 
 Date: 2026-11-08
 Base: 7cd2c22 (production foundation)
@@ -130,6 +131,43 @@ qualification is still pending. See P1_RUNTIME.md for the current architecture.
   deferred live qualification has not been marked passed.
 - P1 is saved locally in the pre-P2 checkpoint commit containing this record.
   Nothing has been pushed; production qualification remains outstanding.
+
+## P2 progress — local MVP candidate
+
+- P1 was saved as commit 36d66c6 before creating feature/no-code-editor.
+- Six implementation slices are integrated: versioned strict snapshot schema,
+  accessible editor controls, same-URL iframe preview, presets/drafts/import/export,
+  personalized OBS fragment URLs and guided setup/diagnostics.
+- Crouton Alpha Free supplied editor.html/editor.css; Beam Free supplied validated
+  draft storage/tests. Parent implemented protocol/controller/render integration.
+  No Flash models or capped-Flint retries.
+- Snapshot fields are allowlisted and nonsecret; payloads are bounded to 8 KiB UTF-8
+  JSON and complete URLs to 12 KiB. Schema-0 prototype migration is documented/tested.
+- Original local scene URLs retain working audio. Fresh editor drafts now use
+  Auto local-only session audio; older drafts/links without audioMode remain Off.
+  Local unauthenticated OBS needs no password; authenticated OBS prompts separately
+  using Interact. Credentials never enter presets/links/storage. Hosted pages and
+  embedded previews stay silent. Manual local port/input setup and Off are available.
+  Copied links do not update with draft edits, and OBS does not share editor storage.
+- Validation: check, baseline:verify (44 runtime files), assets:check (19 assets),
+  test (207 total: 203 pass, 4 explicit platform skips, zero failures), build
+  (52 allowlisted inputs plus manifest), release:check and git diff --check pass.
+- A read-only contract review reported no blockers. Parent fixed two minor preview
+  status/last-valid-state observations and added regression coverage; no delegated
+  re-review or security certification is claimed.
+- Subsequent read-only review of local session audio reported no blockers; parent
+  added real-controller/fake-WebSocket tests for no-auth/auth, origin/frame isolation,
+  memory-only credentials, strict endpoints, cleanup, timeout and stale callbacks.
+- After the local session audio handoff, the user confirmed "OBS testing is ok".
+  Record P2 user-reported OBS smoke acceptance without inferring exact scene,
+  authentication/no-auth, Interact, version or duration coverage.
+  Detailed browser/editor, accessibility and public-deployment qualification remain
+  pending. Deferred soak/scene-transition checks are not marked passed.
+- The user subsequently confirmed "tested the editor ok for me" and approved
+  proceeding to P3. Record editor acceptance without inferring exact feature or
+  browser coverage. Local P2 checkpoint authorized; nothing pushed.
+  Deferred P1 production tests remain open.
+- Local editor: http://127.0.0.1:8080/editor.html (existing loopback server).
 
 ## Original P1 handoff (at checkpoint)
 

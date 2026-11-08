@@ -11,6 +11,7 @@ import { restoreIntegration } from './helpers/restore-integration.mjs';
 const require = createRequire(import.meta.url);
 const createBoot = require('../runtime/boot.js');
 const createSettings = require('../runtime/settings.js');
+const snapshots = require('../runtime/snapshots.js')();
 const root = repoRoot();
 const read = file => readFileSync(join(root, file), 'utf8');
 const local = 'vendor/three.min.js';
@@ -21,6 +22,8 @@ function fixture({config = {}, search = '', fail = [], layer = true, errorElemen
   const error = {hidden: true, textContent: 'Scene bootstrap could not load.'};
   const win = {STREAM_CONFIG: config, location: {search, pathname: '/', hash: '', replace() { throw Error('Unexpected redirect'); }}, console: {error: e => errors.push(e)}};
   win.StreamAudio = {createController() {}};
+  win.StreamAudioSession = {bind(controller) { return controller; }};
+  win.StreamSnapshots = {fromHash() { return null; }, apply(_snapshot, config) { return config; }};
   win.StreamSettings = {resolve: config => ({config, quality: 'tuned', warnings: []}), applyQuality() {}, limit(_kind, value) { return value; }};
   win.StreamRecovery = {createScope() {}, observeRenderer() {}, disposeScene() {}, report() {}, createLoadingManager() {}};
   if (overlayRuntime) win.StreamOverlay = {applyTypography() {}, startClock() {}};
@@ -132,6 +135,15 @@ test('missing shared audio API fails visibly before renderer initialization', as
   }
 });
 
+test('missing session audio helpers fail visibly before loading any renderer', async () => {
+  for (const api of [undefined, {}, {bind: 'invalid'}]) {
+    const f = fixture(); f.win.StreamAudioSession = api;
+    assert.equal((await f.api.start('starting')).status, 'failed');
+    assert.deepEqual(f.requests, []); assert.equal(f.error.hidden, false);
+    assert.match(f.error.textContent, /runtime\/audio-session\.js/);
+  }
+});
+
 test('settings and recovery helpers are required before any renderer is loaded', async () => {
   for (const key of ['StreamSettings', 'StreamRecovery']) {
     const f = fixture(); f.win[key] = {};
@@ -185,6 +197,46 @@ test('failed scene initialization never mounts the optional BRB renderer', async
   assert.ok(!f.events.includes('import'));
 });
 
+test('snapshot URLs transfer nonsecret settings and disable audio without relying on editor storage', async () => {
+  const preset = snapshots.defaults(); preset.quality = 'low'; preset.reducedMotion = true;
+  preset.scenes.starting.title = 'Custom Unicode 星空 😀';
+  const config = {audioReactive: {enabled: true, password: 'synthetic-secret'}, overlay: {title: 'Legacy'}};
+  const f = fixture({config}); f.win.StreamSnapshots = snapshots; f.win.StreamSettings = createSettings();
+  f.win.location.hash = '#preset=' + snapshots.encode(preset);
+  const attributes = {};
+  f.doc.documentElement = {setAttribute(key, value) { attributes[key] = value; }};
+  assert.equal((await f.api.start('starting')).status, 'ready');
+  assert.equal(f.win.STREAM_RUNTIME_CONFIG.overlay.title, preset.scenes.starting.title);
+  assert.equal(f.win.STREAM_OVERLAY.title, preset.scenes.starting.title);
+  assert.equal(f.win.STREAM_RUNTIME_CONFIG.audioReactive.enabled, false);
+  assert.equal(f.win.STREAM_RUNTIME_CONFIG.audioReactive.password, '');
+  assert.equal(f.win.STREAM_QUALITY, 'low'); assert.equal(attributes['data-reduced-motion'], 'true');
+  assert.equal(config.audioReactive.password, 'synthetic-secret');
+});
+
+test('malformed or unavailable snapshot helpers fail closed before any asset or audio initialization', async () => {
+  for (const hash of ['#preset=invalid', '#preset=', '#x=1&preset=invalid']) {
+    const f = fixture(); f.win.StreamSnapshots = snapshots; f.win.location.hash = hash;
+    assert.equal((await f.api.start('starting')).status, 'failed');
+    assert.deepEqual(f.requests, []);
+    assert.match(f.error.textContent, /Preset settings could not be loaded/);
+    assert.ok(!f.error.textContent.includes(hash));
+  }
+  const f = fixture(); delete f.win.StreamSnapshots;
+  assert.equal((await f.api.start('starting')).status, 'failed');
+  assert.deepEqual(f.requests, []);
+});
+
+test('legacy scene URLs preserve their original local audio behavior', async () => {
+  const config = {audioReactive: {enabled: true, password: ''}, overlay: {title: 'Legacy'}};
+  const f = fixture({config}); f.win.StreamSnapshots = snapshots; f.win.StreamSettings = createSettings();
+  f.win.location.hash = '#old-anchor';
+  assert.equal((await f.api.start('starting')).status, 'ready');
+  assert.equal(f.win.STREAM_RUNTIME_CONFIG.audioReactive.enabled, true);
+  assert.equal(f.win.STREAM_RUNTIME_CONFIG.overlay.title, 'Legacy');
+  assert.equal(f.win.STREAM_REDUCED_MOTION, false);
+});
+
 test('BRB imports and mounts its overlay only after its scene script completes', async () => {
   const f = fixture({search: '?assets=offline'});
   const promise = f.api.start('brb');
@@ -234,9 +286,11 @@ test('browser script wrapper auto-starts each HTML data-scene with config loaded
     f.doc.currentScript.getAttribute = key => key === 'data-scene' ? marker[1] : null;
     const context = vm.createContext({window: f.win, document: f.doc, URLSearchParams, URL});
     vm.runInContext(read('config.js'), context);
+    vm.runInContext(read('runtime/snapshots.js'), context);
     vm.runInContext(read('runtime/settings.js'), context);
     vm.runInContext(read('runtime/overlay.js'), context);
     vm.runInContext(read('runtime/audio.js'), context);
+    vm.runInContext(read('runtime/audio-session.js'), context);
     vm.runInContext(read('runtime/recovery.js'), context);
     f.win.STREAM_CONFIG.brbBlackholeReplacement.enabled = false;
     vm.runInContext(read('runtime/boot.js'), context);

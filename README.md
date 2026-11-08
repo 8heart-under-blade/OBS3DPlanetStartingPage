@@ -2,9 +2,9 @@
 
 This page renders a looping 3D solar-system style animation for a "starting soon" scene.
 
-> **Production work in progress:** the P0 foundation adds contributor checks, preview packaging,
-> and asset/baseline documentation; it does not yet provide a no-code editor or a qualified
-> end-user installer. Scene tuning is preserved; openly licensed fonts/textures replace
+> **Production work in progress:** a local no-code editor MVP is available at
+> [editor.html](editor.html), alongside contributor checks and preview packaging.
+> Browser/OBS usability qualification, public deployment and a qualified installer remain pending. Scene tuning is preserved; openly licensed fonts/textures replace
 > the original restricted assets. Typography and Earth/Moon appearance intentionally differ.
 > See [the production roadmap](docs/PRODUCTION_ROADMAP.md),
 > [baseline qualification record](docs/BASELINE.md), and [asset attribution audit](ATTRIBUTIONS.md).
@@ -56,6 +56,26 @@ and currently passes for the replacement asset set. CI uploads previews only whe
 passes; there is no production deployment or browser/OBS certification.
 See [CONTRIBUTING.md](CONTRIBUTING.md) for commands, safeguards, and limitations.
 
+## No-code editor (P2 candidate)
+
+Open [editor.html](editor.html) on the same static server, for example
+`http://127.0.0.1:8080/editor.html`. Edit all three scenes, preview, then copy the
+three personalized URLs into OBS at 1920×1080. Drafts autosave locally; copied URLs
+are independent snapshots and must be copied again after edits.
+
+Bundled fonts only. JSON import/export and reduced motion are supported.
+**New drafts default to Auto — local only:** local HTTP(S) copies connect to OBS
+on port 4455 without a password when authentication is off. If authentication is
+on, enter the password separately using **OBS → Browser Source → Interact**.
+Hosted copies and the embedded preview stay silent. Choose **Off** or **Manual
+local setup** for a custom port/input names. Credentials are session-only, never
+saved in links/presets; refresh clears them. Older drafts/links remain Off until
+you select Auto and copy fresh links. Configure before going live; use
+**Ctrl+Alt+A** (Command+Option+A on macOS) inside Interact to reopen setup.
+Legacy scene URLs keep their existing local audio behavior.
+Never put passwords or private information in overlay text.
+See [P2 format, limits and qualification status](docs/P2_EDITOR.md).
+
 ## P1 quality and recovery
 
 Existing URLs use **tuned** quality by default, preserving the current settings.
@@ -92,6 +112,7 @@ production qualification and the deferred soak/transition checks remain outstand
 - `runtime/boot.js` - shared scene routing and asset bootstrap ([P1 slice details](docs/P1_RUNTIME.md))
 - `runtime/overlay.js` - shared typography and local date/time ticker
 - `runtime/audio.js` - shared OBS WebSocket audio controller and meter processing
+- `runtime/audio-session.js` - local-only, memory-only OBS Interact setup for new links
 - `runtime/settings.js` - trusted-JS config checks and opt-in quality profiles
 - `runtime/recovery.js` - lifecycle scopes, graphics/asset recovery and safe diagnostics
 - `styles.css` - visual styling and overlay layout
@@ -398,5 +419,8 @@ Notes:
 - If the page looks stale after changes, hard refresh with `Ctrl+F5`.
 - If local fonts do not apply, serve over `http://localhost` instead of opening with `file://`, then refresh cache in OBS/browser.
 - If audio reactivity does not respond, verify `targetInputs` names match your OBS mixer input names; if none match, the scenes log a warning and fall back to all active inputs.
-- If OBS requires auth, set the same password in `STREAM_CONFIG.audioReactive.password`.
+- For editor links with OBS authentication enabled, enter the password in that
+  source using Interact; do not put it in shared config, links or presets.
+  Legacy local configurations still use their existing config.js path. Never
+  commit/share real credentials. Authentication is recommended but optional.
 - If using offline mode, keep the scene HTML/JS/CSS files, `brb-blackhole/`, `vendor/`, and `vendor/three-0.181.0/` together.

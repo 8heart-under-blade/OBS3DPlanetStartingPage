@@ -66,6 +66,8 @@ function makeWin({ location, config, overlay } = {}) {
     STREAM_CONFIG: config,
     StreamOverlay: { applyTypography() {}, startClock() {} },
     StreamAudio: { createController() {} },
+    StreamAudioSession: { bind(controller) { return controller; } },
+    StreamSnapshots: { fromHash() { return null; }, apply(_snapshot, config) { return config; } },
     StreamSettings: { resolve: config => ({config, quality: 'tuned', warnings: []}), applyQuality() {}, limit(_kind, value) { return value; } },
     StreamRecovery: { createScope() {}, observeRenderer() {}, disposeScene() {}, report() {}, createLoadingManager() {} },
     STREAM_OVERLAY: overlay,

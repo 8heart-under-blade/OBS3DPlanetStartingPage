@@ -98,12 +98,16 @@
       element.textContent = "Shared overlay helpers could not load. Keep runtime/overlay.js next to this page.";
     } else if (error && error.code === "AUDIO_RUNTIME_MISSING") {
       element.textContent = "Shared audio helpers could not load. Keep runtime/audio.js next to this page.";
+    } else if (error && error.code === "AUDIO_SESSION_RUNTIME_MISSING") {
+      element.textContent = "Local audio setup helpers could not load. Keep runtime/audio-session.js next to this page.";
     } else if (error && error.code === "RECOVERY_RUNTIME_MISSING") {
       element.textContent = "Recovery helpers could not load. Keep runtime/recovery.js next to this page.";
     } else if (error && error.code === "SETTINGS_RUNTIME_MISSING") {
       element.textContent = "Settings helpers could not load. Keep runtime/settings.js next to this page.";
     } else if (error && error.code === "ASSET_TIMEOUT") {
       element.textContent = "An asset took too long to load. Check the local files or network, then refresh this source.";
+    } else if (error && (error.code === "SNAPSHOT_INVALID" || error.code === "SNAPSHOT_RUNTIME_MISSING")) {
+      element.textContent = "Preset settings could not be loaded. Re-import a valid preset in the editor and copy a fresh OBS link.";
     } else if (mode !== "offline") {
       element.textContent = "Could not load rendering assets. Check network access or local vendor files.";
     } else if (scene === "brb") {
@@ -132,6 +136,27 @@
         return { status: "redirected", scene: requestedScene };
       }
 
+      if (!win.StreamSnapshots || typeof win.StreamSnapshots.fromHash !== "function" || typeof win.StreamSnapshots.apply !== "function") {
+        var missingSnapshot = new Error("Preset helpers did not load");
+        missingSnapshot.code = "SNAPSHOT_RUNTIME_MISSING";
+        throw missingSnapshot;
+      }
+      var snapshot;
+      try { snapshot = win.StreamSnapshots.fromHash(win.location.hash || ""); }
+      catch (failure) {
+        var invalidSnapshot = new Error("Preset settings are invalid");
+        invalidSnapshot.code = "SNAPSHOT_INVALID";
+        throw invalidSnapshot;
+      }
+      win.STREAM_REDUCED_MOTION = !!snapshot && snapshot.reducedMotion;
+      if (doc.documentElement && typeof doc.documentElement.setAttribute === "function") {
+        doc.documentElement.setAttribute("data-reduced-motion", win.STREAM_REDUCED_MOTION ? "true" : "false");
+      }
+      if (snapshot) {
+        config = win.StreamSnapshots.apply(snapshot, config);
+        win.STREAM_OVERLAY = config.overlay;
+        win.STREAM_SNAPSHOT = snapshot;
+      }
       if (!win.StreamSettings || typeof win.StreamSettings.resolve !== "function" || typeof win.StreamSettings.applyQuality !== "function" || typeof win.StreamSettings.limit !== "function") {
         var missingSettings = new Error("Settings helpers did not load");
         missingSettings.code = "SETTINGS_RUNTIME_MISSING";
@@ -153,6 +178,11 @@
         var missingAudio = new Error("Shared audio helpers did not load");
         missingAudio.code = "AUDIO_RUNTIME_MISSING";
         throw missingAudio;
+      }
+      if (!win.StreamAudioSession || typeof win.StreamAudioSession.bind !== "function") {
+        var missingSession = new Error("Session audio helpers did not load");
+        missingSession.code = "AUDIO_SESSION_RUNTIME_MISSING";
+        throw missingSession;
       }
       if (!win.StreamRecovery || typeof win.StreamRecovery.createScope !== "function" || typeof win.StreamRecovery.observeRenderer !== "function" || typeof win.StreamRecovery.disposeScene !== "function" || typeof win.StreamRecovery.report !== "function" || typeof win.StreamRecovery.createLoadingManager !== "function") {
         var missingRecovery = new Error("Recovery helpers did not load");

@@ -1,13 +1,13 @@
 {
   "schemaVersion": 1,
-  "baseCommit": "703dbc6",
-  "revision": "p1-lifecycle-settings-recovery-2026-11-08",
-  "purpose": "All six P1 implementation slices: shared boot/overlay/audio, lifecycle generations, validated trusted-JS config with opt-in quality, and renderer/asset recovery. Default tuned numerical config and shaders remain unchanged. Declared integration recipes plus archived helpers reconstruct original scene hashes; current lifecycle behavior intentionally differs. Not runtime/OBS certification.",
+  "baseCommit": "36d66c6",
+  "revision": "p2-editor-session-audio-2026-11-08",
+  "purpose": "P2 candidate: strict nonsecret snapshots, editor/drafts/preview, local-only session audio. Historical P1 hashes retained. Source bytes only, not browser/OBS acceptance.",
   "files": [
     {
       "path": "brb-blackhole/blackholeOverlay.module.js",
-      "bytes": 22014,
-      "sha256": "a97e3edb82731da8a7f8b74d51796344495ac8cfa01ac9f4e7b4ca3f6f845695"
+      "bytes": 22049,
+      "sha256": "aeb660586e06ddadafabb6ed2985f784bb2d94c5385c598b5c9028aef06861ea"
     },
     {
       "path": "brb.css",
@@ -16,13 +16,13 @@
     },
     {
       "path": "brb.html",
-      "bytes": 1318,
-      "sha256": "da7cf031820bd4c9d0cb42a86c732fe6242895363a839cb7ab103cb0e45c6bfb"
+      "bytes": 1651,
+      "sha256": "7a8a1f0cf772b9f5ea68ff3a1580580b25d0bf1503c538d796b0f9e81af28c52"
     },
     {
       "path": "brb.js",
-      "bytes": 44319,
-      "sha256": "0e709e4b85bb07aa5c93517dec90eb3c554a5c216a2c830b3baa2b7e7c48b3db"
+      "bytes": 44457,
+      "sha256": "cec631443d837f25aff7b8a38ba64dc8bd61d22a56e9e7c74f034193a3e422bd"
     },
     {
       "path": "cinzel-decorative.ttf",
@@ -40,9 +40,24 @@
       "sha256": "c7670f78b4c0c95d7c9b7b6cfdbd108d1df9dc2bde5863a78a4a68647ec5f678"
     },
     {
+      "path": "editor.css",
+      "bytes": 9744,
+      "sha256": "ea5a3981b104326bc13a70edc81e2f5765928a0eec6ecfbc1855f06726c6d86e"
+    },
+    {
+      "path": "editor.html",
+      "bytes": 13938,
+      "sha256": "64ff77e121edededb991518bd92fa7c94f85a8b900bf38537f1bad005703d948"
+    },
+    {
+      "path": "editor.js",
+      "bytes": 16360,
+      "sha256": "90e53009f67a8a825f8539046715ad32ec516f0e43cbb09d0bbc3b48ac0c729e"
+    },
+    {
       "path": "index.html",
-      "bytes": 1293,
-      "sha256": "54ef40e65e20b6e72880648800452106827489feef08a8847db47c0f18c7018e"
+      "bytes": 1626,
+      "sha256": "1a12935c92596bc2b707421a2fb6f20bde22b46cd39a48779d3bd1ebf4455766"
     },
     {
       "path": "macondo.ttf",
@@ -51,18 +66,38 @@
     },
     {
       "path": "main.js",
-      "bytes": 52012,
-      "sha256": "b04d42492dd0e1e2e29425981c5bbc4068b173efb8741edaa576d810c2270d34"
+      "bytes": 52150,
+      "sha256": "dd44877744bed663d5256f582ce662d036c61e1aa3c4cbcd7474efc8091f999c"
+    },
+    {
+      "path": "runtime/audio-session.css",
+      "bytes": 1292,
+      "sha256": "b3d6fc8f2a761c1c1f1438d8069de4182ec112bd6bb72a60f5305850ff58ac21"
+    },
+    {
+      "path": "runtime/audio-session.js",
+      "bytes": 8604,
+      "sha256": "a3f705f630143f8fbf5fad14f21071864e23aa5e0960f3572017c110b7e2b05e"
     },
     {
       "path": "runtime/audio.js",
-      "bytes": 21470,
-      "sha256": "fcb1aa2d3959d468c50dbf822519e597c899997aa7df5a8d850f6b8baf7a24a9"
+      "bytes": 21751,
+      "sha256": "7d080951373fb5d1c8497e2877b455f95b00ee211ae393ef49a41170eb4ee7e6"
     },
     {
       "path": "runtime/boot.js",
-      "bytes": 10115,
-      "sha256": "cd55e29e8224b0456d1f39cdfe60655317b3e46c8b2e04cffe36855eca0c29c2"
+      "bytes": 11876,
+      "sha256": "2dec926456aaaf652095f779b995c66d765a28bb06c1713157d8ab49b53f42a8"
+    },
+    {
+      "path": "runtime/drafts.js",
+      "bytes": 3425,
+      "sha256": "46f9786e141986ff53c00e45ee0a13077ad53e68763dbc4fc9b50aa07e5ce302"
+    },
+    {
+      "path": "runtime/motion.css",
+      "bytes": 306,
+      "sha256": "4ab1c9538b189472d2c418fcdf8e4cba7cc3d98b43acce3b8c0973b8679194e8"
     },
     {
       "path": "runtime/overlay.js",
@@ -78,6 +113,11 @@
       "path": "runtime/settings.js",
       "bytes": 7654,
       "sha256": "7a4ec9b91de4324cceed5980b6aab0039a27040ac96625eeebe5f24d2bfe1a12"
+    },
+    {
+      "path": "runtime/snapshots.js",
+      "bytes": 9507,
+      "sha256": "ae3abac3164e3ac952be0eeb5da269bcf154c641dfffb95c9023d967dc17ba26"
     },
     {
       "path": "styles.css",
@@ -116,13 +156,13 @@
     },
     {
       "path": "thanks.html",
-      "bytes": 1582,
-      "sha256": "e200c835bdb8f0ece683ea429f8a84e8b4166e0933bf3a77dbe0217d2391f018"
+      "bytes": 1915,
+      "sha256": "d84c7901768e78db505a3e3edba3e7a0007608184cb91595280dda16d2244dfb"
     },
     {
       "path": "thanks.js",
-      "bytes": 64147,
-      "sha256": "e88762da0e64ff30af8aeeb4c15395076cb4c564e86aad6d3ba2003eda58883a"
+      "bytes": 64285,
+      "sha256": "06307b482074daf4b2097d6ae0bccf5a9ac32401c583c4a6b585901fbe7f6a75"
     },
     {
       "path": "vendor/three-0.181.0/build/three.core.js",

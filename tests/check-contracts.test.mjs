@@ -21,8 +21,16 @@ const REQUIRED = [
   "runtime/boot.js",
   "runtime/overlay.js",
   "runtime/audio.js",
+  "runtime/audio-session.js",
+  "runtime/audio-session.css",
   "runtime/recovery.js",
   "runtime/settings.js",
+  "runtime/snapshots.js",
+  "runtime/drafts.js",
+  "runtime/motion.css",
+  "editor.html",
+  "editor.css",
+  "editor.js",
   "main.js",
   "brb.js",
   "thanks.js",
@@ -50,11 +58,14 @@ test("HTML pages load config before the shared bootstrap with the correct scene"
     const configTag = '<script src="config.js"></script>';
     const overlayTag = '<script src="runtime/overlay.js"';
     const settingsTag = '<script src="runtime/settings.js"';
+    const snapshotTag = '<script src="runtime/snapshots.js"';
     const audioTag = '<script src="runtime/audio.js"';
     const recoveryTag = '<script src="runtime/recovery.js"';
     const bootTag = '<script src="runtime/boot.js" data-scene="' + scene + '"';
     assert.ok(html.includes(configTag), page);
-    assert.ok(html.indexOf(settingsTag) > html.indexOf(configTag), page + ' must load config before settings helpers');
+    assert.ok(html.indexOf(snapshotTag) > html.indexOf(configTag), page + ' must load config before snapshot helpers');
+    assert.ok(html.indexOf(settingsTag) > html.indexOf(snapshotTag), page + ' must load snapshot helpers before settings');
+    assert.equal(html.split('src="runtime/snapshots.js"').length - 1, 1, page);
     assert.ok(html.indexOf(overlayTag) > html.indexOf(settingsTag), page + ' must load settings before overlay helpers');
     assert.equal(html.split('src="runtime/settings.js"').length - 1, 1, page);
     assert.ok(html.indexOf(audioTag) > html.indexOf(overlayTag), page + ' must load overlay then audio helpers');

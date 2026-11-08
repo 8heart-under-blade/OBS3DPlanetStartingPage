@@ -563,7 +563,7 @@ export async function mountBlackholeOverlay() {
     if (controls) {
       controls.update();
     }
-    uniforms.uTime.value = clock.getElapsedTime();
+    uniforms.uTime.value = window.STREAM_REDUCED_MOTION ? 0 : clock.getElapsedTime();
     updateCameraUniforms();
 
     if (composer) {

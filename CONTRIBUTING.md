@@ -1,6 +1,6 @@
 # Contributor guide (P0 foundation)
 
-The runtime remains a static site. **Node is required only for these contributor checks and preview packaging**, not for opening a hosted scene. There is no editor or production installer yet. See [the roadmap](docs/PRODUCTION_ROADMAP.md).
+The runtime remains a static site. **Node is required only for these contributor checks and preview packaging**, not for opening a hosted scene. A no-code editor MVP is available at editor.html; it is not yet browser/OBS-qualified and there is no production installer. See [the roadmap](docs/PRODUCTION_ROADMAP.md).
 
 ## Requirements
 
@@ -35,6 +35,14 @@ npm run clean         # delete generated dist/ and release/ outputs
 Never place a real OBS password into a committed or shared `config.js`. It currently contains `password: ""`. Builds reject nonempty or dynamic password values and do not print the value. The P0 guard also conservatively rejects backslash escapes in executable config tokens (comments excluded), preventing escaped password-property spellings; arbitrary JavaScript customization will need a real schema/parser in a later phase. The scanner checks the current password-property contract without executing config code; **it is not a general secret scanner or proof arbitrary JavaScript is safe**. Review changes manually, including secret-like content elsewhere.
 
 `.env*`, local override filenames and key files are ignored as an extra safeguard. Local overrides are **not yet loaded by the runtime**; creating one does not configure OBS. The separate setup/credential path is planned in P2/P4. Ignoring a file is not sufficient to protect a credential embedded in a tracked file.
+
+## P2 data boundary
+
+Use runtime/snapshots.js for all untrusted preset JSON, storage and URL fragments.
+Do not use runtime/settings.js's trusted-JS config normalization as an import schema.
+Keep strict unknown-field rejection, UTF-8/URL budgets, credential exclusion and
+snapshot audio-off defaults covered by tests. Editor state must never be populated
+from config.js. See docs/P2_EDITOR.md for the protocol and pending acceptance.
 
 ## Windows checks
 

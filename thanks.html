@@ -5,6 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Stream End - Thank You For Watching</title>
   <link rel="stylesheet" href="thanks.css">
+  <link rel="stylesheet" href="runtime/motion.css">
+  <link rel="stylesheet" href="runtime/audio-session.css">
 </head>
 <body>
   <div id="scene" aria-hidden="true"></div>
@@ -25,9 +27,11 @@
   <p id="bootError" class="boot-error" hidden>Scene bootstrap could not load. Keep the runtime folder next to this page.</p>
 
   <script src="config.js"></script>
+  <script src="runtime/snapshots.js" onerror="document.getElementById('bootError').hidden = false"></script>
   <script src="runtime/settings.js" onerror="document.getElementById('bootError').hidden = false"></script>
   <script src="runtime/overlay.js" onerror="document.getElementById('bootError').hidden = false"></script>
   <script src="runtime/audio.js" onerror="document.getElementById('bootError').hidden = false"></script>
+  <script src="runtime/audio-session.js" onerror="document.getElementById('bootError').hidden = false"></script>
   <script src="runtime/recovery.js" onerror="document.getElementById('bootError').hidden = false"></script>
   <script src="runtime/boot.js" data-scene="thanks" onerror="document.getElementById('bootError').hidden = false"></script>
 </body>

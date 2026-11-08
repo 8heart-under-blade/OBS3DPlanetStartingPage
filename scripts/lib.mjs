@@ -28,6 +28,9 @@ export const ALLOW_FILES = [
   "cinzel-decorative.ttf",
   "macondo.ttf",
   "credits.html",
+  "editor.html",
+  "editor.css",
+  "editor.js",
 ];
 
 // Directory names are retained for contract tests; only these exact files ship.
@@ -37,8 +40,13 @@ export const DIRECTORY_FILES = [
   "runtime/boot.js",
   "runtime/overlay.js",
   "runtime/audio.js",
+  "runtime/audio-session.js",
+  "runtime/audio-session.css",
   "runtime/recovery.js",
   "runtime/settings.js",
+  "runtime/snapshots.js",
+  "runtime/drafts.js",
+  "runtime/motion.css",
   "textures/planets/earth_clouds_2k_solarsystemscope.jpg",
   "textures/planets/earth_day_2048.jpg",
   "textures/planets/earth_night_2048.jpg",
@@ -100,7 +108,7 @@ export const FORBIDDEN_BASENAMES = new Set([
   ".env",
 ]);
 
-export const HTML_PAGES = ["index.html", "brb.html", "thanks.html", "credits.html"];
+export const HTML_PAGES = ["index.html", "brb.html", "thanks.html", "credits.html", "editor.html"];
 
 // First-party JS checked for syntax (vendor/ is third-party and excluded).
 export const FIRST_PARTY_JS = [
@@ -108,8 +116,12 @@ export const FIRST_PARTY_JS = [
   "runtime/boot.js",
   "runtime/overlay.js",
   "runtime/audio.js",
+  "runtime/audio-session.js",
   "runtime/recovery.js",
   "runtime/settings.js",
+  "runtime/snapshots.js",
+  "runtime/drafts.js",
+  "editor.js",
   "main.js",
   "brb.js",
   "thanks.js",

@@ -334,7 +334,7 @@
   var warpField = createTimeFabricMesh();
   var warpWaterfall = createWarpWaterfallState(warpField);
   var gravityBodies = [];
-  var audioReactive = window.StreamAudio.createController(CONFIG.audioReactive);
+  var audioReactive = window.StreamAudioSession.bind(window.StreamAudio.createController(CONFIG.audioReactive), CONFIG.audioReactive, runtimeScope);
   var clock = new THREE.Clock();
   var earthWorldPosition = new THREE.Vector3();
   var moonWorldPosition = new THREE.Vector3();
@@ -352,8 +352,8 @@
     if (runtimeScope.isDisposed() || contextWatcher.isLost()) return;
     runtimeScope.requestFrame(animate);
 
-    var delta = Math.min(clock.getDelta(), 0.05);
-    var elapsed = clock.getElapsedTime();
+    var delta = window.STREAM_REDUCED_MOTION ? 0 : Math.min(clock.getDelta(), 0.05);
+    var elapsed = window.STREAM_REDUCED_MOTION ? 0 : clock.getElapsedTime();
     var audioBoost = audioReactive.update(delta);
     var audioFeatures = audioReactive.getFeatures();
 

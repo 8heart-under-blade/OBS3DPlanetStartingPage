@@ -311,7 +311,7 @@
   var fabric = createFabric();
   var fabricWaterfall = createFabricWaterfallState(fabric);
   var gravityBodies = [];
-  var audioReactive = window.StreamAudio.createController(CONFIG.audioReactive);
+  var audioReactive = window.StreamAudioSession.bind(window.StreamAudio.createController(CONFIG.audioReactive), CONFIG.audioReactive, runtimeScope);
   var clock = new THREE.Clock();
   var simDays = 0;
 
@@ -329,8 +329,8 @@
     if (runtimeScope.isDisposed() || contextWatcher.isLost()) return;
     runtimeScope.requestFrame(animate);
 
-    var delta = Math.min(clock.getDelta(), 0.05);
-    var elapsed = clock.getElapsedTime();
+    var delta = window.STREAM_REDUCED_MOTION ? 0 : Math.min(clock.getDelta(), 0.05);
+    var elapsed = window.STREAM_REDUCED_MOTION ? 0 : clock.getElapsedTime();
 
     simDays += delta * CONFIG.simulation.daysPerSecond;
     var currentDays = initialDays + simDays;

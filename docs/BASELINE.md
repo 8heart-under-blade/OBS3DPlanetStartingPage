@@ -2,16 +2,18 @@
 
 ## What this baseline establishes
 
-The active `source-baseline.json` records 36 runtime files after all six P1
-implementation slices. The acceptance gate is not complete. The pre-P1 licensed-asset manifest (31 files)
+The active `source-baseline.json` records 44 runtime files for the P2 editor
+candidate. P1 is saved at commit `36d66c6`; its 36-file manifest is retained in
+`source-baseline-p1-complete.json`. P2 browser/OBS acceptance is pending. The pre-P1 licensed-asset manifest (31 files)
 is retained in `source-baseline-assets.json`; the first P1 bootstrap manifest is
 retained in `source-baseline-p1-boot.json`, and the pre-audio extraction manifest
 in `source-baseline-p1-overlay.json`. The three scene scripts now call shared
-typography/clock/audio helpers whose bodies are unchanged; tests reconstruct the
-original scene files and match their pre-P1 hashes after undoing explicit
+typography/clock/audio helpers; tests reconstruct the original extracted scene files and match their pre-P1 hashes after undoing explicit
 integration adapters and restoring archived helper definitions. Default tuned
-numerical config, styles, assets, audio meter processing/protocol, shaders and
-scene math remain unchanged; lifecycle and failure behavior intentionally differ. See [P1_RUNTIME.md](P1_RUNTIME.md). The asset migration itself was
+numerical config, scene styles/assets, audio meter processing, legacy audio protocol,
+shaders and scene math remain unchanged; lifecycle and failure behavior intentionally
+differ. P2 adds a local-only session setup UI and meter-only subscription for new
+audio sessions, without changing legacy subscription behavior. See [P1_RUNTIME.md](P1_RUNTIME.md). The asset migration itself was
 performed on 2026-11-08. Original P0 hashes at commit
 `ea5fb4c866e48b9c8ba4981191437d1ff61780c6` are retained unchanged in
 `source-baseline-p0.json`. The root code license and Markdown notices are outside
@@ -99,6 +101,27 @@ Those qualification gates remain separate from the deterministic controller test
   "all is good". Record user-reported smoke acceptance of the integrated six slices.
   No specific quality-preset, context-loss/restoration or reconnect exercise was
   reported. The deferred soak and transition tests remain NOT TESTED.
+
+## P2 candidate — automated validation and user-reported OBS smoke acceptance
+
+- Static/source/asset/build/release gates pass: 44 runtime files, 19 third-party assets.
+- Node tests: 207 total, 203 pass, four explicit platform skips, zero failures.
+- Fake DOM/storage/file/clipboard and script-wrapper tests exercise editor changes,
+  validated JSON/fragment URLs, Unicode/limits/migrations, credential-field rejection,
+  initially disabled snapshot boot, retained legacy audio and reduced-motion clocks.
+- Fresh drafts now use local-only Auto audio, with session-only OBS Interact entry
+  when authentication is enabled; unauthenticated local OBS requires no password.
+  Public-hosted copies and embedded previews stay silent. Dedicated synthetic tests
+  cover protocol, isolation, cleanup, timeout and stale callbacks.
+- After the local-only session audio handoff, the user confirmed "OBS testing is ok".
+  Record P2 user-reported OBS smoke acceptance. Exact scenes, authentication modes,
+  Interact steps, versions and test duration were not separately reported; do not
+  infer coverage of both auth/no-auth paths or full production qualification.
+- The user subsequently confirmed "tested the editor ok for me" and approved P3.
+  Record editor acceptance without inferring exact feature/browser coverage.
+  First-time nontechnical workflow, detailed coverage, keyboard and screen-reader
+  qualification remain pending.
+- No public hosting/deployment or production release is claimed. See P2_EDITOR.md.
 
 ## Candidate support matrix — NOT yet qualified
 

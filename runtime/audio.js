@@ -58,6 +58,7 @@
         start: function () {},
         stop: function () {},
         update: function () { return 0; },
+        getStatus: function () { return "disabled"; },
         getFeatures: function () {
           return {
             level: 0,
@@ -369,7 +370,7 @@
 
       var identify = {
         rpcVersion: rpcVersion,
-        eventSubscriptions: 2047 | (1 << 16)
+        eventSubscriptions: settings.meterOnly === true ? (1 << 16) : 2047 | (1 << 16)
       };
 
       var authData = helloData.authentication;
@@ -378,6 +379,10 @@
         return;
       }
 
+      if (settings.requireSessionAuth === true && !wsPassword) {
+        state.status = "auth-required";
+        return;
+      }
       createObsWebSocketAuth(wsPassword, authData.salt, authData.challenge)
         .then(function (authString) {
           if (!isCurrentSocket(socket, socketId, runId)) {
@@ -474,6 +479,7 @@
       start: start,
       stop: stop,
       update: update,
+      getStatus: function () { return state.status; },
       getFeatures: function () {
         return state.featureSnapshot;
       }
