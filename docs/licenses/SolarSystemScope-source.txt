@@ -1,0 +1,24 @@
+Solar System Scope texture license evidence
+Verified: 2026-11-08
+Source: https://www.solarsystemscope.com/textures/
+License link on that page: https://creativecommons.org/licenses/by/4.0/
+
+Verbatim excerpt from the texture pack page:
+"Distributed under Attribution 4.0 International license:
+You may use, adapt, and share these textures for any purpose, even commercially."
+
+The excerpt is inside an anchor linking to the CC BY 4.0 URL above.
+It applies to the texture pack downloaded from that page, not arbitrary
+similarly named images. Download URLs and SHA-256 hashes are recorded in
+docs/asset-inventory.json. Downloads independently verified against the
+research report on 2026-11-08.
+
+Credit: Textures by Solar System Scope (https://www.solarsystemscope.com/textures/),
+licensed under CC BY 4.0 (https://creativecommons.org/licenses/by/4.0/).
+Changes: Earth specular map converted from TIFF to PNG; no resizing.
+Other four maps are unchanged upstream JPEG bytes (local names differ).
+No endorsement by Solar System Scope is implied.
+
+Retain this notice, the bundled CC-BY-4.0.txt legal text, ATTRIBUTIONS.md,
+and the credits page when redistributing. Keep visible scene credit or
+provide equivalent appropriate attribution with the stream/video.

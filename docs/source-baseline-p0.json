@@ -1,0 +1,162 @@
+{
+  "schemaVersion": 1,
+  "sourceCommit": "ea5fb4c866e48b9c8ba4981191437d1ff61780c6",
+  "purpose": "Source-byte baseline, not visual or runtime validation. Update deliberately after an approved runtime change.",
+  "files": [
+    {
+      "path": "brb-blackhole/blackholeOverlay.module.js",
+      "bytes": 20745,
+      "sha256": "5b93de496cee313089475e70ae3702db7eb4d28c0c3409e3542e3b63c9c5e931"
+    },
+    {
+      "path": "brb.css",
+      "bytes": 5827,
+      "sha256": "a237f3c03a760c0b395a05c32e487287a1b0a29d4050583ab244dcce5dae5684"
+    },
+    {
+      "path": "brb.html",
+      "bytes": 5920,
+      "sha256": "22347534b7b5d24cd5240481971b19880b6792a71051f1f5ca5c6e5b5f2237f8"
+    },
+    {
+      "path": "brb.js",
+      "bytes": 66746,
+      "sha256": "1148cb26356964f258ad97b9e0d41ec1a9e3d7d29b177622d14d3bd4eae64d50"
+    },
+    {
+      "path": "config.js",
+      "bytes": 5865,
+      "sha256": "d5d5603f2965b25c3ad311e2895aa8ba65d1855ce0524635b394553a519baf07"
+    },
+    {
+      "path": "index.html",
+      "bytes": 5769,
+      "sha256": "330cae6ecbf927a066e989fe0ad8694368207f2970e0540109e6e09fa6efb270"
+    },
+    {
+      "path": "main.js",
+      "bytes": 74439,
+      "sha256": "18a6200d8b9daa06f5c87460ef6d31618b2504b626d5a85a7cc19c37aded6e72"
+    },
+    {
+      "path": "oracles.woff",
+      "bytes": 25904,
+      "sha256": "e67bab2c78b6a535c3638ea629ba803a4ba03a1aa580f750de80c7bec6503c8b"
+    },
+    {
+      "path": "styles.css",
+      "bytes": 4988,
+      "sha256": "f63bea5bbc13a91f9566e194c5cf9198d90854b4e6545af2c9ecb027122403a4"
+    },
+    {
+      "path": "textures/planets/earth_clouds_1024.png",
+      "bytes": 260222,
+      "sha256": "7d3b82ef6b3feb506fc06f02a744aed3d864e23e7417075005f4082a7ff935a4"
+    },
+    {
+      "path": "textures/planets/earth_clouds_2k_solarsystemscope.jpg",
+      "bytes": 965676,
+      "sha256": "fffd7f68d41b37274822150e54a6ef605af1d3ec35624d9f628c3b896bfa42ed"
+    },
+    {
+      "path": "textures/planets/earth_day_2048.jpg",
+      "bytes": 512606,
+      "sha256": "2faa400d1eade3bc44caf6750d1b772bd9bbb6d87362c02bc7c3304e78fa0a9d"
+    },
+    {
+      "path": "textures/planets/earth_night_2048.png",
+      "bytes": 734910,
+      "sha256": "3cc6972d1d5b6310f33ea6ef4cc14a38f1dd141a91d26888206889327d983d7b"
+    },
+    {
+      "path": "textures/planets/earth_specular_2048.jpg",
+      "bytes": 223421,
+      "sha256": "2df48906732d7a458b2d0a7cdec51a829262307c6bdee4cfdf079a4dd7c71c69"
+    },
+    {
+      "path": "textures/planets/moon_1024.jpg",
+      "bytes": 238093,
+      "sha256": "fcb0f1f5548e6e18d40063dd55c6aacd3daedf2407b181dab85b61e22bf9fe57"
+    },
+    {
+      "path": "thanks.css",
+      "bytes": 5904,
+      "sha256": "d43cde745c13fe9380b13f59f024f9d35bf1881b5e8361bb88840c06a7558b45"
+    },
+    {
+      "path": "thanks.html",
+      "bytes": 5578,
+      "sha256": "c836a0e8b66f59dd444fd130a591f5f622b70ee8e6a6c59250ca5ba59e083290"
+    },
+    {
+      "path": "thanks.js",
+      "bytes": 85991,
+      "sha256": "c47832cfee45ee4e0e855db973606c27345cbe5e67234354cfc5da48b9bc4a0d"
+    },
+    {
+      "path": "twigs.woff",
+      "bytes": 650460,
+      "sha256": "9cc9b45211ff5172f68909686e46c2188f59196c2bb34c46a42e97ba28772978"
+    },
+    {
+      "path": "vendor/three-0.181.0/build/three.core.js",
+      "bytes": 1405971,
+      "sha256": "03fb6e9fa08628385a9096948593251ae473239c7039496d7c280cba73d84631"
+    },
+    {
+      "path": "vendor/three-0.181.0/build/three.module.js",
+      "bytes": 626216,
+      "sha256": "99b94b6829da8e751ef48147e3a7eebae861bd4087dbcb7c3a85af03a4210933"
+    },
+    {
+      "path": "vendor/three-0.181.0/examples/jsm/controls/OrbitControls.js",
+      "bytes": 38722,
+      "sha256": "5e74b0793159d8c7aa670fdca9e2d3f4fbf79471731ed18cf208671149b9c26d"
+    },
+    {
+      "path": "vendor/three-0.181.0/examples/jsm/postprocessing/EffectComposer.js",
+      "bytes": 8502,
+      "sha256": "af8ca6b6bb92a77a8d5e38a612253d7138784aba1821dc35f381f0793238fef0"
+    },
+    {
+      "path": "vendor/three-0.181.0/examples/jsm/postprocessing/MaskPass.js",
+      "bytes": 4694,
+      "sha256": "7cd08eee9d5d6f5578beaddbdcbe9c384f6873810af27f22ab7db3ceeb127aa3"
+    },
+    {
+      "path": "vendor/three-0.181.0/examples/jsm/postprocessing/Pass.js",
+      "bytes": 4243,
+      "sha256": "f873ec11f08728ee1301aae7d47e1243574d124ee108213ef93c5c10458afc5b"
+    },
+    {
+      "path": "vendor/three-0.181.0/examples/jsm/postprocessing/RenderPass.js",
+      "bytes": 4137,
+      "sha256": "42ca9467b143aec15320ea688b2a8b736899ae967cdf0cb30bba8bb3516a5552"
+    },
+    {
+      "path": "vendor/three-0.181.0/examples/jsm/postprocessing/ShaderPass.js",
+      "bytes": 3253,
+      "sha256": "5df4d3e1384f5cb108fa23ecf7f534edd10e1631cd3db06c0dda557372dc7e8f"
+    },
+    {
+      "path": "vendor/three-0.181.0/examples/jsm/postprocessing/UnrealBloomPass.js",
+      "bytes": 14604,
+      "sha256": "2f116c7bbf1268cbdc0b359e2d48ab067ad4600c80b347e226c18e78a15c8292"
+    },
+    {
+      "path": "vendor/three-0.181.0/examples/jsm/shaders/CopyShader.js",
+      "bytes": 729,
+      "sha256": "a33057d5ac91c43304c186ac0e8816e62bb2ed471d3a00ff3018dfd5c0389718"
+    },
+    {
+      "path": "vendor/three-0.181.0/examples/jsm/shaders/LuminosityHighPassShader.js",
+      "bytes": 1316,
+      "sha256": "3db5f13c9cab9f05cb572710a9fdb809a32ad0f2c7e68b2e261817c198ba813e"
+    },
+    {
+      "path": "vendor/three.min.js",
+      "bytes": 669884,
+      "sha256": "170c6789f43217c96b3170f4b42fafe135de7f7cd48497a4218f9757ee1d49fa"
+    }
+  ]
+}

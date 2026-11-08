@@ -5,6 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Stream Be Right Back - Event Horizon</title>
   <link rel="stylesheet" href="brb.css">
+  <link rel="stylesheet" href="runtime/motion.css">
+  <link rel="stylesheet" href="runtime/audio-session.css">
 </head>
 <body>
   <div id="scene" aria-hidden="true"></div>
@@ -17,159 +19,15 @@
     <p id="subtitle">Crossing the event horizon. Return imminent.</p>
   </div>
 
-  <p id="bootError" class="boot-error" hidden></p>
+  <p id="bootError" class="boot-error" hidden>Scene bootstrap could not load. Keep the runtime folder next to this page.</p>
 
   <script src="config.js"></script>
-  <script>
-    (function bootLoader() {
-      var pageConfig = window.STREAM_CONFIG;
-      if (!pageConfig || typeof pageConfig !== "object") {
-        pageConfig = {};
-      }
-
-      var assetConfig = pageConfig.assets && typeof pageConfig.assets === "object" ? pageConfig.assets : {};
-
-      var params = new URLSearchParams(window.location.search);
-      var requestedScene = normalizeScene(params.get("scene"));
-      if (requestedScene === "starting") {
-        redirectToScene("index.html", params, "starting");
-        return;
-      }
-      if (requestedScene === "thanks") {
-        redirectToScene("thanks.html", params, "thanks");
-        return;
-      }
-
-      var requestedMode = (params.get("assets") || "").toLowerCase();
-      var configMode = typeof assetConfig.mode === "string" ? assetConfig.mode.toLowerCase() : "";
-      var modeCandidate = requestedMode || configMode;
-      var mode = ["auto", "offline", "cdn"].indexOf(modeCandidate) >= 0 ? modeCandidate : "auto";
-
-      var localThreeSource = typeof assetConfig.localThree === "string" && assetConfig.localThree
-        ? assetConfig.localThree
-        : "vendor/three.min.js";
-      var cdnThreeSource = typeof assetConfig.cdnThree === "string" && assetConfig.cdnThree
-        ? assetConfig.cdnThree
-        : "https://unpkg.com/three@0.160.1/build/three.min.js";
-
-      window.STREAM_ASSET_MODE = mode;
-      window.STREAM_ASSET_SOURCES = {
-        localThree: localThreeSource,
-        cdnThree: cdnThreeSource
-      };
-
-      function normalizeScene(rawValue) {
-        if (typeof rawValue !== "string") {
-          return "";
-        }
-
-        var normalized = rawValue.trim().toLowerCase();
-        if (normalized === "be-right-back" || normalized === "berightback") {
-          return "brb";
-        }
-        if (normalized === "start" || normalized === "soon") {
-          return "starting";
-        }
-        if (
-          normalized === "thanks" ||
-          normalized === "thankyou" ||
-          normalized === "thank-you" ||
-          normalized === "thanks-for-watching" ||
-          normalized === "ty4w" ||
-          normalized === "ending" ||
-          normalized === "end"
-        ) {
-          return "thanks";
-        }
-        return normalized;
-      }
-
-      function getCurrentPageName() {
-        var path = window.location.pathname || "";
-        var segments = path.split("/");
-        var fileName = segments.length ? segments[segments.length - 1] : "";
-        if (!fileName) {
-          return "index.html";
-        }
-        return fileName.toLowerCase();
-      }
-
-      function redirectToScene(targetPage, currentParams, canonicalScene) {
-        if (getCurrentPageName() === String(targetPage || "").toLowerCase()) {
-          return;
-        }
-
-        var nextParams = new URLSearchParams(currentParams.toString());
-        if (canonicalScene) {
-          nextParams.set("scene", canonicalScene);
-        }
-
-        var nextQuery = nextParams.toString();
-        var hash = window.location.hash || "";
-        var targetUrl = targetPage + (nextQuery ? "?" + nextQuery : "") + hash;
-        window.location.replace(targetUrl);
-      }
-
-      function loadScript(src) {
-        return new Promise(function (resolve, reject) {
-          var script = document.createElement("script");
-          script.src = src;
-          script.async = true;
-          script.onload = resolve;
-          script.onerror = function () {
-            reject(new Error("Failed to load script: " + src));
-          };
-          document.head.appendChild(script);
-        });
-      }
-
-      function showBootError(message) {
-        var errorElement = document.getElementById("bootError");
-        if (!errorElement) {
-          return;
-        }
-        errorElement.textContent = message;
-        errorElement.hidden = false;
-      }
-
-      async function boot() {
-        var sources = window.STREAM_ASSET_SOURCES;
-        var resolvedMode = mode;
-
-        if (mode === "cdn") {
-          await loadScript(sources.cdnThree);
-          resolvedMode = "cdn";
-        } else if (mode === "offline") {
-          await loadScript(sources.localThree);
-          resolvedMode = "offline";
-        } else {
-          try {
-            await loadScript(sources.localThree);
-            resolvedMode = "offline";
-          } catch (error) {
-            await loadScript(sources.cdnThree);
-            resolvedMode = "cdn";
-          }
-        }
-
-        window.STREAM_ASSET_RESOLVED_MODE = resolvedMode;
-        await loadScript("brb.js");
-
-        var overlayModule = await import("./brb-blackhole/blackholeOverlay.module.js");
-        if (overlayModule && typeof overlayModule.mountBlackholeOverlay === "function") {
-          await overlayModule.mountBlackholeOverlay();
-        }
-      }
-
-      boot().catch(function (error) {
-        console.error(error);
-        if (mode === "offline") {
-          showBootError("Offline mode selected, but local BRB assets could not be loaded. Keep the vendor folder and BRB overlay modules next to brb.html, or switch to ?assets=auto.");
-        } else {
-          showBootError("Could not load rendering assets. Check network access or local vendor files.");
-        }
-      });
-    })();
-  </script>
+  <script src="runtime/snapshots.js" onerror="document.getElementById('bootError').hidden = false"></script>
+  <script src="runtime/settings.js" onerror="document.getElementById('bootError').hidden = false"></script>
+  <script src="runtime/overlay.js" onerror="document.getElementById('bootError').hidden = false"></script>
+  <script src="runtime/audio.js" onerror="document.getElementById('bootError').hidden = false"></script>
+  <script src="runtime/audio-session.js" onerror="document.getElementById('bootError').hidden = false"></script>
+  <script src="runtime/recovery.js" onerror="document.getElementById('bootError').hidden = false"></script>
+  <script src="runtime/boot.js" data-scene="brb" onerror="document.getElementById('bootError').hidden = false"></script>
 </body>
 </html>

@@ -4,6 +4,12 @@ node_modules/
 # Build / packaging outputs (regenerated; never commit)
 dist/
 release/
+site/
+cf-dist/
+.wrangler/
+.cf-stage-*/
+test-results/
+playwright-report/
 
 # Logs
 npm-debug.log*

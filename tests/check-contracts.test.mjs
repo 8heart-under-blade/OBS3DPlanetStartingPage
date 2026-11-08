@@ -18,11 +18,25 @@ const REQUIRED = [
   "brb.css",
   "thanks.css",
   "config.js",
+  "runtime/boot.js",
+  "runtime/overlay.js",
+  "runtime/audio.js",
+  "runtime/audio-session.js",
+  "runtime/audio-session.css",
+  "runtime/recovery.js",
+  "runtime/settings.js",
+  "runtime/snapshots.js",
+  "runtime/drafts.js",
+  "runtime/motion.css",
+  "editor.html",
+  "editor.css",
+  "editor.js",
   "main.js",
   "brb.js",
   "thanks.js",
-  "oracles.woff",
-  "twigs.woff",
+  "cinzel-decorative.ttf",
+  "macondo.ttf",
+  "credits.html",
   "vendor/three.min.js",
   "brb-blackhole/blackholeOverlay.module.js",
 ];
@@ -33,16 +47,37 @@ test("required runtime files exist", () => {
   }
 });
 
-test("HTML pages reference config + scene scripts", () => {
+test("HTML pages load config before the shared bootstrap with the correct scene", () => {
   const pairs = [
-    ["index.html", "main.js"],
-    ["brb.html", "brb.js"],
-    ["thanks.html", "thanks.js"],
+    ["index.html", "starting"],
+    ["brb.html", "brb"],
+    ["thanks.html", "thanks"],
   ];
   for (const [page, scene] of pairs) {
     const html = readFileSync(join(ROOT, page), "utf8");
-    assert.match(html, /config\.js/, `${page} must load config.js`);
-    assert.match(html, new RegExp(scene.replace(".", "\\.")), `${page} must load ${scene}`);
+    const configTag = '<script src="config.js"></script>';
+    const overlayTag = '<script src="runtime/overlay.js"';
+    const settingsTag = '<script src="runtime/settings.js"';
+    const snapshotTag = '<script src="runtime/snapshots.js"';
+    const audioTag = '<script src="runtime/audio.js"';
+    const recoveryTag = '<script src="runtime/recovery.js"';
+    const bootTag = '<script src="runtime/boot.js" data-scene="' + scene + '"';
+    assert.ok(html.includes(configTag), page);
+    assert.ok(html.indexOf(snapshotTag) > html.indexOf(configTag), page + ' must load config before snapshot helpers');
+    assert.ok(html.indexOf(settingsTag) > html.indexOf(snapshotTag), page + ' must load snapshot helpers before settings');
+    assert.equal(html.split('src="runtime/snapshots.js"').length - 1, 1, page);
+    assert.ok(html.indexOf(overlayTag) > html.indexOf(settingsTag), page + ' must load settings before overlay helpers');
+    assert.equal(html.split('src="runtime/settings.js"').length - 1, 1, page);
+    assert.ok(html.indexOf(audioTag) > html.indexOf(overlayTag), page + ' must load overlay then audio helpers');
+    assert.ok(html.indexOf(recoveryTag) > html.indexOf(audioTag), page + ' must load audio then recovery helpers');
+    assert.ok(html.indexOf(bootTag) > html.indexOf(recoveryTag), page + ' must load recovery before bootstrap');
+    assert.equal(html.split('src="runtime/recovery.js"').length - 1, 1, page);
+    assert.equal(html.split('src="runtime/audio.js"').length - 1, 1, page);
+    assert.equal(html.split('src="runtime/overlay.js"').length - 1, 1, page);
+    assert.equal(html.split('src="runtime/boot.js"').length - 1, 1, page);
+    assert.doesNotMatch(html, /function bootLoader|<script>/);
+    assert.match(html, /onerror="document.getElementById\('bootError'\).hidden = false"/);
+    assert.match(html, /Scene bootstrap could not load/);
   }
 });
 

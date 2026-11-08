@@ -1,0 +1,25 @@
+.obs-audio-session {
+  position: fixed; z-index: 10000; left: 16px; bottom: 16px;
+  width: min(560px, calc(100vw - 32px)); max-height: calc(100vh - 32px);
+  overflow: auto; box-sizing: border-box; padding: 20px;
+  color: #f4f8ff; background: #0b1728; border: 2px solid #28cdbb;
+  border-radius: 12px; font: 16px/1.5 system-ui, sans-serif;
+  text-align: left; pointer-events: auto;
+}
+.obs-audio-session[hidden] { display: none !important; }
+.obs-audio-session h2 { margin: 0 0 8px; font: bold 21px/1.3 system-ui, sans-serif; }
+.obs-audio-session p { margin: 8px 0 12px; }
+.obs-audio-session label { display: block; margin-top: 12px; font-weight: bold; }
+.obs-audio-session input {
+  display: block; width: 100%; box-sizing: border-box; padding: 10px;
+  color: #f4f8ff; background: #050d19; border: 1px solid #8cabc8;
+  border-radius: 5px; font: inherit;
+}
+.obs-audio-actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+.obs-audio-session button {
+  min-height: 44px; padding: 8px 14px; border: 0; border-radius: 5px;
+  font: bold 16px/1.5 system-ui, sans-serif; color: #001e29;
+  background: #28cdbb; cursor: pointer;
+}
+.obs-audio-session button:disabled { opacity: .6; cursor: wait; }
+.obs-audio-session :focus-visible { outline: 3px solid #ffda4b; outline-offset: 3px; }

@@ -1,6 +1,17 @@
 # Production roadmap and architecture decisions
 
-Status: P0 foundation in progress, not a production-ready release. This roadmap consolidates two review rounds by Space Bunny Free, Nemotron 3 Ultra Free, Big Pickle, Muse Spark 1.3 Contributor Free and GitHub Copilot Auto. Raw discussion is maintained outside this repository. Recommendations are adjudicated, not unanimous.
+Status: P2 implementation and user-reported editor/OBS smoke acceptance complete;
+P3 release/deployment work is starting. Not a production-ready release. This roadmap consolidates two review rounds by Space Bunny Free, Nemotron 3 Ultra Free, Big Pickle, Muse Spark 1.3 Contributor Free and GitHub Copilot Auto. Raw discussion is maintained outside this repository. Recommendations are adjudicated, not unanimous.
+
+Update 2026-11-08: the asset-rights gate now passes for the replacement set;
+see ASSET_AUDIT.md. Runtime visual/OBS qualification is still outstanding.
+This does not complete P0 or authorize a production release.
+
+Checkpoint: the user accepted the preview and confirmed OBS/audio interaction.
+They explicitly deferred sustained playback and repeated scene-transition tests
+and authorized proceeding to P1. This is an exception to the preferred sequence
+below, not a passed qualification gate. See [PROGRESS.md](PROGRESS.md) for the
+saved state, validation results and P1 handoff.
 
 ## Product goal
 
@@ -33,17 +44,52 @@ Gate: static checks/tests pass, preview artifacts contain only intended files, r
 
 ### P1 — Shared runtime
 
+Implementation slices 1–6 are integrated: shared boot/overlay/audio, audio lifecycle
+hardening, config validation/opt-in quality caps and failure/resource recovery.
+Default tuned settings and shaders are preserved; lifecycle behavior deliberately
+changes. The user accepted the integrated pages after the final OBS visual/audio
+recheck request; all six slices have user-reported smoke acceptance. Full P1 runtime
+qualification and the deferred soak/transition checks remain outstanding. See [P1_RUNTIME.md](P1_RUNTIME.md).
+This is implementation completion, **not** a passed P1 acceptance gate.
+
 Extract boot/config/audio/text/lifecycle incrementally. Lazy-load optional BRB modules, handle failed assets/context loss, add quality presets. Preserve current look and routes.
 
 Gate: real browser and OBS smoke tests, network-blocked offline test, repeated mounts/source transitions, recorded visual comparison and measured memory/CPU. Do not use visibilitychange as the sole source-visibility signal.
 
 ### P2 — No-code hosted MVP
 
+All six local implementation slices are integrated on feature/no-code-editor,
+based on P1 checkpoint 36d66c6: strict snapshot schema, editor, iframe preview,
+drafts/presets/JSON files, per-scene URLs and setup guidance. This is a candidate,
+not a passed P2 gate or a deployed hosted product. Fresh drafts default to local-only
+Auto audio; hosted/embedded pages stay silent. Authenticated local OBS uses separate
+session-only Interact entry; no-auth is supported. Older preset links remain Off;
+legacy local URLs preserve P1 behavior. The user reported OBS testing passed,
+then accepted the editor and approved moving to P3. This is user smoke acceptance,
+not full per-mode, accessibility or production qualification. See [P2_EDITOR.md](P2_EDITOR.md).
+
 Editor, presets, accessible controls, preview, autosaved drafts, validated snapshot URLs, preset/static export, guided OBS setup and diagnostics separated from clean stream views.
 
 Gate: first-time nontechnical testers produce all three personalized OBS sources without file edits/terminal; Unicode/long titles, malformed/oversize imports, old-schema migrations, URL transfer into actual OBS and secret-exclusion tests pass.
 
 ### P3 — Qualified release/deployment
+
+Started on feature/qualified-release from accepted local P2 checkpoint `1d28784`.
+Slice 1 adds candidate content-addressed namespaces, retained local history,
+verified current aliases and local selection/rollback tooling. No push/deploy,
+remote CI result or runtime qualification is implied. A clean CI candidate does
+not contain deployed history; retention/real hosting remain work to do.
+Cloudflare Pages is selected; prepared output/headers/404 and read-only live-audit
+commands are implemented. Project cosmic-stream-scenes now has a p3-preview
+upload; public HTTP audits passed for 115 files and two retained namespaces on
+the specific deployment and preview alias. The user confirmed all three hosted
+links work in OBS (transfer/playback smoke acceptance). Detailed hosted workflow,
+A preview-only nonvisual rollout and accepted-current restoration now pass live
+HTTP verification, preserving three namespaces. The user subsequently confirmed
+OBS playback still works after the rollback recheck request. Durable off-machine
+deployment history, remote CI, production deployment and full qualification remain
+pending; deferred soak/transition tests are not marked passed. See [P3_CLOUDFLARE.md](P3_CLOUDFLARE.md).
+See [P3_RELEASE.md](P3_RELEASE.md) for slices, commands and limitations.
 
 Unit tests for config/audio/math; browser/visual regression; immutable/versioned asset paths; tested hosting at repository subpaths; artifacts/checksums/changelog/rollback and user support guide.
 
@@ -61,4 +107,9 @@ Accounts/cloud sync/database, public galleries, marketplaces, automatic OBS scen
 
 ## Next implementation step
 
-Complete P0 and collect actual runtime baseline evidence before P1 scene refactoring. Resolve font/texture permissions with the owner or replace assets with verified equivalents; do not mark rights verified by filename or inference.
+P2 is saved locally as `1d28784`. Complete review/validation of the P3 candidate
+namespace foundation, then add browser/visual regression, release artifact/support
+procedures and verified history-preserving hosting/subpath deployment.
+Keep unperformed P0/P1 production qualification visible; asset rights and static
+checks do not replace it. P3 still needs real deployment and measured sustained
+playback before its gate passes. P4 is the supported local/offline product phase.

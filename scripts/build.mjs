@@ -24,7 +24,7 @@ try {
   }
   const manifest = {
     schemaVersion: 1, name: "obs3dplanetstartingpage", version, previewOnly: true,
-    licenseNote: "UNVERIFIED: public release requires the licensing gate. Local preview only.",
+    licenseNote: "Preview only: the licensing gate must pass; browser/OBS production qualification is separate.",
     files: PACKAGE_FILES.map(path => ({ path, bytes: readFileSync(join(out, path)).length, sha256: sha256File(join(out, path)) })),
   };
   writeFileSync(join(out, "build-manifest.json"), JSON.stringify(manifest, null, 2) + "\n");

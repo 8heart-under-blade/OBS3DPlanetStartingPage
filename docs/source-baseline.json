@@ -1,12 +1,13 @@
 {
   "schemaVersion": 1,
-  "sourceCommit": "ea5fb4c866e48b9c8ba4981191437d1ff61780c6",
-  "purpose": "Source-byte baseline, not visual or runtime validation. Update deliberately after an approved runtime change.",
+  "baseCommit": "1d28784928846cf58d75230c26fec09807ea5c0b",
+  "revision": "p3-browser-preview-navigation-2026-11-08",
+  "purpose": "P3 browser regression slice: renderer bytes retained; editor preview adds a nonsecret per-revision query marker to force document bootstrap after preset-fragment edits. Copied OBS URLs remain canonical. P2 hashes archived separately. Not production/GPU qualification.",
   "files": [
     {
       "path": "brb-blackhole/blackholeOverlay.module.js",
-      "bytes": 20745,
-      "sha256": "5b93de496cee313089475e70ae3702db7eb4d28c0c3409e3542e3b63c9c5e931"
+      "bytes": 22049,
+      "sha256": "aeb660586e06ddadafabb6ed2985f784bb2d94c5385c598b5c9028aef06861ea"
     },
     {
       "path": "brb.css",
@@ -15,43 +16,113 @@
     },
     {
       "path": "brb.html",
-      "bytes": 5920,
-      "sha256": "22347534b7b5d24cd5240481971b19880b6792a71051f1f5ca5c6e5b5f2237f8"
+      "bytes": 1651,
+      "sha256": "7a8a1f0cf772b9f5ea68ff3a1580580b25d0bf1503c538d796b0f9e81af28c52"
     },
     {
       "path": "brb.js",
-      "bytes": 66746,
-      "sha256": "1148cb26356964f258ad97b9e0d41ec1a9e3d7d29b177622d14d3bd4eae64d50"
+      "bytes": 44457,
+      "sha256": "cec631443d837f25aff7b8a38ba64dc8bd61d22a56e9e7c74f034193a3e422bd"
+    },
+    {
+      "path": "cinzel-decorative.ttf",
+      "bytes": 60408,
+      "sha256": "5b862be329103ad287a10f0a53e27a40e8cc519999253f1a0223e2dc330b10b8"
     },
     {
       "path": "config.js",
-      "bytes": 5865,
-      "sha256": "d5d5603f2965b25c3ad311e2895aa8ba65d1855ce0524635b394553a519baf07"
+      "bytes": 5928,
+      "sha256": "1951ef80e37f35765de2b0e14cc182a3b6121596bad33c5815d77068b1ec7819"
+    },
+    {
+      "path": "credits.html",
+      "bytes": 1973,
+      "sha256": "c7670f78b4c0c95d7c9b7b6cfdbd108d1df9dc2bde5863a78a4a68647ec5f678"
+    },
+    {
+      "path": "editor.css",
+      "bytes": 9744,
+      "sha256": "ea5a3981b104326bc13a70edc81e2f5765928a0eec6ecfbc1855f06726c6d86e"
+    },
+    {
+      "path": "editor.html",
+      "bytes": 13938,
+      "sha256": "64ff77e121edededb991518bd92fa7c94f85a8b900bf38537f1bad005703d948"
+    },
+    {
+      "path": "editor.js",
+      "bytes": 16652,
+      "sha256": "2061f2926bc1df79942673dd0ba8f83adff8da239e6a3d7cc0c439ed1ca7d950"
     },
     {
       "path": "index.html",
-      "bytes": 5769,
-      "sha256": "330cae6ecbf927a066e989fe0ad8694368207f2970e0540109e6e09fa6efb270"
+      "bytes": 1626,
+      "sha256": "1a12935c92596bc2b707421a2fb6f20bde22b46cd39a48779d3bd1ebf4455766"
+    },
+    {
+      "path": "macondo.ttf",
+      "bytes": 48776,
+      "sha256": "1910fe29b60588799474ea6281b59e131e33e96c77bfb80722a4c7f8133db4aa"
     },
     {
       "path": "main.js",
-      "bytes": 74439,
-      "sha256": "18a6200d8b9daa06f5c87460ef6d31618b2504b626d5a85a7cc19c37aded6e72"
+      "bytes": 52150,
+      "sha256": "dd44877744bed663d5256f582ce662d036c61e1aa3c4cbcd7474efc8091f999c"
     },
     {
-      "path": "oracles.woff",
-      "bytes": 25904,
-      "sha256": "e67bab2c78b6a535c3638ea629ba803a4ba03a1aa580f750de80c7bec6503c8b"
+      "path": "runtime/audio-session.css",
+      "bytes": 1292,
+      "sha256": "b3d6fc8f2a761c1c1f1438d8069de4182ec112bd6bb72a60f5305850ff58ac21"
+    },
+    {
+      "path": "runtime/audio-session.js",
+      "bytes": 8604,
+      "sha256": "a3f705f630143f8fbf5fad14f21071864e23aa5e0960f3572017c110b7e2b05e"
+    },
+    {
+      "path": "runtime/audio.js",
+      "bytes": 21751,
+      "sha256": "7d080951373fb5d1c8497e2877b455f95b00ee211ae393ef49a41170eb4ee7e6"
+    },
+    {
+      "path": "runtime/boot.js",
+      "bytes": 11876,
+      "sha256": "2dec926456aaaf652095f779b995c66d765a28bb06c1713157d8ab49b53f42a8"
+    },
+    {
+      "path": "runtime/drafts.js",
+      "bytes": 3425,
+      "sha256": "46f9786e141986ff53c00e45ee0a13077ad53e68763dbc4fc9b50aa07e5ce302"
+    },
+    {
+      "path": "runtime/motion.css",
+      "bytes": 306,
+      "sha256": "4ab1c9538b189472d2c418fcdf8e4cba7cc3d98b43acce3b8c0973b8679194e8"
+    },
+    {
+      "path": "runtime/overlay.js",
+      "bytes": 8615,
+      "sha256": "b9a903eaef7f73af6adfc0543eab4117b400696804bf9e87318b6f3e32ad34dd"
+    },
+    {
+      "path": "runtime/recovery.js",
+      "bytes": 14898,
+      "sha256": "cf2fb5cfe425b3b8862ee70e8dc3b61f3aaa685a4dda12287126287dbc1ee8a1"
+    },
+    {
+      "path": "runtime/settings.js",
+      "bytes": 7654,
+      "sha256": "7a4ec9b91de4324cceed5980b6aab0039a27040ac96625eeebe5f24d2bfe1a12"
+    },
+    {
+      "path": "runtime/snapshots.js",
+      "bytes": 9507,
+      "sha256": "ae3abac3164e3ac952be0eeb5da269bcf154c641dfffb95c9023d967dc17ba26"
     },
     {
       "path": "styles.css",
       "bytes": 4988,
       "sha256": "f63bea5bbc13a91f9566e194c5cf9198d90854b4e6545af2c9ecb027122403a4"
-    },
-    {
-      "path": "textures/planets/earth_clouds_1024.png",
-      "bytes": 260222,
-      "sha256": "7d3b82ef6b3feb506fc06f02a744aed3d864e23e7417075005f4082a7ff935a4"
     },
     {
       "path": "textures/planets/earth_clouds_2k_solarsystemscope.jpg",
@@ -60,43 +131,38 @@
     },
     {
       "path": "textures/planets/earth_day_2048.jpg",
-      "bytes": 512606,
-      "sha256": "2faa400d1eade3bc44caf6750d1b772bd9bbb6d87362c02bc7c3304e78fa0a9d"
+      "bytes": 463087,
+      "sha256": "767ee1dc6eb3802699bfccf6f264880f8acd0b80de3191cd24984fe279b07b7c"
     },
     {
-      "path": "textures/planets/earth_night_2048.png",
-      "bytes": 734910,
-      "sha256": "3cc6972d1d5b6310f33ea6ef4cc14a38f1dd141a91d26888206889327d983d7b"
+      "path": "textures/planets/earth_night_2048.jpg",
+      "bytes": 255287,
+      "sha256": "c16fd1bc096ab91a5c5265c6ff9847c43f489f2e2ee790ccdbcbd03251cf3a5a"
     },
     {
-      "path": "textures/planets/earth_specular_2048.jpg",
-      "bytes": 223421,
-      "sha256": "2df48906732d7a458b2d0a7cdec51a829262307c6bdee4cfdf079a4dd7c71c69"
+      "path": "textures/planets/earth_specular_2048.png",
+      "bytes": 275710,
+      "sha256": "f3c614db5ce764c291e9fa0eb67e6c8f19661e17bf951f22a52f013792751f6d"
     },
     {
-      "path": "textures/planets/moon_1024.jpg",
-      "bytes": 238093,
-      "sha256": "fcb0f1f5548e6e18d40063dd55c6aacd3daedf2407b181dab85b61e22bf9fe57"
+      "path": "textures/planets/moon_2048.jpg",
+      "bytes": 1053869,
+      "sha256": "2764ba6535ea0481a062846ee033cc7a909dae05b31a8fd13f3e98f3a7fd92bd"
     },
     {
       "path": "thanks.css",
-      "bytes": 5904,
-      "sha256": "d43cde745c13fe9380b13f59f024f9d35bf1881b5e8361bb88840c06a7558b45"
+      "bytes": 6264,
+      "sha256": "0b84ef50108b70b1ba2e7d840f58a15e92ef465f504ac276dbeccaba2602d678"
     },
     {
       "path": "thanks.html",
-      "bytes": 5578,
-      "sha256": "c836a0e8b66f59dd444fd130a591f5f622b70ee8e6a6c59250ca5ba59e083290"
+      "bytes": 1915,
+      "sha256": "d84c7901768e78db505a3e3edba3e7a0007608184cb91595280dda16d2244dfb"
     },
     {
       "path": "thanks.js",
-      "bytes": 85991,
-      "sha256": "c47832cfee45ee4e0e855db973606c27345cbe5e67234354cfc5da48b9bc4a0d"
-    },
-    {
-      "path": "twigs.woff",
-      "bytes": 650460,
-      "sha256": "9cc9b45211ff5172f68909686e46c2188f59196c2bb34c46a42e97ba28772978"
+      "bytes": 64285,
+      "sha256": "06307b482074daf4b2097d6ae0bccf5a9ac32401c583c4a6b585901fbe7f6a75"
     },
     {
       "path": "vendor/three-0.181.0/build/three.core.js",

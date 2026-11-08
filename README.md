@@ -2,12 +2,14 @@
 
 This page renders a looping 3D solar-system style animation for a "starting soon" scene.
 
-> **Production work in progress:** the P0 foundation adds contributor checks, preview packaging,
-> and asset/baseline documentation; it does not yet provide a no-code editor or a qualified
-> end-user installer. The existing scenes and tuned configuration are preserved.
+> **Production work in progress:** a local no-code editor MVP is available at
+> [editor.html](editor.html), alongside contributor checks and preview packaging.
+> Browser/OBS usability qualification, public deployment and a qualified installer remain pending. Scene tuning is preserved; openly licensed fonts/textures replace
+> the original restricted assets. Typography and Earth/Moon appearance intentionally differ.
 > See [the production roadmap](docs/PRODUCTION_ROADMAP.md),
 > [baseline qualification record](docs/BASELINE.md), and [asset attribution audit](ATTRIBUTIONS.md).
-> Unresolved third-party asset rights block public redistribution.
+> The current asset inventory has no unresolved rights; browser/OBS qualification remains pending.
+> Keep the texture credit, license link and conversion notice with public streams/videos.
 >
 > **Credential safety:** never publish an OBS password in `config.js`. The committed value is
 > blank; preview builds must reject a nonblank value. A separate credential/setup path is planned.
@@ -37,7 +39,8 @@ It includes:
 ## Contributor checks and preview packaging
 
 Node.js 22+ is required **only for contributor tooling**, not hosted scene playback.
-There are no third-party npm dependencies.
+There are no runtime npm dependencies. Browser regression uses pinned
+contributor-only Playwright/image-comparison devDependencies.
 
 ```bash
 npm ci
@@ -49,19 +52,94 @@ npm run build
 ```
 
 `npm run package` creates a reproducible **local preview** archive using GNU tar (Linux/CI).
-It is not an installer. `npm run release:check` currently fails intentionally because asset
-redistribution rights are unresolved; CI skips artifact publication until that gate passes.
+It is not an installer. `npm run release:check` verifies static redistribution eligibility
+and currently passes for the replacement asset set. CI uploads previews only when that gate
+passes; there is no production deployment or browser/OBS certification.
 See [CONTRIBUTING.md](CONTRIBUTING.md) for commands, safeguards, and limitations.
+
+## P3 candidate release layout (in progress)
+
+P2 is saved locally as `1d28784` after user-reported editor/OBS acceptance.
+`npm run build:site` creates a content-addressed candidate under `site/releases/`;
+`npm run site:verify` checks every retained namespace and current compatibility
+alias. The versioned editor generates pinned scene links. Earlier namespaces are
+not overwritten by later builds, and `site:select` can change the current candidate.
+
+This does **not** publish or qualify a release. A clean CI artifact has no previous
+deployment history: retain/restore old namespaces before a real deployment.
+`npm run clean` deliberately keeps `site/`. See [P3_RELEASE.md](docs/P3_RELEASE.md)
+for commands, retention/rollback limitations and remaining P3 gates. P4 remains the
+supported local/offline launcher phase.
+
+`npm run test:browser` now exercises the editor and compares scene frames with
+accepted P2 in a real browser. Browser install, evidence and scope limits are in
+[P3_BROWSER.md](docs/P3_BROWSER.md). These are not OBS/GPU soak results.
+
+Cloudflare Pages is the selected hosting target. `npm run build:cloudflare` prepares
+`cf-dist/` with retained release namespaces, cache rules and a non-SPA 404 page;
+`npm run cloudflare:verify` checks it. No upload/account access is performed.
+See [P3_CLOUDFLARE.md](docs/P3_CLOUDFLARE.md) before any deployment—fresh CI artifacts
+must not overwrite deployed history.
+
+## No-code editor (P2 candidate)
+
+Open [editor.html](editor.html) on the same static server, for example
+`http://127.0.0.1:8080/editor.html`. Edit all three scenes, preview, then copy the
+three personalized URLs into OBS at 1920×1080. Drafts autosave locally; copied URLs
+are independent snapshots and must be copied again after edits.
+
+Bundled fonts only. JSON import/export and reduced motion are supported.
+**New drafts default to Auto — local only:** local HTTP(S) copies connect to OBS
+on port 4455 without a password when authentication is off. If authentication is
+on, enter the password separately using **OBS → Browser Source → Interact**.
+Hosted copies and the embedded preview stay silent. Choose **Off** or **Manual
+local setup** for a custom port/input names. Credentials are session-only, never
+saved in links/presets; refresh clears them. Older drafts/links remain Off until
+you select Auto and copy fresh links. Configure before going live; use
+**Ctrl+Alt+A** (Command+Option+A on macOS) inside Interact to reopen setup.
+Legacy scene URLs keep their existing local audio behavior.
+Never put passwords or private information in overlay text.
+See [P2 format, limits and qualification status](docs/P2_EDITOR.md).
+
+## P1 quality and recovery
+
+Existing URLs use **tuned** quality by default, preserving the current settings.
+Optionally append `&quality=low`, `&quality=medium` or `&quality=high` to a scene
+URL (use `?` instead of `&` if it has no query yet):
+
+```text
+http://127.0.0.1:8080/?assets=offline&quality=low
+http://127.0.0.1:8080/brb.html?assets=offline&quality=medium
+http://127.0.0.1:8080/thanks.html?assets=offline&quality=tuned
+```
+
+Profiles cap pixel ratio, fabric segments and star density; they do not guarantee
+a particular FPS. An optional `quality` string in config.js supplies the default;
+the URL overrides it. Malformed known settings fall back to scene defaults, with
+fixed warning codes available in `window.STREAM_CONFIG_WARNINGS`. Config remains
+trusted JavaScript, not a safe untrusted-preset import format.
+
+Context loss pauses rendering; restoration reloads the same URL to rebuild.
+Failed textures retain procedural fallbacks and show a diagnostic. A script load
+taking longer than 15 seconds requires refresh rather than unsafe competing loads.
+See [P1 implementation and qualification status](docs/P1_RUNTIME.md).
+The user accepted all six P1 slices after an OBS visual/audio recheck; full
+production qualification and the deferred soak/transition checks remain outstanding.
 
 ## Files
 
 - `config.js` - runtime settings (assets, overlay text, custom fonts; never publish credentials)
-- `docs/source-baseline.json` - byte hashes preserving the current runtime during P0
+- `docs/source-baseline.json` - current source-byte hashes; historical P0 and pre-P1 hashes in `docs/source-baseline-p0.json` and `docs/source-baseline-assets.json`
 - `docs/asset-inventory.json` - third-party asset hashes, rights evidence, and release blockers
-- `ATTRIBUTIONS.md` - third-party notices and unresolved permissions
-- `index.html` - page shell + asset boot loader
-- `brb.html` - BRB page shell + asset boot loader
-- `thanks.html` - "Thank You For Watching" page shell + asset boot loader
+- `ATTRIBUTIONS.md`, `credits.html`, `docs/licenses/` - third-party credits and bundled license terms
+- `cinzel-decorative.ttf`, `macondo.ttf` - local OFL fonts (no external font service required)
+- `index.html`, `brb.html`, `thanks.html` - scene shells with fixed bootstrap scene identifiers
+- `runtime/boot.js` - shared scene routing and asset bootstrap ([P1 slice details](docs/P1_RUNTIME.md))
+- `runtime/overlay.js` - shared typography and local date/time ticker
+- `runtime/audio.js` - shared OBS WebSocket audio controller and meter processing
+- `runtime/audio-session.js` - local-only, memory-only OBS Interact setup for new links
+- `runtime/settings.js` - trusted-JS config checks and opt-in quality profiles
+- `runtime/recovery.js` - lifecycle scopes, graphics/asset recovery and safe diagnostics
 - `styles.css` - visual styling and overlay layout
 - `brb.css` - BRB visual styling and overlay layout
 - `thanks.css` - "Thank You For Watching" visual styling and overlay layout
@@ -243,7 +321,7 @@ window.STREAM_CONFIG = {
   overlay: {
     title: "MY CUSTOM TITLE",
     subtitle: "Subtitle with custom typography",
-    titleFontFamily: "'Oracles', serif",
+    titleFontFamily: "'Cinzel Decorative', serif",
     subtitleFontFamily: "'Orbitron', sans-serif",
     titleFontWeight: 400,
     subtitleFontWeight: 400,
@@ -254,8 +332,8 @@ window.STREAM_CONFIG = {
     ],
     customFontFaces: [
       {
-        family: "Oracles",
-        src: "@oracles.woff",
+        family: "Cinzel Decorative",
+        src: "@cinzel-decorative.ttf",
         weight: "400",
         style: "normal",
         display: "swap"
@@ -350,8 +428,8 @@ Tuning tips:
 - Waterfall shaping is driven by OBS meter features (RMS, peak, transient, stereo balance) and propagated over time.
 
 Notes:
-- `customFontFaces[].src` accepts `@oracles.woff`, direct paths/URLs (`fonts/oracles.woff2`), or full CSS `url(...)` syntax.
-- TY4W subtitle defaults to `See You Next Time` with `@twigs.woff` (`overlayThanks.subtitleFontFamily = "'Twigs', serif"`).
+- `customFontFaces[].src` accepts `@cinzel-decorative.ttf`, direct paths/URLs (`fonts/my-font.woff2`), or full CSS `url(...)` syntax. Bundle only fonts with documented embedding/redistribution rights.
+- TY4W subtitle defaults to `See You Next Time` with `@macondo.ttf` (`overlayThanks.subtitleFontFamily = "'Macondo', serif"`).
 - TY4W aurora is constrained to north/south polar regions and is strongest on the night side.
 - TY4W supports real-world texture maps via `STREAM_CONFIG.thanksScene.useRealWorldMaps` and map URLs (`earthDayMapUrl`, `earthNightMapUrl`, `earthCloudMapUrl`, `earthWaterMaskUrl`, `moonMapUrl`).
 - For faster startup, keep TY4W maps local (for example `textures/planets/*.jpg|png`) instead of remote URLs.
@@ -366,5 +444,8 @@ Notes:
 - If the page looks stale after changes, hard refresh with `Ctrl+F5`.
 - If local fonts do not apply, serve over `http://localhost` instead of opening with `file://`, then refresh cache in OBS/browser.
 - If audio reactivity does not respond, verify `targetInputs` names match your OBS mixer input names; if none match, the scenes log a warning and fall back to all active inputs.
-- If OBS requires auth, set the same password in `STREAM_CONFIG.audioReactive.password`.
+- For editor links with OBS authentication enabled, enter the password in that
+  source using Interact; do not put it in shared config, links or presets.
+  Legacy local configurations still use their existing config.js path. Never
+  commit/share real credentials. Authentication is recommended but optional.
 - If using offline mode, keep the scene HTML/JS/CSS files, `brb-blackhole/`, `vendor/`, and `vendor/three-0.181.0/` together.

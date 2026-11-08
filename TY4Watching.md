@@ -1,5 +1,10 @@
 # Plan - Thank You For Watching Scene (Earth + Moon)
 
+> Historical implementation plan, not current setup instructions. The licensed-asset
+> migration replaced Twigs with Macondo (`@macondo.ttf`) and the original example
+> textures with Solar System Scope maps. Follow README.md and config.js for current
+> setup; the original design notes below are retained as history.
+
 This plan adds a third OBS scene focused on Planet Earth + Moon while preserving the project core:
 - planetary hero object above the spacetime fabric
 - fabric reacts to OBS desktop audio (WebSocket)

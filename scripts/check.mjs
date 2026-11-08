@@ -154,7 +154,7 @@ function checkHtmlAssetLinks(root) {
     const src = readFileSync(cfgPath, "utf8");
     const lit = /"([^"]*)"|'([^']*)'/g;
     let m;
-    const exts = [".js", ".woff", ".woff2", ".png", ".jpg", ".jpeg", ".webp", ".css", ".json"];
+    const exts = [".js", ".woff", ".woff2", ".ttf", ".otf", ".png", ".jpg", ".jpeg", ".webp", ".css", ".json"];
     const seen = new Set();
     while ((m = lit.exec(src)) !== null) {
       const v = (m[1] !== undefined ? m[1] : m[2]).trim();
@@ -162,7 +162,7 @@ function checkHtmlAssetLinks(root) {
       seen.add(v);
       if (/^[a-zA-Z][a-zA-Z0-9+.-]*:/.test(v)) continue; // URL / scheme
       if (!exts.some((e) => v.toLowerCase().split(/[?#]/)[0].endsWith(e))) continue;
-      const target = v.replace(/^@/, "").split(/[?#]/)[0]; // "@oracles.woff" -> root file
+      const target = v.replace(/^@/, "").split(/[?#]/)[0]; // "@cinzel-decorative.ttf" -> root file
       if (!isSafeRelativePath(root, target)) {
         fail(`config.js: unsafe local asset path: ${target}`);
         continue;

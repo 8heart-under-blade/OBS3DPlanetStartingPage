@@ -1,0 +1,8 @@
+/* Snapshot-only reduced motion: scene clocks freeze in JS; keep text readable. */
+html[data-reduced-motion="true"] *,
+html[data-reduced-motion="true"] *::before,
+html[data-reduced-motion="true"] *::after {
+  animation: none !important;
+  transition: none !important;
+  scroll-behavior: auto !important;
+}

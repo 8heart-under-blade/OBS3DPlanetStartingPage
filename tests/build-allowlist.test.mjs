@@ -50,8 +50,9 @@ test("dist contains all allowlisted runtime files", () => {
     "vendor/three.min.js",
     "brb-blackhole/blackholeOverlay.module.js",
     "textures/planets/earth_day_2048.jpg",
-    "oracles.woff",
-    "twigs.woff",
+    "cinzel-decorative.ttf",
+    "macondo.ttf",
+    "credits.html",
   ]) {
     assert.equal(existsSync(join(DIST, f)), true, `dist missing runtime file: ${f}`);
   }

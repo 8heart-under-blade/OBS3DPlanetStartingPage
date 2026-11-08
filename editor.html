@@ -1,0 +1,263 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="No-code editor for the OBS Planet starting, BRB and thanks scenes.">
+  <title>Editor — OBS Planet Scenes</title>
+  <link rel="stylesheet" href="editor.css">
+</head>
+<body>
+  <a class="skip-link" href="#editor-form">Skip to editor controls</a>
+
+  <header class="site-header">
+    <p class="eyebrow">OBS Planet Scenes</p>
+    <h1>Scene editor</h1>
+    <p class="lede">Shape the starting, BRB and thanks overlays in one place, watch the live preview, then copy snapshot links for OBS. No code needed and no account — everything below runs in this browser.</p>
+    <p class="header-note">Prefer to read first? <a href="#setup-instructions">Jump to setup instructions</a> · <a href="credits.html">Texture and font credits</a></p>
+  </header>
+
+  <main class="layout">
+    <section class="panel controls-panel" aria-labelledby="controls-heading">
+      <div class="panel-heading">
+        <p class="kicker">Controls</p>
+        <h2 id="controls-heading">Edit the scenes</h2>
+        <p>Choose a scene, refine its words and styling, then check the preview. Changes autosave to this browser but copied OBS links are snapshots.</p>
+      </div>
+
+      <p id="editor-status" class="status" role="status" aria-live="polite">Ready. Your edits autosave to this browser.</p>
+      <p id="editor-error" class="error" role="alert" hidden></p>
+
+      <form id="editor-form" novalidate>
+        <fieldset>
+          <legend>Scene and overlay text</legend>
+
+          <div class="field">
+            <label for="scene-select">Scene</label>
+            <select id="scene-select" name="scene">
+              <option value="starting" selected>Starting</option>
+              <option value="brb">BRB</option>
+              <option value="thanks">Thanks</option>
+            </select>
+            <p class="help" id="scene-help">Edits apply to the scene selected here. Switch scenes to edit each one.</p>
+          </div>
+
+          <div class="field">
+            <label for="title-input">Title</label>
+            <input id="title-input" name="title" type="text" maxlength="240" autocomplete="off" aria-describedby="title-help">
+            <p class="help" id="title-help">Up to 120 Unicode characters. Keep it short enough to read at a glance on stream.</p>
+          </div>
+
+          <div class="field">
+            <label for="subtitle-input">Subtitle</label>
+            <textarea id="subtitle-input" name="subtitle" rows="3" maxlength="480" aria-describedby="subtitle-help"></textarea>
+            <p class="help" id="subtitle-help">Up to 240 Unicode characters. A short supporting line works best under the title.</p>
+          </div>
+
+          <div class="field-grid">
+            <div class="field">
+              <label for="title-font">Title font</label>
+              <select id="title-font" name="titleFont">
+                <option value="cinzel" selected>Cinzel Decorative</option>
+                <option value="macondo">Macondo</option>
+                <option value="system">System sans</option>
+              </select>
+            </div>
+
+            <div class="field">
+              <label for="subtitle-font">Subtitle font</label>
+              <select id="subtitle-font" name="subtitleFont">
+                <option value="cinzel">Cinzel Decorative</option>
+                <option value="macondo">Macondo</option>
+                <option value="system" selected>System sans</option>
+              </select>
+            </div>
+          </div>
+          <p class="help">Bundled local fonts only — no external font services. See <a href="credits.html">credits</a> for the bundled font licences.</p>
+
+          <div class="field-grid">
+            <div class="field">
+              <label for="top-input">Top offset (0–40)</label>
+              <input id="top-input" name="topVh" type="number" min="0" max="40" step="1" inputmode="numeric">
+            </div>
+
+            <div class="field">
+              <label for="title-spacing">Title spacing (0–0.4)</label>
+              <input id="title-spacing" name="titleSpacing" type="number" min="0" max="0.4" step="0.01" inputmode="decimal">
+            </div>
+
+            <div class="field">
+              <label for="subtitle-spacing">Subtitle spacing (0–0.4)</label>
+              <input id="subtitle-spacing" name="subtitleSpacing" type="number" min="0" max="0.4" step="0.01" inputmode="decimal">
+            </div>
+          </div>
+        </fieldset>
+
+        <fieldset>
+          <legend>Quality and motion</legend>
+
+          <div class="field">
+            <label for="quality-select">Render quality</label>
+            <select id="quality-select" name="quality">
+              <option value="tuned" selected>Tuned (recommended)</option>
+              <option value="low">Low — light on the GPU</option>
+              <option value="medium">Medium — balanced detail</option>
+              <option value="high">High — original detail caps</option>
+            </select>
+            <p class="help" id="quality-help">Lower settings suit weaker graphics cards. Tuned is the safe starting point.</p>
+          </div>
+
+          <div class="field field-check">
+            <input id="reduced-motion" name="reducedMotion" type="checkbox">
+            <label for="reduced-motion">Reduce motion</label>
+            <p class="help" id="motion-help">Freezes 3D motion and decorative animation. Your system preference is used for a new draft.</p>
+          </div>
+        </fieldset>
+
+        <fieldset>
+          <legend>Optional local OBS audio</legend>
+          <div class="field">
+            <label for="audio-mode">Audio mode</label>
+            <select id="audio-mode" name="audioMode" aria-describedby="audio-help">
+              <option value="auto" selected>Auto — local only (recommended)</option>
+              <option value="off">Off</option>
+              <option value="setup">Manual local setup</option>
+            </select>
+            <p class="help" id="audio-help">Auto connects to local OBS on port 4455 only when this page is served from localhost, 127.0.0.1 or [::1]. Authentication off: no password needed. Authentication on: enter the password using OBS Interact, separately for each source. Manual setup lets you change the local address and input names. Credentials stay in page memory, never in links/presets; refresh clears them. Configure before going live. Hosted pages and the embedded preview stay silent.</p>
+          </div>
+        </fieldset>
+
+        <fieldset>
+          <legend>Presets — import and export (JSON)</legend>
+          <p class="help">Preset import/export uses JSON. Export a preset to keep a backup or share your setup; import one to restore it in this browser.</p>
+
+          <div class="field">
+            <label for="preset-select">Preset</label>
+            <select id="preset-select">
+              <option value="original" selected>Original</option>
+              <option value="minimal">Minimal</option>
+              <option value="quiet">Quiet</option>
+            </select>
+          </div>
+
+          <div class="button-row">
+            <button id="preset-apply" type="button">Apply preset</button>
+            <button id="export-button" type="button">Export preset JSON</button>
+          </div>
+
+          <div class="field">
+            <label for="import-input">Import preset JSON file</label>
+            <input id="import-input" type="file" accept="application/json,.json" aria-describedby="import-help">
+            <p class="help" id="import-help">Choose a preset file exported from this editor. Invalid files are rejected with an error message.</p>
+          </div>
+        </fieldset>
+
+        <div class="button-row actions">
+          <button id="reset-button" type="button">Reset scene to original</button>
+          <button id="clear-draft-button" type="button">Clear saved draft</button>
+        </div>
+      </form>
+
+      <section class="diagnostics" aria-labelledby="diagnostics-heading">
+        <h3 id="diagnostics-heading">Scene checks</h3>
+        <p class="help" id="warning-help">Fixed messages appear here when a scene needs attention. An empty list means there are no editor warnings; still check the preview and OBS.</p>
+        <ul id="warning-list" aria-describedby="warning-help"></ul>
+      </section>
+
+      <details id="setup-instructions">
+        <summary>Setup instructions</summary>
+        <ol>
+          <li>Edit the scene on the left and watch the preview update.</li>
+          <li>Copy all three sources at 1920×1080 — the starting, BRB and thanks links on the right.</li>
+          <li>Add each copied link as a Browser Source in OBS at 1920×1080.</li>
+          <li>Changes autosave to this browser but copied OBS links are snapshots, so copy again after editing.</li>
+          <li>Browser storage isn't shared with OBS. Open this editor in the same browser to see your saved draft.</li>
+        </ol>
+      </details>
+
+      <details>
+        <summary>Advanced settings</summary>
+        <dl>
+          <dt>Quality</dt>
+          <dd>Use Low on older hardware, High only when the GPU has headroom. The preview uses the same quality as the copied links.</dd>
+          <dt>Motion</dt>
+          <dd>Reduce motion freezes 3D motion without changing your words or layout.</dd>
+          <dt>Audio</dt>
+          <dd>Auto connects only from a trusted localhost/loopback copy. OBS authentication is optional: if enabled, enter the password in each source using Interact. Credentials never enter links/presets and refresh clears them. Hosted copies stay silent. Use Ctrl+Alt+A (Command+Option+A on macOS) inside Interact to reopen setup. Existing legacy pages keep their local audio behavior.</dd>
+          <dt>Secrets</dt>
+          <dd>Don't put secrets in overlay text. Titles and subtitles appear on stream, so keep them free of passwords, keys and personal details.</dd>
+          <dt>Storage</dt>
+          <dd>Clear saved draft removes the autosaved copy from this browser only. It does not change links already copied into OBS.</dd>
+        </dl>
+      </details>
+    </section>
+
+    <section class="panel preview-panel" aria-labelledby="preview-heading">
+      <div class="panel-heading">
+        <p class="kicker">Preview</p>
+        <h2 id="preview-heading">Live scene preview</h2>
+        <p>The preview uses the same scene URL at 1920×1080, scaled down to fit this panel. Browser and OBS rendering can differ.</p>
+      </div>
+
+      <div id="preview-stage" class="preview-stage">
+        <iframe id="scene-preview" title="Live scene preview" width="1920" height="1080" tabindex="-1"></iframe>
+      </div>
+
+      <p class="preview-open-row"><a id="preview-open" href="index.html" target="_blank" rel="noopener">Open preview in a new tab</a></p>
+
+      <fieldset class="copy-links">
+        <legend>Copy links for OBS — snapshots at 1920×1080</legend>
+        <p class="help">Copy all three sources at 1920×1080 and add each one in OBS as its own Browser Source. Copied links are snapshots and will not follow later edits.</p>
+
+        <div class="field link-field">
+          <label for="link-starting">Starting scene link</label>
+          <input id="link-starting" type="text" readonly aria-describedby="link-help">
+          <button id="copy-starting" type="button" aria-label="Copy link for Starting scene">Copy link</button>
+        </div>
+
+        <div class="field link-field">
+          <label for="link-brb">BRB scene link</label>
+          <input id="link-brb" type="text" readonly aria-describedby="link-help">
+          <button id="copy-brb" type="button" aria-label="Copy link for BRB scene">Copy link</button>
+        </div>
+
+        <div class="field link-field">
+          <label for="link-thanks">Thanks scene link</label>
+          <input id="link-thanks" type="text" readonly aria-describedby="link-help">
+          <button id="copy-thanks" type="button" aria-label="Copy link for Thanks scene">Copy link</button>
+        </div>
+
+        <p class="help" id="link-help">Links contain only nonsecret settings and the audio mode. Auto audio runs only on a local copy; OBS authentication, if enabled, needs a separately entered session password.</p>
+      </fieldset>
+
+      <aside class="guidance" aria-label="Before you copy">
+        <h3>Before you copy</h3>
+        <ul>
+          <li>Changes autosave to this browser but copied OBS links are snapshots.</li>
+          <li>Copy all three sources at 1920×1080.</li>
+          <li>Browser storage isn't shared with OBS.</li>
+          <li>Auto audio is local-only. If OBS authentication is enabled, enter the password separately with Interact. Hosted copies and the embedded preview stay silent.</li>
+          <li>Don't put secrets in overlay text.</li>
+          <li>Bundled fonts only.</li>
+        </ul>
+      </aside>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <p>Textures by Solar System Scope — see <a href="credits.html">texture attribution and credits</a>. Bundled fonts only; no downloads are needed beyond this folder.</p>
+    <p><a href="index.html">Starting</a> · <a href="brb.html">BRB</a> · <a href="thanks.html">Thanks</a> · <a href="credits.html">Credits</a></p>
+  </footer>
+
+  <noscript>
+    <div class="noscript-fallback">
+      <h2>JavaScript is needed for the editor</h2>
+      <p>This editor needs JavaScript to edit scenes, build preview links and save drafts. You can still view the finished scenes directly: <a href="index.html">Starting</a>, <a href="brb.html">BRB</a> and <a href="thanks.html">Thanks</a>. Texture and font details are in <a href="credits.html">credits</a>.</p>
+    </div>
+  </noscript>
+
+  <script src="runtime/snapshots.js"></script>
+  <script src="runtime/drafts.js"></script>
+  <script src="editor.js"></script>
+</body>
+</html>

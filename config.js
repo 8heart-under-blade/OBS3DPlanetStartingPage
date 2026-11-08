@@ -55,7 +55,7 @@
     overlay: {
       title: "STREAM STARTING SOON",
       subtitle: "Calibrating spacetime and aligning planetary ephemerides...",
-      titleFontFamily: "'Oracles', serif",
+      titleFontFamily: "'Cinzel Decorative', serif",
       subtitleFontFamily: "'Orbitron', sans-serif",
       titleFontWeight: 400,
       subtitleFontWeight: 400,
@@ -86,16 +86,16 @@
 
       // Example local font face:
       // {
-      //   family: "Oracles",
-      //   src: "@oracles.woff",
+      //   family: "Cinzel Decorative",
+      //   src: "@cinzel-decorative.ttf",
       //   weight: "400",
       //   style: "normal",
       //   display: "swap"
       // }
       customFontFaces: [
         {
-          family: "Oracles",
-          src: "@oracles.woff",
+          family: "Cinzel Decorative",
+          src: "@cinzel-decorative.ttf",
           weight: "400",
           style: "normal",
           display: "swap"
@@ -111,8 +111,8 @@
     overlayThanks: {
       title: "THANK YOU FOR WATCHING",
       subtitle: "See You Next Time",
-      titleFontFamily: "'Oracles', serif",
-      subtitleFontFamily: "'Twigs', serif",
+      titleFontFamily: "'Cinzel Decorative', serif",
+      subtitleFontFamily: "'Macondo', serif",
       titleFontWeight: 400,
       subtitleFontWeight: 400,
       titleTextTransform: "uppercase",
@@ -124,8 +124,8 @@
       subtitleOffsetY: 2,
       customFontFaces: [
         {
-          family: "Twigs",
-          src: "@twigs.woff",
+          family: "Macondo",
+          src: "@macondo.ttf",
           weight: "400",
           style: "normal",
           display: "swap"
@@ -153,10 +153,10 @@
       auroraBeatResponse: 1.05,
       useRealWorldMaps: true,
       earthDayMapUrl: "textures/planets/earth_day_2048.jpg",
-      earthNightMapUrl: "textures/planets/earth_night_2048.png",
+      earthNightMapUrl: "textures/planets/earth_night_2048.jpg",
       earthCloudMapUrl: "textures/planets/earth_clouds_2k_solarsystemscope.jpg",
-      earthWaterMaskUrl: "textures/planets/earth_specular_2048.jpg",
-      moonMapUrl: "textures/planets/moon_1024.jpg",
+      earthWaterMaskUrl: "textures/planets/earth_specular_2048.png",
+      moonMapUrl: "textures/planets/moon_2048.jpg",
       moonBumpMapUrl: "",
       moonRoughnessMapUrl: "",
       moonRadius: 2.4,

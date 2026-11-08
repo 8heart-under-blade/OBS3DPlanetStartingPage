@@ -371,26 +371,32 @@ async function loadOverlayRuntime() {
 }
 
 export async function mountBlackholeOverlay() {
-  const runtime = await loadOverlayRuntime();
+  const streamConfig = window.STREAM_RUNTIME_CONFIG || window.STREAM_CONFIG || {};
+  const replacementConfig = streamConfig.brbBlackholeReplacement && typeof streamConfig.brbBlackholeReplacement === "object"
+    ? streamConfig.brbBlackholeReplacement : {};
+  if (replacementConfig.enabled === false) return null;
+  const layer = document.getElementById("blackholeLayer");
+  if (!layer) return null;
+
+  if (window.StreamRuntime && window.StreamRuntime.isDisposed()) return null;
+  const runtimeScope = window.StreamRecovery.createScope();
+  runtimeScope.listen(window, "beforeunload", function () { runtimeScope.dispose(); });
+  let runtime;
+  try {
+    runtime = await loadOverlayRuntime();
+  } catch (error) {
+    runtimeScope.dispose();
+    throw error;
+  }
+  if (runtimeScope.isDisposed() || (window.StreamRuntime && window.StreamRuntime.isDisposed())) {
+    runtimeScope.dispose();
+    return null;
+  }
   const THREE = runtime.THREE;
   const OrbitControls = runtime.OrbitControls;
   const EffectComposer = runtime.EffectComposer;
   const RenderPass = runtime.RenderPass;
   const UnrealBloomPass = runtime.UnrealBloomPass;
-  const streamConfig = window.STREAM_CONFIG && typeof window.STREAM_CONFIG === "object" ? window.STREAM_CONFIG : {};
-  const replacementConfig = streamConfig.brbBlackholeReplacement && typeof streamConfig.brbBlackholeReplacement === "object"
-    ? streamConfig.brbBlackholeReplacement
-    : {};
-  const enabled = replacementConfig.enabled !== false;
-
-  if (!enabled) {
-    return null;
-  }
-
-  const layer = document.getElementById("blackholeLayer");
-  if (!layer) {
-    return null;
-  }
 
   const pointerEvents = typeof replacementConfig.pointerEvents === "string"
     ? replacementConfig.pointerEvents.toLowerCase()
@@ -406,11 +412,18 @@ export async function mountBlackholeOverlay() {
   const resolvedPointerEvents = pointerEvents === "none" || !mouseControlEnabled ? "none" : "auto";
   layer.style.pointerEvents = resolvedPointerEvents;
 
-  const renderer = new THREE.WebGLRenderer({
-    antialias: true,
-    alpha: true,
-    powerPreference: "high-performance"
-  });
+  let renderer;
+  try {
+    renderer = new THREE.WebGLRenderer({
+      antialias: true,
+      alpha: true,
+      powerPreference: "high-performance"
+    });
+  } catch (error) {
+    runtimeScope.dispose();
+    window.StreamRecovery.report("webgl-unavailable");
+    throw new Error("BRB WebGL initialization failed.");
+  }
   renderer.setClearColor(0x000000, 0);
   renderer.setClearAlpha(0);
   renderer.outputColorSpace = THREE.SRGBColorSpace;
@@ -502,6 +515,11 @@ export async function mountBlackholeOverlay() {
   const clock = new THREE.Clock();
   let rafId = 0;
   let resizeObserver = null;
+  const contextWatcher = window.StreamRecovery.observeRenderer(renderer, {
+    onLost: function () {
+      if (window.StreamRuntime) window.StreamRuntime.dispose();
+    }
+  });
 
   function updateCameraUniforms() {
     viewCamera.updateMatrixWorld();
@@ -518,11 +536,12 @@ export async function mountBlackholeOverlay() {
   }
 
   function onResize() {
+    if (runtimeScope.isDisposed() || contextWatcher.isLost()) return;
     const bounds = layer.getBoundingClientRect();
     const width = Math.max(1, Math.round(bounds.width));
     const height = Math.max(1, Math.round(bounds.height));
 
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, window.StreamSettings.limit("pixelRatio", 2, window.STREAM_QUALITY || "tuned")));
     renderer.setSize(width, height, false);
     if (composer) {
       composer.setSize(width, height);
@@ -539,11 +558,12 @@ export async function mountBlackholeOverlay() {
   }
 
   function tick() {
+    if (runtimeScope.isDisposed() || contextWatcher.isLost()) return;
     renderer.setClearColor(0x000000, 0);
     if (controls) {
       controls.update();
     }
-    uniforms.uTime.value = clock.getElapsedTime();
+    uniforms.uTime.value = window.STREAM_REDUCED_MOTION ? 0 : clock.getElapsedTime();
     updateCameraUniforms();
 
     if (composer) {
@@ -551,45 +571,40 @@ export async function mountBlackholeOverlay() {
     } else {
       renderer.render(raytraceScene, quadCamera);
     }
-    rafId = window.requestAnimationFrame(tick);
+    rafId = runtimeScope.requestFrame(tick);
   }
 
   function dispose() {
-    if (rafId) {
-      window.cancelAnimationFrame(rafId);
-      rafId = 0;
-    }
-
-    window.removeEventListener("resize", onResize);
-    if (resizeObserver) {
-      resizeObserver.disconnect();
-      resizeObserver = null;
-    }
-
-    if (controls) {
-      controls.dispose();
-    }
-    if (composer) {
-      composer.dispose();
-    }
-    quadGeometry.dispose();
-    material.dispose();
-    renderer.dispose();
-
-    if (renderer.domElement.parentElement === layer) {
-      layer.removeChild(renderer.domElement);
-    }
+    runtimeScope.dispose();
   }
 
-  window.addEventListener("resize", onResize);
+  runtimeScope.add(function () {
+    window.StreamRecovery.disposeScene(raytraceScene, renderer);
+    if (renderer.domElement.parentElement === layer) layer.removeChild(renderer.domElement);
+  });
+  runtimeScope.add(function () { if (controls) controls.dispose(); });
+  runtimeScope.add(function () { if (composer) composer.dispose(); });
+  runtimeScope.add(function () { if (bloomPass && bloomPass.dispose) bloomPass.dispose(); });
+  runtimeScope.add(function () { contextWatcher.dispose(); });
+  runtimeScope.add(function () {
+    if (resizeObserver) { resizeObserver.disconnect(); resizeObserver = null; }
+  });
+
+  runtimeScope.listen(window, "resize", onResize);
   if (typeof window.ResizeObserver === "function") {
     resizeObserver = new window.ResizeObserver(onResize);
     resizeObserver.observe(layer);
   }
-  window.addEventListener("beforeunload", dispose, { once: true });
+  runtimeScope.listen(window, "pagehide", function (event) { if (!event.persisted) dispose(); });
 
-  onResize();
-  tick();
+  try {
+    onResize();
+    tick();
+  } catch (error) {
+    dispose();
+    window.StreamRecovery.report("boot-failed");
+    throw new Error("BRB renderer could not start.");
+  }
 
   return {
     dispose

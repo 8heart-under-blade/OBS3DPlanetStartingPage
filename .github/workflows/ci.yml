@@ -12,7 +12,10 @@ permissions:
 
 jobs:
   check-test-build:
-    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v4
 
@@ -41,15 +44,85 @@ jobs:
         run: npm run build
 
       # Do not publish downloadable bundled assets while their rights are unresolved.
-      - name: Redistribution eligibility (expected blocked until asset rights cleared)
+      - name: Static redistribution eligibility (separate from runtime qualification)
         id: redistribution
         continue-on-error: true
         run: npm run release:check
 
-      - name: Upload preview artifact (rights cleared only; no deploy)
+      - name: Build versioned candidate site (rights cleared only; no deploy)
         if: steps.redistribution.outcome == 'success'
+        run: npm run build:site
+
+      - name: Verify candidate namespaces and current aliases
+        if: steps.redistribution.outcome == 'success'
+        run: npm run site:verify
+
+      - name: Prepare Cloudflare Pages candidate (no account or upload)
+        if: steps.redistribution.outcome == 'success'
+        run: npm run build:cloudflare
+
+      - name: Verify Cloudflare 404, cache policy and retained release seals
+        if: steps.redistribution.outcome == 'success'
+        run: npm run cloudflare:verify
+
+      - name: Upload Cloudflare preparation artifact (no deploy)
+        if: steps.redistribution.outcome == 'success' && runner.os == 'Linux'
+        uses: actions/upload-artifact@v4
+        with:
+          name: obs3dplanetstartingpage-cloudflare-candidate
+          path: cf-dist/
+          include-hidden-files: true
+          if-no-files-found: error
+
+      # Fresh CI produces a candidate, NOT a deployable replacement for a site's
+      # retained history. Deployment must carry forward older namespaces.
+      - name: Upload versioned candidate site (no deploy)
+        if: steps.redistribution.outcome == 'success' && runner.os == 'Linux'
+        uses: actions/upload-artifact@v4
+        with:
+          name: obs3dplanetstartingpage-site-candidate
+          path: site/
+          include-hidden-files: true
+          if-no-files-found: error
+
+      - name: Upload preview artifact (rights cleared only; no deploy)
+        if: steps.redistribution.outcome == 'success' && runner.os == 'Linux'
         uses: actions/upload-artifact@v4
         with:
           name: obs3dplanetstartingpage-preview
           path: dist/
           if-no-files-found: error
+
+  browser-regression:
+    needs: check-test-build
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          # The accepted P2 reference commit must remain reachable in history.
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+
+      - run: npm ci
+
+      - name: Install contributor-only Chromium test browser
+        run: npx playwright install --with-deps chromium
+
+      - name: Editor journeys and accepted-P2 visual regression
+        run: npm run test:browser
+
+      - name: Browser report (synthetic fixtures only; no real OBS credentials)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: obs3dplanetstartingpage-browser-report
+          path: |
+            playwright-report/
+            test-results/
+          if-no-files-found: ignore
+          retention-days: 14
