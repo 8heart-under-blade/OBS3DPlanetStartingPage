@@ -16,6 +16,18 @@ function fixture() {
   }
   return dir;
 }
+// Only skip the specific Windows privilege limitation, never arbitrary errors.
+function makeSymlink(t, target, path) {
+  try { symlinkSync(target, path); return true; }
+  catch (error) {
+    if (process.platform === 'win32' && error.code === 'EPERM') {
+      t.skip('Windows file symlinks require Developer Mode or elevated privileges');
+      return false;
+    }
+    throw error;
+  }
+}
+
 function run(script, dir, extra = []) {
   return execFileSync(process.execPath, [script, '--root', dir, ...extra], { encoding: 'utf8', stdio: 'pipe' });
 }
@@ -51,12 +63,12 @@ test('build refuses dangerous output overrides without deleting files', () => {
   } finally { rmSync(dir, { recursive: true, force: true }); }
 });
 
-test('build rejects symlinked inputs', () => {
+test('build rejects symlinked inputs', t => {
   const dir = fixture();
   try {
     const target = join(dir, 'config.js');
     copyFileSync(target, join(dir, 'original.js')); rmSync(target);
-    symlinkSync(join(dir, 'original.js'), target);
+    if (!makeSymlink(t, join(dir, 'original.js'), target)) return;
     assert.throws(() => run(build, dir), /Symlink not permitted/);
   } finally { rmSync(dir, { recursive: true, force: true }); }
 });
@@ -79,28 +91,28 @@ test('packaging rechecks credentials even when a prior dist exists', () => {
   } finally { rmSync(dir, { recursive: true, force: true }); }
 });
 
-test('packaging refuses dangling output symlinks without creating their targets', () => {
+test('packaging refuses dangling output symlinks without creating their targets', t => {
   for (const suffix of ['', '.sha256']) {
     const dir = fixture();
     try {
       mkdirSync(join(dir, 'release'));
       const version = JSON.parse(readFileSync(join(dir, 'package.json'), 'utf8')).version;
       const target = join(dir, 'must-not-be-created');
-      symlinkSync(target, join(dir, 'release', `obs3dplanetstartingpage-preview-v${version}.tar.gz${suffix}`));
+      if (!makeSymlink(t, target, join(dir, 'release', `obs3dplanetstartingpage-preview-v${version}.tar.gz${suffix}`))) return;
       assert.throws(() => run(pack, dir));
       assert.equal(existsSync(target), false);
     } finally { rmSync(dir, { recursive: true, force: true }); }
   }
 });
 
-test('unsafe checksum output does not remove an existing archive', () => {
+test('unsafe checksum output does not remove an existing archive', t => {
   const dir = fixture();
   try {
     mkdirSync(join(dir, 'release'));
     const version = JSON.parse(readFileSync(join(dir, 'package.json'), 'utf8')).version;
     const archive = join(dir, 'release', `obs3dplanetstartingpage-preview-v${version}.tar.gz`);
     writeFileSync(archive, 'previous preview');
-    symlinkSync(join(dir, 'missing-target'), archive + '.sha256');
+    if (!makeSymlink(t, join(dir, 'missing-target'), archive + '.sha256')) return;
     assert.throws(() => run(pack, dir));
     assert.equal(readFileSync(archive, 'utf8'), 'previous preview');
   } finally { rmSync(dir, { recursive: true, force: true }); }
@@ -118,7 +130,7 @@ test('archive bytes are reproducible and contain the complete independent baseli
     const first = readFileSync(path);
     run(pack, dir); assert.deepEqual(readFileSync(path), first);
     const baseline = JSON.parse(readFileSync(join(root, 'docs/source-baseline.json'), 'utf8'));
-    const expected = [...baseline.files.map(f => f.path), 'LICENSE', 'ATTRIBUTIONS.md', 'docs/ASSET_AUDIT.md', 'docs/asset-inventory.json', 'build-manifest.json'].sort();
+    const expected = [...baseline.files.map(f => f.path), 'LICENSE', 'ATTRIBUTIONS.md', 'docs/ASSET_AUDIT.md', 'docs/asset-inventory.json', 'docs/licenses/CinzelDecorative-OFL.txt', 'docs/licenses/Macondo-OFL.txt', 'docs/licenses/CC-BY-4.0.txt', 'docs/licenses/SolarSystemScope-source.txt', 'build-manifest.json'].sort();
     const members = execFileSync('tar', ['-tzf', path], { encoding: 'utf8' }).trim().split('\n').sort();
     assert.deepEqual(members, expected);
   } finally { rmSync(dir, { recursive: true, force: true }); }

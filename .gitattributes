@@ -1,0 +1,11 @@
+# Byte-hash manifests require consistent text checkouts on every platform.
+* text=auto eol=lf
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.woff binary
+*.woff2 binary
+*.ttf binary
+*.otf binary
+# Preserve upstream license text verbatim, including its original whitespace.
+docs/licenses/*.txt whitespace=-blank-at-eol,-blank-at-eof

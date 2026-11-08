@@ -1,11 +1,9 @@
 {
   "schemaVersion": 1,
-  "auditDate": "2026-10-11",
+  "auditDate": "2026-11-08",
   "repository": "OBS3DPlanetStartingPage",
-  "branch": "feature/production-foundation",
-  "sourceCommit": "ea5fb4c866e48b9c8ba4981191437d1ff61780c6",
   "hashAlgorithm": "sha256",
-  "scope": "Third-party binary/bundled assets: all vendor/** files, all textures/** files, and all root *.woff files. First-party source code is NOT listed here (see repositoryCode).",
+  "scope": "All runtime vendor/** and textures/** files and bundled font files (TTF/WOFF/WOFF2/OTF). License notices are separately shipped by the build allowlist.",
   "statusLegend": {
     "verified": "A license and its applicability are established by evidence contained in the repository (e.g. an embedded license notice); attribution requirements are recorded.",
     "unresolved": "The asset is present but no in-repo evidence establishes its license or redistribution rights. Treated as a release blocker until provenance/license is documented."
@@ -15,7 +13,7 @@
     "license": "MIT",
     "copyright": "Copyright (c) 2026 8heart-under-blade",
     "appliesTo": "First-party source files (HTML/CSS/JS) authored for this project.",
-    "doesNotCover": "vendor/** (Three.js is separately MIT), textures/** and *.woff (separate provenance; see assets). The repository MIT license does not, by itself, grant rights to bundled third-party files."
+    "doesNotCover": "vendor/**, textures/** and font files have their own licenses; see assets. The root MIT license does not grant rights to third-party files."
   },
   "assets": [
     {
@@ -127,115 +125,131 @@
       "notes": "Attribution notice is embedded and must be preserved. This is a DIFFERENT major revision (r160, Copyright 2010-2023) from vendor/three-0.181.0/ (r181). Two Three.js revisions are bundled; both are MIT. No standalone LICENSE file accompanies the vendored copy."
     },
     {
-      "path": "textures/planets/earth_clouds_1024.png",
-      "sha256": "7d3b82ef6b3feb506fc06f02a744aed3d864e23e7417075005f4082a7ff935a4",
-      "status": "unresolved",
-      "source": "Unknown. No provenance recorded in repo. The only lead is the code default in thanks.js (lines 128-130): https://threejs.org/examples/textures/planets/earth_clouds_1024.png.",
-      "license": "Unknown / not documented",
-      "evidence": "PNG contains no tEXt/iTXt/rights metadata. A remote URL in code does not establish a license for the bundled copy.",
-      "notes": "Redistribution rights not documented. RELEASE BLOCKER."
+      "path": "textures/planets/earth_day_2048.jpg",
+      "sha256": "767ee1dc6eb3802699bfccf6f264880f8acd0b80de3191cd24984fe279b07b7c",
+      "status": "verified",
+      "source": "https://www.solarsystemscope.com/textures/download/2k_earth_daymap.jpg",
+      "upstreamSha256": "767ee1dc6eb3802699bfccf6f264880f8acd0b80de3191cd24984fe279b07b7c",
+      "license": "CC-BY-4.0",
+      "evidence": "Texture pack explicitly licensed at https://www.solarsystemscope.com/textures/; dated excerpt and license hyperlink in docs/licenses/SolarSystemScope-source.txt; terms in docs/licenses/CC-BY-4.0.txt.",
+      "notes": "Unmodified upstream JPEG; local filename differs. 2048x1024. Credit Solar System Scope and link source and CC BY 4.0.",
+      "licenseFiles": [
+        "docs/licenses/CC-BY-4.0.txt",
+        "docs/licenses/SolarSystemScope-source.txt"
+      ],
+      "licenseFileHashes": {
+        "docs/licenses/CC-BY-4.0.txt": "9ba9550ad48438d0836ddab3da480b3b69ffa0aac7b7878b5a0039e7ab429411",
+        "docs/licenses/SolarSystemScope-source.txt": "2352c8df682fd2f36c5b3a0b9537fb3f8823a41f243c276396b9691bbbf986d7"
+      }
+    },
+    {
+      "path": "textures/planets/earth_night_2048.jpg",
+      "sha256": "c16fd1bc096ab91a5c5265c6ff9847c43f489f2e2ee790ccdbcbd03251cf3a5a",
+      "status": "verified",
+      "source": "https://www.solarsystemscope.com/textures/download/2k_earth_nightmap.jpg",
+      "upstreamSha256": "c16fd1bc096ab91a5c5265c6ff9847c43f489f2e2ee790ccdbcbd03251cf3a5a",
+      "license": "CC-BY-4.0",
+      "evidence": "Texture pack explicitly licensed at https://www.solarsystemscope.com/textures/; dated excerpt and license hyperlink in docs/licenses/SolarSystemScope-source.txt; terms in docs/licenses/CC-BY-4.0.txt.",
+      "notes": "Unmodified upstream JPEG; local filename differs. 2048x1024. Credit Solar System Scope and link source and CC BY 4.0.",
+      "licenseFiles": [
+        "docs/licenses/CC-BY-4.0.txt",
+        "docs/licenses/SolarSystemScope-source.txt"
+      ],
+      "licenseFileHashes": {
+        "docs/licenses/CC-BY-4.0.txt": "9ba9550ad48438d0836ddab3da480b3b69ffa0aac7b7878b5a0039e7ab429411",
+        "docs/licenses/SolarSystemScope-source.txt": "2352c8df682fd2f36c5b3a0b9537fb3f8823a41f243c276396b9691bbbf986d7"
+      }
     },
     {
       "path": "textures/planets/earth_clouds_2k_solarsystemscope.jpg",
       "sha256": "fffd7f68d41b37274822150e54a6ef605af1d3ec35624d9f628c3b896bfa42ed",
-      "status": "unresolved",
-      "source": "Unknown. Filename suggests Solar System Scope (solarsystemscope.com); file contains Adobe XMP Core 5.6 metadata only.",
-      "license": "Unknown / not documented",
-      "evidence": "XMP packet contains only the Adobe toolkit identifier and no rights/creator fields. Filename text is not license evidence. Solar System Scope publishes many planet textures under CC BY 4.0, but neither the origin of this file nor the applicable terms are confirmed in-repo.",
-      "notes": "If CC BY 4.0 genuinely applies, attribution is required and the exact source URL must be recorded. Until then rights are unresolved. RELEASE BLOCKER."
+      "status": "verified",
+      "source": "https://www.solarsystemscope.com/textures/download/2k_earth_clouds.jpg",
+      "upstreamSha256": "fffd7f68d41b37274822150e54a6ef605af1d3ec35624d9f628c3b896bfa42ed",
+      "license": "CC-BY-4.0",
+      "evidence": "Texture pack explicitly licensed at https://www.solarsystemscope.com/textures/; dated excerpt and license hyperlink in docs/licenses/SolarSystemScope-source.txt; terms in docs/licenses/CC-BY-4.0.txt.",
+      "notes": "Unmodified upstream JPEG; local filename differs. 2048x1024. Credit Solar System Scope and link source and CC BY 4.0.",
+      "licenseFiles": [
+        "docs/licenses/CC-BY-4.0.txt",
+        "docs/licenses/SolarSystemScope-source.txt"
+      ],
+      "licenseFileHashes": {
+        "docs/licenses/CC-BY-4.0.txt": "9ba9550ad48438d0836ddab3da480b3b69ffa0aac7b7878b5a0039e7ab429411",
+        "docs/licenses/SolarSystemScope-source.txt": "2352c8df682fd2f36c5b3a0b9537fb3f8823a41f243c276396b9691bbbf986d7"
+      }
     },
     {
-      "path": "textures/planets/earth_day_2048.jpg",
-      "sha256": "2faa400d1eade3bc44caf6750d1b772bd9bbb6d87362c02bc7c3304e78fa0a9d",
-      "status": "unresolved",
-      "source": "Unknown. Metadata indicates GIMP 2.6.7 and a 2010-06-08 timestamp plus an Adobe Photoshop DocumentID; origin not recorded in repo.",
-      "license": "Unknown / not documented",
-      "evidence": "EXIF/XMP contain no copyright, creator, or license fields.",
-      "notes": "Redistribution rights not documented. RELEASE BLOCKER."
+      "path": "textures/planets/earth_specular_2048.png",
+      "sha256": "f3c614db5ce764c291e9fa0eb67e6c8f19661e17bf951f22a52f013792751f6d",
+      "status": "verified",
+      "source": "https://www.solarsystemscope.com/textures/download/2k_earth_specular_map.tif",
+      "upstreamSha256": "6b90ecfce248591a1ecc9a3e49acca1a7059b6828877e718302ed9a6b4471bd7",
+      "license": "CC-BY-4.0",
+      "evidence": "Texture pack explicitly licensed at https://www.solarsystemscope.com/textures/; dated excerpt and license hyperlink in docs/licenses/SolarSystemScope-source.txt; terms in docs/licenses/CC-BY-4.0.txt.",
+      "notes": "Converted TIFF to PNG with Windows System.Drawing Image.Save(Png); 2048x1024, all decoded RGB pixels identical to source, white ocean / black land. Credit Solar System Scope, link source and CC BY 4.0, indicate conversion.",
+      "licenseFiles": [
+        "docs/licenses/CC-BY-4.0.txt",
+        "docs/licenses/SolarSystemScope-source.txt"
+      ],
+      "licenseFileHashes": {
+        "docs/licenses/CC-BY-4.0.txt": "9ba9550ad48438d0836ddab3da480b3b69ffa0aac7b7878b5a0039e7ab429411",
+        "docs/licenses/SolarSystemScope-source.txt": "2352c8df682fd2f36c5b3a0b9537fb3f8823a41f243c276396b9691bbbf986d7"
+      }
     },
     {
-      "path": "textures/planets/earth_night_2048.png",
-      "sha256": "3cc6972d1d5b6310f33ea6ef4cc14a38f1dd141a91d26888206889327d983d7b",
-      "status": "unresolved",
-      "source": "Unknown. tEXt chunk records 'Software: Adobe ImageReady'; origin not recorded in repo.",
-      "license": "Unknown / not documented",
-      "evidence": "Only a software tag is present; no copyright or license metadata.",
-      "notes": "Redistribution rights not documented. RELEASE BLOCKER."
+      "path": "textures/planets/moon_2048.jpg",
+      "sha256": "2764ba6535ea0481a062846ee033cc7a909dae05b31a8fd13f3e98f3a7fd92bd",
+      "status": "verified",
+      "source": "https://www.solarsystemscope.com/textures/download/2k_moon.jpg",
+      "upstreamSha256": "2764ba6535ea0481a062846ee033cc7a909dae05b31a8fd13f3e98f3a7fd92bd",
+      "license": "CC-BY-4.0",
+      "evidence": "Texture pack explicitly licensed at https://www.solarsystemscope.com/textures/; dated excerpt and license hyperlink in docs/licenses/SolarSystemScope-source.txt; terms in docs/licenses/CC-BY-4.0.txt.",
+      "notes": "Unmodified upstream JPEG; local filename differs. 2048x1024. Credit Solar System Scope and link source and CC BY 4.0.",
+      "licenseFiles": [
+        "docs/licenses/CC-BY-4.0.txt",
+        "docs/licenses/SolarSystemScope-source.txt"
+      ],
+      "licenseFileHashes": {
+        "docs/licenses/CC-BY-4.0.txt": "9ba9550ad48438d0836ddab3da480b3b69ffa0aac7b7878b5a0039e7ab429411",
+        "docs/licenses/SolarSystemScope-source.txt": "2352c8df682fd2f36c5b3a0b9537fb3f8823a41f243c276396b9691bbbf986d7"
+      }
     },
     {
-      "path": "textures/planets/earth_specular_2048.jpg",
-      "sha256": "2df48906732d7a458b2d0a7cdec51a829262307c6bdee4cfdf079a4dd7c71c69",
-      "status": "unresolved",
-      "source": "Unknown. Bare JFIF file; origin not recorded in repo.",
-      "license": "Unknown / not documented",
-      "evidence": "Only an APP0 JFIF segment is present; no EXIF/XMP rights metadata.",
-      "notes": "Redistribution rights not documented. RELEASE BLOCKER."
+      "path": "cinzel-decorative.ttf",
+      "sha256": "5b862be329103ad287a10f0a53e27a40e8cc519999253f1a0223e2dc330b10b8",
+      "status": "verified",
+      "source": "https://raw.githubusercontent.com/google/fonts/3dd78844021e948ceb633d1dcee3f7885561b5d9/ofl/cinzeldecorative/CinzelDecorative-Regular.ttf",
+      "license": "OFL-1.1",
+      "evidence": "Pinned upstream font directory includes OFL.txt; complete notice bundled in docs/licenses/CinzelDecorative-OFL.txt.",
+      "notes": "Unmodified Regular TTF; font family/internal names unchanged. Preserve copyright and OFL notice; do not sell font by itself.",
+      "licenseFiles": [
+        "docs/licenses/CinzelDecorative-OFL.txt"
+      ],
+      "licenseFileHashes": {
+        "docs/licenses/CinzelDecorative-OFL.txt": "1e5d6660366ddcfca4f2fc10e2acfba9fa4d97d40aec80d7dbfd41d730a420ae"
+      }
     },
     {
-      "path": "textures/planets/moon_1024.jpg",
-      "sha256": "fcb0f1f5548e6e18d40063dd55c6aacd3daedf2407b181dab85b61e22bf9fe57",
-      "status": "unresolved",
-      "source": "Unknown. No provenance recorded in repo. The only lead is the code default in thanks.js: https://threejs.org/examples/textures/planets/moon_1024.jpg.",
-      "license": "Unknown / not documented",
-      "evidence": "Bare JFIF file with no EXIF/XMP rights metadata. A remote URL in code does not establish a license for the bundled copy.",
-      "notes": "Redistribution rights not documented. RELEASE BLOCKER."
-    },
-    {
-      "path": "oracles.woff",
-      "sha256": "e67bab2c78b6a535c3638ea629ba803a4ba03a1aa580f750de80c7bec6503c8b",
-      "status": "unresolved",
-      "source": "Heroglyphs (font foundry). Webfont converted via the Font Squirrel webfont generator (name table fields).",
-      "license": "Unknown / proprietary - 'All rights reserved', no redistribution grant documented",
-      "evidence": "WOFF name table (read from the file): copyright 'Copyright (c) 2016 by Heroglyphs. All rights reserved.'; trademark 'Oracles is a trademark of Heroglyphs.'; manufacturer/designer 'Heroglyphs'; description 'Copyright (c) 2016 by faqih. All rights reserved.'; nameID 55555 'Font Squirrel'; version 'Version 1.000'.",
-      "notes": "Embedded notices assert full reservation of rights; no license granting redistribution/embedding is bundled. Font Squirrel generation alone does not grant redistribution rights - the foundry's terms govern. RELEASE BLOCKER."
-    },
-    {
-      "path": "twigs.woff",
-      "sha256": "9cc9b45211ff5172f68909686e46c2188f59196c2bb34c46a42e97ba28772978",
-      "status": "unresolved",
-      "source": "Heroglyphs (font foundry). Webfont converted via the Font Squirrel webfont generator (name table fields).",
-      "license": "Unknown / proprietary - 'All rights reserved', no redistribution grant documented",
-      "evidence": "WOFF name table (read from the file): copyright 'Copyright (c) 2016 by Heroglyphs. All rights reserved.'; trademark 'The Twigs is a trademark of Heroglyphs.'; manufacturer/designer 'Heroglyphs'; description 'Copyright (c) 2016 by faqih. All rights reserved.'; nameID 55555 'Font Squirrel'; version 'Version 1.000'.",
-      "notes": "Embedded notices assert full reservation of rights; no license granting redistribution/embedding is bundled. Font Squirrel generation alone does not grant redistribution rights - the foundry's terms govern. RELEASE BLOCKER."
+      "path": "macondo.ttf",
+      "sha256": "1910fe29b60588799474ea6281b59e131e33e96c77bfb80722a4c7f8133db4aa",
+      "status": "verified",
+      "source": "https://raw.githubusercontent.com/google/fonts/f9961a5e2e605f43bfada3af33920e0a12fd657f/ofl/macondo/Macondo-Regular.ttf",
+      "license": "OFL-1.1",
+      "evidence": "Pinned upstream font directory includes OFL.txt; complete notice bundled byte-identically in docs/licenses/Macondo-OFL.txt. Upstream itself contains two U+FFFD characters; ATTRIBUTIONS.md additionally reproduces the readable copyright statement from the unmodified TTF name table.",
+      "notes": "Unmodified Regular TTF; font family/internal names unchanged. Preserve copyright and OFL notice; do not sell font by itself.",
+      "licenseFiles": [
+        "docs/licenses/Macondo-OFL.txt"
+      ],
+      "licenseFileHashes": {
+        "docs/licenses/Macondo-OFL.txt": "0d75673e4c98de3e11337dbd90b05d0232edfcade5c1c02fbc0118c85aea25da"
+      }
     }
   ],
-  "releaseBlockers": [
-    {
-      "path": "textures/planets/earth_clouds_1024.png",
-      "reason": "Redistribution rights unresolved. No license grant is documented in-repo; clear written permission/attribution before redistribution."
-    },
-    {
-      "path": "textures/planets/earth_clouds_2k_solarsystemscope.jpg",
-      "reason": "Redistribution rights unresolved. No license grant is documented in-repo; clear written permission/attribution before redistribution."
-    },
-    {
-      "path": "textures/planets/earth_day_2048.jpg",
-      "reason": "Redistribution rights unresolved. No license grant is documented in-repo; clear written permission/attribution before redistribution."
-    },
-    {
-      "path": "textures/planets/earth_night_2048.png",
-      "reason": "Redistribution rights unresolved. No license grant is documented in-repo; clear written permission/attribution before redistribution."
-    },
-    {
-      "path": "textures/planets/earth_specular_2048.jpg",
-      "reason": "Redistribution rights unresolved. No license grant is documented in-repo; clear written permission/attribution before redistribution."
-    },
-    {
-      "path": "textures/planets/moon_1024.jpg",
-      "reason": "Redistribution rights unresolved. No license grant is documented in-repo; clear written permission/attribution before redistribution."
-    },
-    {
-      "path": "oracles.woff",
-      "reason": "Redistribution rights unresolved. No license grant is documented in-repo; clear written permission/attribution before redistribution."
-    },
-    {
-      "path": "twigs.woff",
-      "reason": "Redistribution rights unresolved. No license grant is documented in-repo; clear written permission/attribution before redistribution."
-    }
-  ],
+  "releaseBlockers": [],
   "counts": {
-    "total": 20,
-    "verified": 12,
-    "unresolved": 8
-  }
+    "total": 19,
+    "verified": 19,
+    "unresolved": 0
+  },
+  "baseCommit": "7cd2c22"
 }

@@ -4,9 +4,10 @@ This file records the licensing and provenance of material bundled in this repos
 It is a companion to the machine-readable inventory in [`docs/asset-inventory.json`](docs/asset-inventory.json)
 and the detailed audit in [`docs/ASSET_AUDIT.md`](docs/ASSET_AUDIT.md).
 
-> **Status of this document:** The first-party project code is MIT. Bundled **Three.js** copies are MIT and
-> attributed below. The bundled **textures** and **fonts** have **no documented redistribution license** in this
-> repository and are currently **unresolved release blockers**. See "Unresolved assets" below.
+> **Current asset set:** first-party code and Three.js are MIT. Earth/Moon textures are
+> Solar System Scope CC BY 4.0; Cinzel Decorative and Macondo fonts are SIL OFL 1.1.
+> Complete font and texture terms are bundled in docs/licenses/. This clears the
+> recorded asset-rights blockers, not browser/OBS production qualification.
 
 ## 1. First-party project code
 
@@ -77,48 +78,58 @@ with any redistribution of the vendored Three.js files. The addon modules under
 three.js distribution notice in `vendor/three-0.181.0/build/`. Note that no standalone Three.js
 `LICENSE` file is bundled under `vendor/`.
 
-## 3. Unresolved assets (no documented license)
+## 3. Earth and Moon textures — CC BY 4.0
 
-The following files are bundled but have **no license grant or provenance documented in this
-repository**. They are treated as release blockers for redistribution. Do not assume the filename
-or the repository MIT license establishes provenance or rights.
+Textures by **Solar System Scope**, https://www.solarsystemscope.com/textures/,
+licensed under **Creative Commons Attribution 4.0 International**:
+https://creativecommons.org/licenses/by/4.0/.
 
-### Fonts — proprietary notices embedded
+- Earth day, night, clouds and Moon JPEGs are unchanged upstream bytes.
+- Earth specular map was converted from TIFF to PNG; no resizing.
+- Local filenames differ from upstream. Exact download URLs, upstream SHA-256
+  and bundled SHA-256 are in docs/asset-inventory.json.
+- No endorsement is implied.
 
-Both fonts carry embedded `.woff` name-table notices that reserve all rights:
+The upstream page explicitly grants use, adaptation and sharing, including
+commercially. A dated excerpt is bundled in docs/licenses/SolarSystemScope-source.txt;
+full license terms are in docs/licenses/CC-BY-4.0.txt.
 
-| Path | Family | Embedded notice (from the font's own name table) |
-| --- | --- | --- |
-| `oracles.woff` | Oracles | `Copyright (c) 2016 by Heroglyphs. All rights reserved.` · `Oracles is a trademark of Heroglyphs.` |
-| `twigs.woff` | The Twigs | `Copyright (c) 2016 by Heroglyphs. All rights reserved.` · `The Twigs is a trademark of Heroglyphs.` |
+Keep appropriate credit, the source and license links, and the conversion notice
+with redistributions and public uses. The Thanks scene has visible credit and
+links to credits.html. If cropping the credit from a stream/video, provide
+equivalent attribution with that stream/video.
 
-Both were converted with the Font Squirrel webfont generator (`nameID 55555 = "Font Squirrel"`).
-Generating a webfont does not by itself grant redistribution or embedding rights; the foundry's
-terms govern.
+Suggested credit:
 
-### Textures — no rights metadata present
+> Earth and Moon textures by Solar System Scope
+> (https://www.solarsystemscope.com/textures/), CC BY 4.0
+> (https://creativecommons.org/licenses/by/4.0/).
+> Specular map converted from TIFF to PNG.
 
-| Path | Notes |
-| --- | --- |
-| `textures/planets/earth_clouds_1024.png` | No metadata; code default points at `threejs.org/examples/textures/...` (a URL is not a license). |
-| `textures/planets/earth_clouds_2k_solarsystemscope.jpg` | Filename implies Solar System Scope; file contains only Adobe XMP toolkit metadata. |
-| `textures/planets/earth_day_2048.jpg` | EXIF: GIMP 2.6.7, 2010, Photoshop `DocumentID`; no rights fields. |
-| `textures/planets/earth_night_2048.png` | PNG `tEXt`: `Software: Adobe ImageReady`; no rights fields. |
-| `textures/planets/earth_specular_2048.jpg` | Bare JFIF; no rights fields. |
-| `textures/planets/moon_1024.jpg` | No metadata; code default points at `threejs.org/examples/textures/...` (a URL is not a license). |
+## 4. Fonts — SIL Open Font License 1.1
 
-## 4. How to resolve
+- **Cinzel Decorative Regular** by Natanael Gama:
+  unmodified upstream TTF; see docs/licenses/CinzelDecorative-OFL.txt.
+- **Macondo Regular** by John Vargas Beltrán:
+  unmodified upstream TTF; see docs/licenses/Macondo-OFL.txt.
 
-To move an unresolved asset to **verified**, add verifiable license evidence to this repository:
+Pinned google/fonts source URLs and hashes are in docs/asset-inventory.json.
+The pinned upstream Macondo OFL.txt itself contains two Unicode replacement
+characters in its copyright line; our bundled notice is byte-identical to that
+upstream file, not a lossy local conversion. For a readable copyright statement,
+the unmodified TTF's name table (name ID 0) supplies:
 
-- **Fonts:** obtain the foundry's (Heroglyphs) written license terms for webfont embedding/redistribution,
-  or replace with a font under an explicit open license (e.g. SIL OFL) and record its source URL,
-  license name, and the license text/notice.
-- **Textures:** record the exact source URL, author, and license for each image (e.g. NASA public domain,
-  or CC BY 4.0 with required attribution), or replace with assets whose terms are documented. For
-  CC-licensed assets, retain the attribution and license notice required by that license.
-- Then update `docs/asset-inventory.json` (status, source, license, evidence) and this file, and remove
-  the corresponding entry from the release-blocker list.
+> Copyright (c) 1997 - 2011, John Vargas Beltran.
+> (www.johnvargasbeltran.com|john.vargasbeltran@gmail.com),
+> with Reserved Font Name "Macondo"
 
-Until then, **do not redistribute this repository's bundled assets** with any claim that they are
-licensed for reuse.
+Retain each full copyright and OFL notice with redistributed font files.
+The fonts are not relicensed under the root MIT license.
+
+## 5. Historical assets
+
+Oracles, Twigs and the unverified example textures are no longer bundled.
+The unused 1k cloud map was removed. The P0 historical source hashes remain in
+docs/source-baseline-p0.json for audit only; they do not grant rights to those
+old files. This clearance applies to the current inventory, not old commits,
+archives or cached copies.

@@ -13,7 +13,7 @@ The runtime remains a static site. **Node is required only for these contributor
 ```sh
 npm ci
 npm run check          # first-party/inline syntax, local refs, complete runtime set, empty-password guard
-npm run baseline:verify # preserve all 31 original runtime files byte-for-byte during P0
+npm run baseline:verify # verify current runtime source bytes; historical P0 hashes are retained
 npm run assets:check   # inventory coverage, SHA-256, metadata and blocker consistency
 npm test              # built-in node:test regression/contract suite
 npm run build         # regenerate dist/ from exact allowlisted inputs, including notices
@@ -22,7 +22,7 @@ npm run release:check # fail while any asset redistribution rights remain unreso
 npm run clean         # delete generated dist/ and release/ outputs
 ```
 
-`release:check` is a static eligibility gate, **not** legal approval or runtime production certification. Its expected current result is failure: six textures and two fonts have unresolved rights. Do not bypass it by changing status labels without supporting evidence and review. CI checks/builds the preview, but skips downloadable artifact upload while the redistribution gate fails. There is no deployment step.
+`release:check` is a static eligibility gate, **not** legal approval or runtime production certification. It currently passes for the openly licensed replacement set: five Solar System Scope textures (CC BY 4.0), two OFL fonts and the existing MIT Three.js files. Never clear a future blocker by changing status labels without evidence and review. CI uploads previews only when this gate passes. There is no deployment step.
 
 ## Outputs
 
@@ -36,10 +36,14 @@ Never place a real OBS password into a committed or shared `config.js`. It curre
 
 `.env*`, local override filenames and key files are ignored as an extra safeguard. Local overrides are **not yet loaded by the runtime**; creating one does not configure OBS. The separate setup/credential path is planned in P2/P4. Ignoring a file is not sufficient to protect a credential embedded in a tracked file.
 
+## Windows checks
+
+`.gitattributes` requires LF text to preserve byte hashes. Avoid checkout-wide line-ending conversion. On Windows without Developer Mode/elevation, the three file-symlink regressions report explicit skips; they must still run on Linux CI. GNU tar packaging is separately skipped when unavailable. Skips do not qualify those paths on Windows.
+
 ## Baselines and new assets
 
-Read [BASELINE.md](docs/BASELINE.md) before modifying scenes. P0's `source-baseline.json` intentionally fails on any runtime difference. Later refactors must first capture real visual/OBS evidence, then update the baseline deliberately in the same reviewed change—not regenerate it to hide unexpected differences.
+Read [BASELINE.md](docs/BASELINE.md) before modifying scenes. The active `source-baseline.json` records the intentional licensed-asset migration; `source-baseline-p0.json` retains the original hashes. A hash update does not establish visual parity. Rendering refactors still need real browser/OBS evidence, and baseline updates must be deliberate—not regenerated to hide unexpected differences.
 
-When adding/replacing assets, update the exact build allowlist in `scripts/lib.mjs`, the source baseline where appropriate, the asset inventory and notices. Check hashes and record verifiable source/license evidence. Do not infer rights from a filename or root MIT license. [ASSET_AUDIT.md](docs/ASSET_AUDIT.md) documents the current blockers.
+When adding/replacing assets, update the exact build allowlist in `scripts/lib.mjs`, the source baseline where appropriate, the asset inventory and notices. Check hashes and record verifiable source/license evidence. Do not infer rights from a filename or root MIT license. [ASSET_AUDIT.md](docs/ASSET_AUDIT.md) documents the replacement provenance. Non-vendor verified assets must list shipped license evidence and its hashes in the inventory.
 
 No public release should occur until both licensing and the browser/OBS acceptance gates in the roadmap are satisfied. Preview tests alone do not establish WebGL rendering, compatibility, offline operation or performance.

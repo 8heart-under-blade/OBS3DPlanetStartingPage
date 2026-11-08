@@ -4,10 +4,12 @@ This page renders a looping 3D solar-system style animation for a "starting soon
 
 > **Production work in progress:** the P0 foundation adds contributor checks, preview packaging,
 > and asset/baseline documentation; it does not yet provide a no-code editor or a qualified
-> end-user installer. The existing scenes and tuned configuration are preserved.
+> end-user installer. Scene tuning is preserved; openly licensed fonts/textures replace
+> the original restricted assets. Typography and Earth/Moon appearance intentionally differ.
 > See [the production roadmap](docs/PRODUCTION_ROADMAP.md),
 > [baseline qualification record](docs/BASELINE.md), and [asset attribution audit](ATTRIBUTIONS.md).
-> Unresolved third-party asset rights block public redistribution.
+> The current asset inventory has no unresolved rights; browser/OBS qualification remains pending.
+> Keep the texture credit, license link and conversion notice with public streams/videos.
 >
 > **Credential safety:** never publish an OBS password in `config.js`. The committed value is
 > blank; preview builds must reject a nonblank value. A separate credential/setup path is planned.
@@ -49,16 +51,18 @@ npm run build
 ```
 
 `npm run package` creates a reproducible **local preview** archive using GNU tar (Linux/CI).
-It is not an installer. `npm run release:check` currently fails intentionally because asset
-redistribution rights are unresolved; CI skips artifact publication until that gate passes.
+It is not an installer. `npm run release:check` verifies static redistribution eligibility
+and currently passes for the replacement asset set. CI uploads previews only when that gate
+passes; there is no production deployment or browser/OBS certification.
 See [CONTRIBUTING.md](CONTRIBUTING.md) for commands, safeguards, and limitations.
 
 ## Files
 
 - `config.js` - runtime settings (assets, overlay text, custom fonts; never publish credentials)
-- `docs/source-baseline.json` - byte hashes preserving the current runtime during P0
+- `docs/source-baseline.json` - current source-byte hashes; original P0 hashes retained in `docs/source-baseline-p0.json`
 - `docs/asset-inventory.json` - third-party asset hashes, rights evidence, and release blockers
-- `ATTRIBUTIONS.md` - third-party notices and unresolved permissions
+- `ATTRIBUTIONS.md`, `credits.html`, `docs/licenses/` - third-party credits and bundled license terms
+- `cinzel-decorative.ttf`, `macondo.ttf` - local OFL fonts (no external font service required)
 - `index.html` - page shell + asset boot loader
 - `brb.html` - BRB page shell + asset boot loader
 - `thanks.html` - "Thank You For Watching" page shell + asset boot loader
@@ -243,7 +247,7 @@ window.STREAM_CONFIG = {
   overlay: {
     title: "MY CUSTOM TITLE",
     subtitle: "Subtitle with custom typography",
-    titleFontFamily: "'Oracles', serif",
+    titleFontFamily: "'Cinzel Decorative', serif",
     subtitleFontFamily: "'Orbitron', sans-serif",
     titleFontWeight: 400,
     subtitleFontWeight: 400,
@@ -254,8 +258,8 @@ window.STREAM_CONFIG = {
     ],
     customFontFaces: [
       {
-        family: "Oracles",
-        src: "@oracles.woff",
+        family: "Cinzel Decorative",
+        src: "@cinzel-decorative.ttf",
         weight: "400",
         style: "normal",
         display: "swap"
@@ -350,8 +354,8 @@ Tuning tips:
 - Waterfall shaping is driven by OBS meter features (RMS, peak, transient, stereo balance) and propagated over time.
 
 Notes:
-- `customFontFaces[].src` accepts `@oracles.woff`, direct paths/URLs (`fonts/oracles.woff2`), or full CSS `url(...)` syntax.
-- TY4W subtitle defaults to `See You Next Time` with `@twigs.woff` (`overlayThanks.subtitleFontFamily = "'Twigs', serif"`).
+- `customFontFaces[].src` accepts `@cinzel-decorative.ttf`, direct paths/URLs (`fonts/my-font.woff2`), or full CSS `url(...)` syntax. Bundle only fonts with documented embedding/redistribution rights.
+- TY4W subtitle defaults to `See You Next Time` with `@macondo.ttf` (`overlayThanks.subtitleFontFamily = "'Macondo', serif"`).
 - TY4W aurora is constrained to north/south polar regions and is strongest on the night side.
 - TY4W supports real-world texture maps via `STREAM_CONFIG.thanksScene.useRealWorldMaps` and map URLs (`earthDayMapUrl`, `earthNightMapUrl`, `earthCloudMapUrl`, `earthWaterMaskUrl`, `moonMapUrl`).
 - For faster startup, keep TY4W maps local (for example `textures/planets/*.jpg|png`) instead of remote URLs.

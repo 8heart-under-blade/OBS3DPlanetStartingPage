@@ -3,10 +3,10 @@
 import { readFileSync } from 'node:fs';
 import { join, resolve } from 'node:path';
 import { pathToFileURL } from 'node:url';
-import { repoRoot, RUNTIME_FILES, assertRegularFile, sha256File } from './lib.mjs';
+import { repoRoot, RUNTIME_FILES, NOTICE_FILES, assertRegularFile, sha256File } from './lib.mjs';
 export function verifyInventory(root, inventory) {
   if (inventory.schemaVersion !== 1 || !Array.isArray(inventory.assets)) throw new Error('Unsupported asset inventory format');
-  const expected = RUNTIME_FILES.filter(p => p.startsWith('vendor/') || p.startsWith('textures/') || p.endsWith('.woff')).sort();
+  const expected = RUNTIME_FILES.filter(p => p.startsWith('vendor/') || p.startsWith('textures/') || /\.(?:woff2?|ttf|otf)$/.test(p)).sort();
   const paths = inventory.assets.map(a => a.path).sort();
   if (JSON.stringify(paths) !== JSON.stringify(expected)) throw new Error('Asset inventory coverage mismatch or duplicate records');
   const unresolved = [];
@@ -17,6 +17,18 @@ export function verifyInventory(root, inventory) {
     }
     assertRegularFile(root, asset.path);
     if (sha256File(join(root, asset.path)) !== asset.sha256) throw new Error(`Asset hash mismatch: ${asset.path}`);
+    if (asset.status === 'verified' && !asset.path.startsWith('vendor/')) {
+      if (!Array.isArray(asset.licenseFiles) || !asset.licenseFiles.length) {
+        throw new Error(`Missing bundled license evidence: ${asset.path}`);
+      }
+      for (const notice of asset.licenseFiles) {
+        if (!NOTICE_FILES.includes(notice)) throw new Error(`License notice not shipped: ${asset.path}`);
+        assertRegularFile(root, notice);
+        if (sha256File(join(root, notice)) !== asset.licenseFileHashes?.[notice]) {
+          throw new Error(`License evidence hash mismatch: ${asset.path}`);
+        }
+      }
+    }
     if (asset.status === 'unresolved') unresolved.push(asset.path);
   }
   if (inventory.counts?.total !== expected.length || inventory.counts?.unresolved !== unresolved.length ||

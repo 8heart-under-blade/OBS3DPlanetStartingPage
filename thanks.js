@@ -28,8 +28,8 @@
   );
   if (overlayFontFaces.length === 0) {
     overlayFontFaces.push({
-      family: "Twigs",
-      src: "@twigs.woff",
+      family: "Macondo",
+      src: "@macondo.ttf",
       weight: "400",
       style: "normal",
       display: "swap"
@@ -41,7 +41,7 @@
       title: pickDefined(thanksOverlay.title, "THANK YOU FOR WATCHING"),
       subtitle: pickDefined(thanksOverlay.subtitle, "See You Next Time"),
       titleFontFamily: pickDefined(thanksOverlay.titleFontFamily, pickDefined(baseOverlay.titleFontFamily, '"Trebuchet MS", "Gill Sans", "Segoe UI", sans-serif')),
-      subtitleFontFamily: pickDefined(thanksOverlay.subtitleFontFamily, "'Twigs', serif"),
+      subtitleFontFamily: pickDefined(thanksOverlay.subtitleFontFamily, "'Macondo', serif"),
       titleFontWeight: pickDefined(thanksOverlay.titleFontWeight, pickDefined(baseOverlay.titleFontWeight, 700)),
       subtitleFontWeight: pickDefined(thanksOverlay.subtitleFontWeight, 400),
       titleTextTransform: pickDefined(thanksOverlay.titleTextTransform, pickDefined(baseOverlay.titleTextTransform, "uppercase")),
@@ -125,11 +125,11 @@
     },
     maps: {
       useRealWorldMaps: pickDefined(thanksSceneOverrides.useRealWorldMaps, true) !== false,
-      earthDayMapUrl: normalizeOptionalUrl(pickDefined(thanksSceneOverrides.earthDayMapUrl, "https://threejs.org/examples/textures/planets/earth_atmos_2048.jpg")),
-      earthNightMapUrl: normalizeOptionalUrl(pickDefined(thanksSceneOverrides.earthNightMapUrl, "https://threejs.org/examples/textures/planets/earth_lights_2048.png")),
-      earthCloudMapUrl: normalizeOptionalUrl(pickDefined(thanksSceneOverrides.earthCloudMapUrl, "https://threejs.org/examples/textures/planets/earth_clouds_1024.png")),
-      earthWaterMaskUrl: normalizeOptionalUrl(pickDefined(thanksSceneOverrides.earthWaterMaskUrl, "https://threejs.org/examples/textures/planets/earth_specular_2048.jpg")),
-      moonMapUrl: normalizeOptionalUrl(pickDefined(thanksSceneOverrides.moonMapUrl, "https://threejs.org/examples/textures/planets/moon_1024.jpg")),
+      earthDayMapUrl: normalizeOptionalUrl(pickDefined(thanksSceneOverrides.earthDayMapUrl, "textures/planets/earth_day_2048.jpg")),
+      earthNightMapUrl: normalizeOptionalUrl(pickDefined(thanksSceneOverrides.earthNightMapUrl, "textures/planets/earth_night_2048.jpg")),
+      earthCloudMapUrl: normalizeOptionalUrl(pickDefined(thanksSceneOverrides.earthCloudMapUrl, "textures/planets/earth_clouds_2k_solarsystemscope.jpg")),
+      earthWaterMaskUrl: normalizeOptionalUrl(pickDefined(thanksSceneOverrides.earthWaterMaskUrl, "textures/planets/earth_specular_2048.png")),
+      moonMapUrl: normalizeOptionalUrl(pickDefined(thanksSceneOverrides.moonMapUrl, "textures/planets/moon_2048.jpg")),
       moonBumpMapUrl: normalizeOptionalUrl(pickDefined(thanksSceneOverrides.moonBumpMapUrl, "")),
       moonRoughnessMapUrl: normalizeOptionalUrl(pickDefined(thanksSceneOverrides.moonRoughnessMapUrl, ""))
     },

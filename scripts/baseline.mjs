@@ -16,7 +16,7 @@ try {
       throw new Error(`Runtime differs from recorded baseline: ${file.path}`);
     }
   }
-  console.log(`baseline: all ${baseline.files.length} runtime files match source bytes at ${baseline.sourceCommit}`);
+  console.log(`baseline: all ${baseline.files.length} runtime files match recorded source bytes`);
   console.log('baseline: no rendering or OBS qualification implied');
 } catch (error) {
   console.error(`baseline FAIL: ${error.message}`);

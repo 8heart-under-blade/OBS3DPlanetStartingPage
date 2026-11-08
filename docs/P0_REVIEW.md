@@ -1,4 +1,8 @@
-# P0 implementation review record
+# P0 implementation review record (historical)
+
+This record describes the original production-foundation work, before the
+2026-11-08 licensed-asset migration. Its counts and unresolved-rights results
+are historical, not the current release status. See ASSET_AUDIT.md and BASELINE.md.
 
 Branch: `feature/production-foundation`.
 

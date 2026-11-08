@@ -160,6 +160,28 @@ h1 {
   animation: subtitle-float 4.9s ease-in-out infinite;
 }
 
+.asset-credit {
+  position: absolute;
+  right: 12px;
+  bottom: 10px;
+  left: 12px;
+  z-index: 4;
+  text-align: right;
+  font: 12px/1.5 var(--font-ui);
+  color: #dcebf5;
+  text-shadow: 0 1px 3px #000;
+}
+
+.asset-credit a {
+  color: inherit;
+  text-decoration: underline;
+}
+
+.asset-credit a:focus-visible {
+  outline: 2px solid #79d7bf;
+  outline-offset: 3px;
+}
+
 .boot-error {
   position: absolute;
   left: min(8vw, 120px);

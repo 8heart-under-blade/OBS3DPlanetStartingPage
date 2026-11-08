@@ -2,6 +2,16 @@
 
 Status: P0 foundation in progress, not a production-ready release. This roadmap consolidates two review rounds by Space Bunny Free, Nemotron 3 Ultra Free, Big Pickle, Muse Spark 1.3 Contributor Free and GitHub Copilot Auto. Raw discussion is maintained outside this repository. Recommendations are adjudicated, not unanimous.
 
+Update 2026-11-08: the asset-rights gate now passes for the replacement set;
+see ASSET_AUDIT.md. Runtime visual/OBS qualification is still outstanding.
+This does not complete P0 or authorize a production release.
+
+Checkpoint: the user accepted the preview and confirmed OBS/audio interaction.
+They explicitly deferred sustained playback and repeated scene-transition tests
+and authorized proceeding to P1. This is an exception to the preferred sequence
+below, not a passed qualification gate. See [PROGRESS.md](PROGRESS.md) for the
+saved state, validation results and P1 handoff.
+
 ## Product goal
 
 A nontechnical user opens a website, picks a Starting/BRB/Thanks template, customizes and previews it, then copies three personalized OBS Browser Source URLs. No account, terminal, source editing, Node or Python requirement. Retain the existing hand-tuned visuals and existing entry points.
@@ -61,4 +71,4 @@ Accounts/cloud sync/database, public galleries, marketplaces, automatic OBS scen
 
 ## Next implementation step
 
-Complete P0 and collect actual runtime baseline evidence before P1 scene refactoring. Resolve font/texture permissions with the owner or replace assets with verified equivalents; do not mark rights verified by filename or inference.
+Complete P0 by collecting actual browser/OBS baseline evidence for the replacement asset set before P1 scene refactoring. Asset provenance and terms are now documented; preserve attribution and keep the rights gate enforced for future changes.

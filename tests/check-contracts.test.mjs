@@ -21,8 +21,9 @@ const REQUIRED = [
   "main.js",
   "brb.js",
   "thanks.js",
-  "oracles.woff",
-  "twigs.woff",
+  "cinzel-decorative.ttf",
+  "macondo.ttf",
+  "credits.html",
   "vendor/three.min.js",
   "brb-blackhole/blackholeOverlay.module.js",
 ];

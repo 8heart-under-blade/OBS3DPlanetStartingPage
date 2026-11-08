@@ -12,7 +12,10 @@ permissions:
 
 jobs:
   check-test-build:
-    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v4
 
@@ -41,13 +44,13 @@ jobs:
         run: npm run build
 
       # Do not publish downloadable bundled assets while their rights are unresolved.
-      - name: Redistribution eligibility (expected blocked until asset rights cleared)
+      - name: Static redistribution eligibility (separate from runtime qualification)
         id: redistribution
         continue-on-error: true
         run: npm run release:check
 
       - name: Upload preview artifact (rights cleared only; no deploy)
-        if: steps.redistribution.outcome == 'success'
+        if: steps.redistribution.outcome == 'success' && runner.os == 'Linux'
         uses: actions/upload-artifact@v4
         with:
           name: obs3dplanetstartingpage-preview

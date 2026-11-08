@@ -25,20 +25,20 @@ export const ALLOW_FILES = [
   "main.js",
   "brb.js",
   "thanks.js",
-  "oracles.woff",
-  "twigs.woff",
+  "cinzel-decorative.ttf",
+  "macondo.ttf",
+  "credits.html",
 ];
 
 // Directory names are retained for contract tests; only these exact files ship.
 export const ALLOW_DIRS = ["brb-blackhole", "textures", "vendor"];
 export const DIRECTORY_FILES = [
   "brb-blackhole/blackholeOverlay.module.js",
-  "textures/planets/earth_clouds_1024.png",
   "textures/planets/earth_clouds_2k_solarsystemscope.jpg",
   "textures/planets/earth_day_2048.jpg",
-  "textures/planets/earth_night_2048.png",
-  "textures/planets/earth_specular_2048.jpg",
-  "textures/planets/moon_1024.jpg",
+  "textures/planets/earth_night_2048.jpg",
+  "textures/planets/earth_specular_2048.png",
+  "textures/planets/moon_2048.jpg",
   "vendor/three.min.js",
   "vendor/three-0.181.0/build/three.core.js",
   "vendor/three-0.181.0/build/three.module.js",
@@ -53,7 +53,11 @@ export const DIRECTORY_FILES = [
   "vendor/three-0.181.0/examples/jsm/shaders/LuminosityHighPassShader.js",
 ];
 export const RUNTIME_FILES = [...ALLOW_FILES, ...DIRECTORY_FILES].sort();
-export const NOTICE_FILES = ['ATTRIBUTIONS.md', 'docs/ASSET_AUDIT.md', 'docs/asset-inventory.json'];
+export const NOTICE_FILES = [
+  'ATTRIBUTIONS.md', 'docs/ASSET_AUDIT.md', 'docs/asset-inventory.json',
+  'docs/licenses/CinzelDecorative-OFL.txt', 'docs/licenses/Macondo-OFL.txt',
+  'docs/licenses/CC-BY-4.0.txt', 'docs/licenses/SolarSystemScope-source.txt',
+];
 export const PACKAGE_FILES = [...RUNTIME_FILES, ...NOTICE_FILES].sort();
 
 export function assertNotSymlink(path) {
@@ -91,7 +95,7 @@ export const FORBIDDEN_BASENAMES = new Set([
   ".env",
 ]);
 
-export const HTML_PAGES = ["index.html", "brb.html", "thanks.html"];
+export const HTML_PAGES = ["index.html", "brb.html", "thanks.html", "credits.html"];
 
 // First-party JS checked for syntax (vendor/ is third-party and excluded).
 export const FIRST_PARTY_JS = [

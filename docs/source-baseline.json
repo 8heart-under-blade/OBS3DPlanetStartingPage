@@ -1,7 +1,8 @@
 {
   "schemaVersion": 1,
-  "sourceCommit": "ea5fb4c866e48b9c8ba4981191437d1ff61780c6",
-  "purpose": "Source-byte baseline, not visual or runtime validation. Update deliberately after an approved runtime change.",
+  "baseCommit": "7cd2c22",
+  "revision": "open-asset-replacement-2026-11-08",
+  "purpose": "Deliberate font/texture migration plus visible credit; source bytes only, not browser/OBS visual qualification. Historical P0 manifest retained in docs/source-baseline-p0.json.",
   "files": [
     {
       "path": "brb-blackhole/blackholeOverlay.module.js",
@@ -24,9 +25,19 @@
       "sha256": "1148cb26356964f258ad97b9e0d41ec1a9e3d7d29b177622d14d3bd4eae64d50"
     },
     {
+      "path": "cinzel-decorative.ttf",
+      "bytes": 60408,
+      "sha256": "5b862be329103ad287a10f0a53e27a40e8cc519999253f1a0223e2dc330b10b8"
+    },
+    {
       "path": "config.js",
-      "bytes": 5865,
-      "sha256": "d5d5603f2965b25c3ad311e2895aa8ba65d1855ce0524635b394553a519baf07"
+      "bytes": 5928,
+      "sha256": "1951ef80e37f35765de2b0e14cc182a3b6121596bad33c5815d77068b1ec7819"
+    },
+    {
+      "path": "credits.html",
+      "bytes": 1973,
+      "sha256": "c7670f78b4c0c95d7c9b7b6cfdbd108d1df9dc2bde5863a78a4a68647ec5f678"
     },
     {
       "path": "index.html",
@@ -34,24 +45,19 @@
       "sha256": "330cae6ecbf927a066e989fe0ad8694368207f2970e0540109e6e09fa6efb270"
     },
     {
+      "path": "macondo.ttf",
+      "bytes": 48776,
+      "sha256": "1910fe29b60588799474ea6281b59e131e33e96c77bfb80722a4c7f8133db4aa"
+    },
+    {
       "path": "main.js",
       "bytes": 74439,
       "sha256": "18a6200d8b9daa06f5c87460ef6d31618b2504b626d5a85a7cc19c37aded6e72"
     },
     {
-      "path": "oracles.woff",
-      "bytes": 25904,
-      "sha256": "e67bab2c78b6a535c3638ea629ba803a4ba03a1aa580f750de80c7bec6503c8b"
-    },
-    {
       "path": "styles.css",
       "bytes": 4988,
       "sha256": "f63bea5bbc13a91f9566e194c5cf9198d90854b4e6545af2c9ecb027122403a4"
-    },
-    {
-      "path": "textures/planets/earth_clouds_1024.png",
-      "bytes": 260222,
-      "sha256": "7d3b82ef6b3feb506fc06f02a744aed3d864e23e7417075005f4082a7ff935a4"
     },
     {
       "path": "textures/planets/earth_clouds_2k_solarsystemscope.jpg",
@@ -60,43 +66,38 @@
     },
     {
       "path": "textures/planets/earth_day_2048.jpg",
-      "bytes": 512606,
-      "sha256": "2faa400d1eade3bc44caf6750d1b772bd9bbb6d87362c02bc7c3304e78fa0a9d"
+      "bytes": 463087,
+      "sha256": "767ee1dc6eb3802699bfccf6f264880f8acd0b80de3191cd24984fe279b07b7c"
     },
     {
-      "path": "textures/planets/earth_night_2048.png",
-      "bytes": 734910,
-      "sha256": "3cc6972d1d5b6310f33ea6ef4cc14a38f1dd141a91d26888206889327d983d7b"
+      "path": "textures/planets/earth_night_2048.jpg",
+      "bytes": 255287,
+      "sha256": "c16fd1bc096ab91a5c5265c6ff9847c43f489f2e2ee790ccdbcbd03251cf3a5a"
     },
     {
-      "path": "textures/planets/earth_specular_2048.jpg",
-      "bytes": 223421,
-      "sha256": "2df48906732d7a458b2d0a7cdec51a829262307c6bdee4cfdf079a4dd7c71c69"
+      "path": "textures/planets/earth_specular_2048.png",
+      "bytes": 275710,
+      "sha256": "f3c614db5ce764c291e9fa0eb67e6c8f19661e17bf951f22a52f013792751f6d"
     },
     {
-      "path": "textures/planets/moon_1024.jpg",
-      "bytes": 238093,
-      "sha256": "fcb0f1f5548e6e18d40063dd55c6aacd3daedf2407b181dab85b61e22bf9fe57"
+      "path": "textures/planets/moon_2048.jpg",
+      "bytes": 1053869,
+      "sha256": "2764ba6535ea0481a062846ee033cc7a909dae05b31a8fd13f3e98f3a7fd92bd"
     },
     {
       "path": "thanks.css",
-      "bytes": 5904,
-      "sha256": "d43cde745c13fe9380b13f59f024f9d35bf1881b5e8361bb88840c06a7558b45"
+      "bytes": 6264,
+      "sha256": "0b84ef50108b70b1ba2e7d840f58a15e92ef465f504ac276dbeccaba2602d678"
     },
     {
       "path": "thanks.html",
-      "bytes": 5578,
-      "sha256": "c836a0e8b66f59dd444fd130a591f5f622b70ee8e6a6c59250ca5ba59e083290"
+      "bytes": 5905,
+      "sha256": "7f7a66ab1b1ae392f2e3a48c973000cdb3507e373d002d9f6d5830c75358aa34"
     },
     {
       "path": "thanks.js",
-      "bytes": 85991,
-      "sha256": "c47832cfee45ee4e0e855db973606c27345cbe5e67234354cfc5da48b9bc4a0d"
-    },
-    {
-      "path": "twigs.woff",
-      "bytes": 650460,
-      "sha256": "9cc9b45211ff5172f68909686e46c2188f59196c2bb34c46a42e97ba28772978"
+      "bytes": 85863,
+      "sha256": "2d8e6398fca0bd722855fff2688d6cc49a5020682ec760dee59c775c172128a1"
     },
     {
       "path": "vendor/three-0.181.0/build/three.core.js",
