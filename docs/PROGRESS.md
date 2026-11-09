@@ -315,6 +315,48 @@ qualification is still pending. See P1_RUNTIME.md for the current architecture.
   remain available. Remote CI, durable off-machine history and production promotion
   are still pending. Deferred soak/GPU/transition qualification remains open.
 
+## Production readiness — audio authentication test synchronization
+
+- Replaced the audio-session authentication test's fixed eight-setImmediate flush
+  with a listener registered before Hello that resolves on the fake WebSocket's
+  actual send. A five-second deadline fails on missing completion; listener and
+  timer cleanup runs on success or timeout. No runtime behavior was changed.
+- Added regression coverage with explicitly gated real Web Crypto and a missing-send
+  timeout/cleanup test. No retry-on-failure mechanism was added.
+- Local Linux / Node v22.22.1 validation: 100 consecutive audio-session suite runs
+  passed (1,200 tests); the full Node suite passed all 227 tests with no skips.
+  Static checks, all 44 runtime baseline hashes, 19 asset hashes, site/Cloudflare
+  history validators and git diff --check passed.
+- All three restored namespaces and the accepted-current selection remain unchanged.
+  No browser-reference updates, builds, publication or pushes were performed.
+  Remote CI for this change has not run. Durable restore-before-deploy integration,
+  deferred OBS/soak/GPU qualification and authorized production upload remain open.
+
+## Production readiness — cumulative history recovery/preparation
+
+- Added dependency-free offline snapshot/verify/restore commands and isolated
+  `prepare:cloudflare`: pinned history is authenticated and restored before any
+  build, current selection is mandatory, and every retained namespace remains
+  byte-identical. Existing differing history and reused backup/output names refuse.
+- Every snapshot is catalog-sealed and freshly restore-tested, including a re-read
+  of the written archive. Preparation creates a cumulative history.tar.gz plus
+  nonsecret input/output pins and selection proof, without changing source outputs.
+- Added strict ustar parsing, safe paths/types, size limits and symlink-ancestor
+  checks. Ten regression tests cover integrity, malicious archives, conflicting
+  history, cleanup, full retention and old-current/source selection.
+- Recorded the original published migration backup's out-of-band pin/341 records/
+  three IDs in history-bootstrap.json. DEPLOYMENT_HISTORY.md documents immutable
+  off-machine retention, download-back verification and separate publishing gates.
+- On magi-1 / Node v22.22.1, the original archive passed the new verifier, and an
+  isolated end-to-end preparation retained all three IDs, all 341 records and the
+  accepted current. Workspace site/cf-dist validators still pass unchanged.
+- Full local Node suite: 237 passed, no failures/skips. Static checks, 44 runtime
+  baseline hashes, 19 asset hashes and diff checks pass. No browser reference or
+  runtime changes, public mutations, credential access, pruning, commits or pushes.
+- This is local integration/rehearsal, not a new durable off-machine upload or
+  remote CI result. Future candidate storage/download checks, deferred OBS/soak/GPU
+  qualification and explicitly approved production publication remain outstanding.
+
 ## Original P1 handoff (at checkpoint)
 
 1. Inspect duplicated configuration and asset boot loading across the three scenes.

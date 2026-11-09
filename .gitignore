@@ -8,6 +8,8 @@ site/
 cf-dist/
 .wrangler/
 .cf-stage-*/
+.history-stage-*/
+.history-prepare-*/
 test-results/
 playwright-report/
 

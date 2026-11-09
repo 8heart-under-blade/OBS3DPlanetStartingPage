@@ -105,11 +105,22 @@ Gate: clean machine needs no developer runtime, external-network-blocked playbac
 
 Accounts/cloud sync/database, public galleries, marketplaces, automatic OBS scene creation/control, GPU compute rewrites and microphone permissions. Do not solve these before the hosted MVP is useful.
 
-## Next implementation step
+## Next production gates (after migration)
 
-P2 is saved locally as `1d28784`. Complete review/validation of the P3 candidate
-namespace foundation, then add browser/visual regression, release artifact/support
-procedures and verified history-preserving hosting/subpath deployment.
-Keep unperformed P0/P1 production qualification visible; asset rights and static
-checks do not replace it. P3 still needs real deployment and measured sustained
-playback before its gate passes. P4 is the supported local/offline product phase.
+P2 remains reachable at `1d28784928846cf58d75230c26fec09807ea5c0b`. P3 preview
+rollout/rollback and merged-main CI passed; the three-namespace off-machine backup
+was restored and verified on magi-1. The intermittent authentication test now uses
+bounded actual-send completion, with local repeat/full-suite evidence.
+
+Local cumulative snapshot/restore and isolated restore-before-build preparation are
+implemented; see [DEPLOYMENT_HISTORY.md](DEPLOYMENT_HISTORY.md). Remote CI for these
+readiness changes has not run. A future candidate still requires separately
+authorized off-machine backup storage and download/restore verification; local
+preparation is not that durability gate and never uploads anything.
+
+Remaining gates: remote validation of the readiness changes; deferred sustained
+playback, repeated scene transitions and identified OBS/CEF/GPU/resource checks;
+reviewed current-renderer selection and retained-history proof; then explicit
+production-upload approval, live HTTP audits and production URL/OBS checks.
+Asset rights, browser snapshots and static checks do not replace runtime
+qualification. P4 remains the separate supported local/offline product phase.
