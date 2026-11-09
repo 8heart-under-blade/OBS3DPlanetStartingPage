@@ -32,6 +32,14 @@ needed. Future publishing still requires authorization and retained history.
 
 ## Commands and folder
 
+For a future upload candidate, use the cumulative **restore-before-build** procedure
+in [DEPLOYMENT_HISTORY.md](DEPLOYMENT_HISTORY.md), not a fresh single-release CI
+artifact. `npm run prepare:cloudflare` authenticates a pinned backup, restores it
+in isolation, builds with explicit current selection, checks retention and creates
+and restore-checks a new snapshot. Off-machine retention/download verification and
+publishing approval remain separate gates; the command never uploads anything.
+The commands below are lower-level local tools, not a complete deployment workflow.
+
 ```sh
 npm run build:cloudflare
 npm run cloudflare:verify

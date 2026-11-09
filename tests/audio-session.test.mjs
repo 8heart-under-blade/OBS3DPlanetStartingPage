@@ -2,11 +2,20 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { createRequire } from 'node:module';
 import { webcrypto } from 'node:crypto';
+import { EventEmitter, once } from 'node:events';
 const require = createRequire(import.meta.url);
 const snapshots = require('../runtime/snapshots.js')();
 const createAudio = require('../runtime/audio.js');
 const createSession = require('../runtime/audio-session.js');
-const flush = async () => { for (let i = 0; i < 8; i++) await new Promise(resolve => setImmediate(resolve)); };
+async function waitForSend(socket, timeoutMs = 5000) {
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(new Error('Timed out waiting for OBS Identify message')), timeoutMs);
+  try {
+    await once(socket, 'sent', {signal: controller.signal});
+  } finally {
+    clearTimeout(timeout);
+  }
+}
 class Element {
   constructor(tag) { this.tag = tag; this.children = []; this.listeners = new Map(); this.hidden = false; this.value = ''; this.attributes = {}; }
   appendChild(child) { this.children.push(child); child.parentNode = this; return child; }
@@ -17,20 +26,20 @@ class Element {
   emit(type, extra = {}) { const event = {preventDefault() { this.prevented = true; }, ...extra}; for (const fn of [...(this.listeners.get(type) || [])]) fn(event); return event; }
   focus() { this.focused = true; }
 }
-function fixture({mode = 'auto', href = 'http://127.0.0.1:8080/index.html', framed = false, legacy = false} = {}) {
+function fixture({mode = 'auto', href = 'http://127.0.0.1:8080/index.html', framed = false, legacy = false, crypto = webcrypto} = {}) {
   const elements = [], sockets = [], timers = new Map(), warnings = [], cleanups = [];
   let timerId = 0;
   const doc = {body: new Element('body'), createElement(tag) { const el = new Element(tag); elements.push(el); return el; }};
-  class Socket {
-    constructor(url) { this.url = url; this.readyState = 0; this.sent = []; this.closes = 0; sockets.push(this); }
+  class Socket extends EventEmitter {
+    constructor(url) { super(); this.url = url; this.readyState = 0; this.sent = []; this.closes = 0; sockets.push(this); }
     open() { this.readyState = 1; this.onopen?.(); }
     message(data) { this.onmessage?.({data: JSON.stringify(data)}); }
-    send(data) { this.sent.push(JSON.parse(data)); }
+    send(data) { this.sent.push(JSON.parse(data)); this.emit('sent'); }
     close() { this.readyState = 3; this.closes++; this.onclose?.(); }
   }
   const win = Object.assign(new Element('window'), {
     STREAM_SNAPSHOT: legacy ? null : {...snapshots.defaults(), audioMode: mode},
-    StreamSnapshots: snapshots, location: {href}, WebSocket: Socket, crypto: webcrypto, TextEncoder,
+    StreamSnapshots: snapshots, location: {href}, WebSocket: Socket, crypto, TextEncoder,
     btoa: value => Buffer.from(value, 'binary').toString('base64'),
     console: {warn: (...args) => warnings.push(args)},
     setTimeout(fn, delay) { const id = ++timerId; timers.set(id, {fn, delay}); return id; },
@@ -82,7 +91,9 @@ test('separately entered password authenticates without plaintext transport or p
   const snapshotBefore = snapshots.stringify(f.win.STREAM_SNAPSHOT), hrefBefore = f.win.location.href;
   assert.equal(f.submit('synthetic-session-secret').prevented, true);
   assert.equal(f.find('obs-audio-password').value, '');
-  const socket = hello(f, true); await flush();
+  // Subscribe before Hello: Web Crypto completion is asynchronous, not a fixed number of event-loop ticks.
+  const sent = waitForSend(f.sockets.at(-1));
+  const socket = hello(f, true); await sent;
   assert.equal(socket.sent.length, 1); assert.equal(typeof socket.sent[0].d.authentication, 'string');
   assert.ok(!JSON.stringify(socket.sent).includes('synthetic-session-secret'));
   socket.message({op: 2, d: {negotiatedRpcVersion: 1}}); f.controller.update(.016);
@@ -90,6 +101,40 @@ test('separately entered password authenticates without plaintext transport or p
   assert.equal(snapshots.stringify(f.win.STREAM_SNAPSHOT), snapshotBefore); assert.equal(f.base.password, '');
   assert.ok(!JSON.stringify(f.warnings).includes('synthetic-session-secret'));
   f.scope.dispose(); assert.equal(f.sockets[0].closes, 1); assert.equal(f.timers.size, 0);
+});
+
+test('authentication completion wait tolerates explicitly delayed Web Crypto', async t => {
+  let releaseDigest, markStarted;
+  const gate = new Promise(resolve => { releaseDigest = resolve; });
+  const started = new Promise(resolve => { markStarted = resolve; });
+  const crypto = {subtle: {async digest(...args) {
+    markStarted();
+    await gate;
+    return webcrypto.subtle.digest(...args);
+  }}};
+  const f = fixture({mode: 'setup', crypto});
+  t.after(() => { releaseDigest(); f.scope.dispose(); });
+  f.controller.start(); f.submit('synthetic-session-secret');
+  const socket = f.sockets.at(-1), sent = waitForSend(socket);
+  hello(f, true);
+  await started;
+  assert.equal(socket.sent.length, 0);
+  releaseDigest();
+  await sent;
+  assert.equal(socket.sent.length, 1);
+  assert.equal(socket.sent[0].op, 1);
+  assert.equal(typeof socket.sent[0].d.authentication, 'string');
+  assert.equal(socket.listenerCount('sent'), 0);
+});
+
+test('authentication completion wait fails within its deadline if no message is sent', async () => {
+  const socket = new EventEmitter();
+  await assert.rejects(waitForSend(socket, 20), error => {
+    assert.equal(error.name, 'AbortError');
+    assert.equal(error.cause?.message, 'Timed out waiting for OBS Identify message');
+    return true;
+  });
+  assert.equal(socket.listenerCount('sent'), 0);
 });
 
 test('manual setup also permits authentication-disabled OBS and custom local port/input names', () => {

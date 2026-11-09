@@ -111,6 +111,22 @@ test('invalid controls disable stale link copying/export without writing raw inp
   assert.ok(!f.controls['editor-error'].textContent.includes('private.example'));
 });
 
+test('correcting invalid input to the unchanged snapshot restores links without a redundant autosave', async () => {
+  const f = fixture(), originalLink = f.controls['link-starting'].value;
+  const originalTop = String(f.api.getSnapshot().scenes.starting.topVh);
+  await f.edit('top-input', ''); f.runTimers();
+  assert.equal(f.controls['copy-starting'].disabled, true);
+  assert.equal(f.controls['link-starting'].value, '');
+  await f.edit('top-input', originalTop); f.runTimers();
+  for (const scene of ['starting', 'brb', 'thanks']) {
+    assert.equal(f.controls['copy-' + scene].disabled, false);
+    assert.deepEqual(decodeLink(f, scene), f.api.getSnapshot());
+  }
+  assert.equal(f.controls['link-starting'].value, originalLink);
+  assert.equal(f.controls['editor-error'].hidden, true);
+  assert.equal(f.saved.length, 0);
+});
+
 test('new drafts honor system reduced motion while restored drafts retain their own choice', () => {
   const fresh = fixture({reduced: true});
   assert.equal(fresh.api.getSnapshot().reducedMotion, true);
