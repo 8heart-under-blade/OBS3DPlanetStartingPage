@@ -8,6 +8,11 @@ create a project/release, update a public alias or authorize production.
 
 ## Trust anchor and existing durable backup
 
+The latest production upload and download/restore-verified archive are recorded in
+[deployed-history.json](deployed-history.json). Use that reviewed record for the
+next cumulative preparation. The bootstrap below remains the original migration
+backup, not a silently updated visual reference; preserve both backups indefinitely.
+
 The migration backup is already published as a GitHub **backup prerelease**, not
 latest/production. Its reviewed URL, out-of-band SHA-256, 341-record count, three
 namespaces, accepted current and accepted P2 commit are in

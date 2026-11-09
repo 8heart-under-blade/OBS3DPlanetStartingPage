@@ -1,0 +1,33 @@
+{
+  "schemaVersion": 1,
+  "kind": "cosmic-stream-scenes-deployed-history",
+  "project": "cosmic-stream-scenes",
+  "productionBranch": "main",
+  "productionApproved": true,
+  "productionUrl": "https://cosmic-stream-scenes.pages.dev/",
+  "editorUrl": "https://cosmic-stream-scenes.pages.dev/editor",
+  "deploymentId": "20ef03a5-e4d7-453e-963d-846b8eb86d98",
+  "deploymentUrl": "https://20ef03a5.cosmic-stream-scenes.pages.dev/",
+  "deployedAt": "2026-11-09T12:09:48.288826Z",
+  "sourceCommit": "031241a8a296024b3060404c9aef724eb794cc64",
+  "backupRelease": "https://github.com/8heart-under-blade/OBS3DPlanetStartingPage/releases/tag/site-history-20261109T114506Z",
+  "archiveUrl": "https://github.com/8heart-under-blade/OBS3DPlanetStartingPage/releases/download/site-history-20261109T114506Z/cosmic-stream-scenes-history-20261109T114506Z.tar.gz",
+  "archiveSha256": "f4002b053d27f26b9876656fe6da41bf6b080f17b63c076b5f02054a5e54c72e",
+  "records": 341,
+  "currentRelease": "v0.1.0-6613f9a2f7269ed867f21986aa2dc412dadc3c55803c27286292f4a7fcf97fc1",
+  "retainedReleases": [
+    "v0.1.0-600261d16300c44261515963ab4e6154dd762f4c1815b91b0b87a622149198ba",
+    "v0.1.0-6613f9a2f7269ed867f21986aa2dc412dadc3c55803c27286292f4a7fcf97fc1",
+    "v0.1.0-p3.1-b648c84dc5a3eba693b63cf92c9fde49883cd30818344fb7f2859f186e5f8abd"
+  ],
+  "backupDownloadedAndRestored": true,
+  "restoredTreesByteIdenticalToPrepared": true,
+  "specificDeploymentHttpAuditPassed": true,
+  "productionAliasHttpAuditPassed": true,
+  "httpAuditFilesPerOrigin": 169,
+  "httpAuditCaveat": "Full successful audits occurred for both origins, but other attempts hit intermittent 15-second response/body timeouts. One identified asset returned HTTP 200 then timed out reading; an independent curl download completed in 1.26 seconds with the expected SHA-256. No byte/header mismatch was observed; timeout root cause is unconfirmed.",
+  "productionObsSmoke": "user-reported-pass",
+  "productionObsSmokeScope": "User confirms fresh production link in OBS has expected visuals and audio; individual scenes, duration and audio/authentication modes not separately enumerated.",
+  "acceptedP2Commit": "1d28784928846cf58d75230c26fec09807ea5c0b",
+  "previousBackupRecord": "history-bootstrap.json"
+}

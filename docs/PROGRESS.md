@@ -1,5 +1,42 @@
 # Project progress and checkpoints
 
+## First production upload — 2026-11-09
+
+Explicitly approved by the user. Published a new non-latest GitHub backup
+prerelease, downloaded its archive and verified the independently pinned hash,
+fresh restore, all 341 records / three namespaces and byte-identical site/cf-dist.
+Uploaded that complete restored cf-dist to cosmic-stream-scenes production/main,
+keeping the tested accepted renderer current. Production editor:
+https://cosmic-stream-scenes.pages.dev/editor
+
+Cloudflare deployment 20ef03a5 reports production/success. Both specific deployment
+and production alias passed full 169-file HTTP audits, but other attempts had
+intermittent 15-second timeouts; no byte mismatch observed, cause unconfirmed.
+See [PRODUCTION_QUALIFICATION.md](PRODUCTION_QUALIFICATION.md) for limitations and
+[deployed-history.json](deployed-history.json) for the durable archive/selection
+record to use for future preparations. Original backups and all pins retained.
+The user subsequently confirmed a fresh production link in OBS has expected
+visuals and audio: user-reported production smoke pass. Individual scenes retested,
+duration and audio/authentication modes were not separately enumerated. Earlier
+preparation-only statuses below are historical.
+
+## Production preparation and user smoke qualification — 2026-11-09
+
+See [PRODUCTION_QUALIFICATION.md](PRODUCTION_QUALIFICATION.md) for the identified
+OBS 32.2.2 / Iris Xe / Linux setup, supplied resource recording, limitations and
+local cumulative candidate pin. The user reports 60+ minutes of playback with
+recording, all three scenes and more than 20 transitions/tests per scene, with no
+observed blank frames or audio loss. Those previously deferred exercises now have
+setup-specific user-reported smoke acceptance, not universal qualification.
+OBS lag counters and CEF version were not recorded; I/O stalls and modest summed
+RSS growth remain explicit limitations. Main CI 42550325111 passed all jobs.
+
+A fresh local restore-before-build preparation preserves all three namespaces and
+the tested accepted current; an additional fresh restore and 169-file live preview
+comparison pass. New archive pin and paths are in the qualification record.
+Public backup, download/restore verification, production upload and production URL
+checks are still pending; no Cloudflare mutation or publishing approval is inferred.
+
 ## PR #3 browser failure correction — 2026-11-09, JMB-HP
 
 - PR run 42544632971 failed the invalid-controls Copy-enabled assertion.
