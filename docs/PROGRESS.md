@@ -1,5 +1,29 @@
 # Project progress and checkpoints
 
+## PR #3 browser failure correction — 2026-11-09, JMB-HP
+
+- PR run 42544632971 failed the invalid-controls Copy-enabled assertion.
+  Trace inspection on magi-1 found recovered links/enabled buttons in the final
+  DOM, consistent with assertion polling starved by continuous full-HD SwiftShader
+  rendering; this is not proof of an OBS/GPU performance defect.
+- Three editor-only interaction tests now use the existing test-only controlled
+  RAF queue. Real bootstrap and preview loading remain; audio/session tests keep
+  frame-driven monitoring, and visual comparisons/reference.json are unchanged.
+- Strengthened unchanged-value recovery/error clearing/manual-copy coverage and
+  changed-value recovery through decoded URL and actual preview snapshot. Added
+  a Node regression for restored links without redundant autosave.
+- JMB-HP, Node 26.13.0, Playwright 1.65.0 / Chromium 158.0.8127.18:
+  editor Node tests 19/19; full Node suite 238/238; failing browser test five
+  consecutive passes (2.9 minutes); complete browser suite 9/9 (3.6 minutes).
+  Static, 44-file baseline, 19-asset, release, restored site/Cloudflare validators
+  and diff checks pass. No runtime bytes, timeouts, retries or visual pins changed.
+- Restored the pinned migration archive locally before any site build: SHA-256
+  b30048e3b7e081ae5e5da29c1cd53c88edddc038fbca89c38dd86cb1140360fa,
+  341 records / three namespaces; Cloudflare accepted current remains unchanged.
+- Remote CI for this correction is pending at commit time. No merge, upload or
+  Cloudflare mutation; deferred soak/transitions and OBS/GPU qualification remain
+  NOT TESTED. Local browser evidence does not replace those gates.
+
 The saved pre-P1 checkpoint is commit `703dbc6`. P1 slice 1 subsequently started;
 see the progress sections below, P1_RUNTIME.md and P2_EDITOR.md.
 P1 is now saved at `36d66c6`; P2 is on `feature/no-code-editor`.

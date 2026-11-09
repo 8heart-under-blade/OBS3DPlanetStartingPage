@@ -4,7 +4,9 @@ import { candidateBase, prepare, preset, previewReady, ready, snapshots } from '
 
 test('editor customizes three scenes, autosaves, exports/imports and copies a pinned OBS URL', async ({page, context, baseURL}) => {
   const errors = []; page.on('pageerror', error => errors.push(error.message));
-  await prepare(page);
+  // Editor interactions must not compete with a perpetual full-HD SwiftShader loop.
+  // Keep real scene bootstrap/preview loading; visual.spec owns stepped render comparisons.
+  await prepare(page, {controlledFrames: true});
   await context.grantPermissions(['clipboard-read', 'clipboard-write'], {origin: new URL(baseURL).origin});
   await page.goto('/project/editor.html');
   await expect(page).toHaveURL(/\/project\/releases\/v[^/]+\/editor\.html$/);
@@ -49,24 +51,36 @@ test('editor customizes three scenes, autosaves, exports/imports and copies a pi
 });
 
 test('invalid controls disable stale copying, and clipboard failure offers a selected manual-copy field', async ({page}) => {
-  await prepare(page);
+  await prepare(page, {controlledFrames: true});
   await page.addInitScript(() => Object.defineProperty(navigator, 'clipboard', {configurable: true, value: undefined}));
   await page.goto('/project/editor.html'); await previewReady(page);
   const original = await page.locator('#scene-preview').getAttribute('src');
+  const originalLink = await page.locator('#link-starting').inputValue();
   await page.locator('#top-input').fill('');
   await expect(page.getByRole('button', {name: 'Copy link for Starting scene', exact: true})).toBeDisabled();
   await expect(page.locator('#editor-status')).toContainText('last valid');
   expect(await page.locator('#scene-preview').getAttribute('src')).toBe(original);
   await page.locator('#top-input').fill('12');
   await expect(page.getByRole('button', {name: 'Copy link for Starting scene', exact: true})).toBeEnabled();
+  await expect(page.locator('#editor-error')).toBeHidden();
+  await expect(page.locator('#link-starting')).toHaveValue(originalLink);
   await page.getByRole('button', {name: 'Copy link for Starting scene', exact: true}).click();
   await expect(page.locator('#editor-status')).toContainText('Link selected');
   await expect(page.locator('#link-starting')).toBeFocused();
   expect(await page.locator('#link-starting').evaluate(el => el.selectionEnd - el.selectionStart)).toBe((await page.locator('#link-starting').inputValue()).length);
+  await page.locator('#top-input').fill('-1');
+  await expect(page.getByRole('button', {name: 'Copy link for Starting scene', exact: true})).toBeDisabled();
+  await expect(page.locator('#link-starting')).toHaveValue('');
+  await page.locator('#top-input').fill('13');
+  await expect(page.getByRole('button', {name: 'Copy link for Starting scene', exact: true})).toBeEnabled();
+  const corrected = await page.locator('#link-starting').inputValue();
+  expect(snapshots.fromHash(new URL(corrected).hash).scenes.starting.topVh).toBe(13);
+  const preview = await previewReady(page);
+  expect(await preview.evaluate(() => window.STREAM_SNAPSHOT.scenes.starting.topVh)).toBe(13);
 });
 
 test('mobile editor has no horizontal overflow, labelled controls and uniformly sized Copy link buttons', async ({page}) => {
-  await page.setViewportSize({width: 390, height: 844}); await prepare(page);
+  await page.setViewportSize({width: 390, height: 844}); await prepare(page, {controlledFrames: true});
   await page.goto('/project/editor.html'); await previewReady(page);
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
   const buttons = page.locator('[id^="copy-"]'); expect(await buttons.allTextContents()).toEqual(['Copy link', 'Copy link', 'Copy link']);
