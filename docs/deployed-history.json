@@ -26,7 +26,8 @@
   "productionAliasHttpAuditPassed": true,
   "httpAuditFilesPerOrigin": 169,
   "httpAuditCaveat": "Full successful audits occurred for both origins, but other attempts hit intermittent 15-second response/body timeouts. One identified asset returned HTTP 200 then timed out reading; an independent curl download completed in 1.26 seconds with the expected SHA-256. No byte/header mismatch was observed; timeout root cause is unconfirmed.",
-  "productionObsSmoke": "pending-user-check",
+  "productionObsSmoke": "user-reported-pass",
+  "productionObsSmokeScope": "User confirms fresh production link in OBS has expected visuals and audio; individual scenes, duration and audio/authentication modes not separately enumerated.",
   "acceptedP2Commit": "1d28784928846cf58d75230c26fec09807ea5c0b",
   "previousBackupRecord": "history-bootstrap.json"
 }

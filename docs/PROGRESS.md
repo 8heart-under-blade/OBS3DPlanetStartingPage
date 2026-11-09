@@ -15,8 +15,10 @@ intermittent 15-second timeouts; no byte mismatch observed, cause unconfirmed.
 See [PRODUCTION_QUALIFICATION.md](PRODUCTION_QUALIFICATION.md) for limitations and
 [deployed-history.json](deployed-history.json) for the durable archive/selection
 record to use for future preparations. Original backups and all pins retained.
-Production OBS/editor URL smoke checks await the user; do not infer them from
-preview soak acceptance. Earlier preparation-only statuses below are historical.
+The user subsequently confirmed a fresh production link in OBS has expected
+visuals and audio: user-reported production smoke pass. Individual scenes retested,
+duration and audio/authentication modes were not separately enumerated. Earlier
+preparation-only statuses below are historical.
 
 ## Production preparation and user smoke qualification — 2026-11-09
 

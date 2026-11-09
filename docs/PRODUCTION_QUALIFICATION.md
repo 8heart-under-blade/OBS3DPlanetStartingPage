@@ -1,7 +1,9 @@
 # Production preparation — JMB-HP, 2026-11-09
 
 Status: **production uploaded with explicit user approval**, after durable backup
-upload/download/restore verification. Production OBS smoke check is pending.
+upload/download/restore verification. The user subsequently confirmed fresh-link
+production OBS visuals and audio work as expected; individual scenes retested
+were not separately enumerated.
 No broad platform, frame-rate or audio-mode certification.
 This record supersedes the historical NOT TESTED status for the specific soak and
 transition exercises below; older checkpoint records remain historical evidence.
@@ -124,11 +126,14 @@ Latest deployed recovery state and exact full pin: [deployed-history.json](deplo
 Use that record for the next cumulative preparation; retain history-bootstrap.json
 and the original backup as historical recovery inputs, never prune them.
 
-**Remaining:** user checks production editor plus all three production OBS URLs.
-Preview soak acceptance does not automatically constitute a production URL smoke
-pass. No production audio/visual result has yet been supplied.
+**Production OBS feedback:** after the request to generate fresh links from the
+production editor, the user reported: "Test fresh link in OBS, visual and audio is
+working as expected". Record a user-reported fresh-link production OBS smoke pass.
+The user did not separately enumerate which scenes were retested or the duration;
+do not infer all-three production retest coverage or all audio/authentication modes.
+The earlier all-three soak/transition evidence remains separately scoped.
 
-## Publishing checklist (steps 1–3 completed; step 4 HTTP passed, OBS pending)
+## Publishing checklist (backup, upload, HTTP and user fresh-link OBS smoke completed)
 
 1. Confirm permission to create a uniquely named GitHub backup prerelease (not
    latest/production); upload only the cumulative history archive and nonsecret
