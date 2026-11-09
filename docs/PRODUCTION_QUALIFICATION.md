@@ -1,7 +1,8 @@
 # Production preparation — JMB-HP, 2026-11-09
 
-Status: local candidate prepared and restore-verified; **not publicly backed up or
-uploaded to production**. No broad platform, frame-rate or audio-mode certification.
+Status: **production uploaded with explicit user approval**, after durable backup
+upload/download/restore verification. Production OBS smoke check is pending.
+No broad platform, frame-rate or audio-mode certification.
 This record supersedes the historical NOT TESTED status for the specific soak and
 transition exercises below; older checkpoint records remain historical evidence.
 
@@ -77,9 +78,9 @@ Restore-before-build preparation and an additional fresh local restore both pass
 341 records, all three existing namespaces retained, accepted current unchanged.
 New history.tar.gz SHA-256:
 `f4002b053d27f26b9876656fe6da41bf6b080f17b63c076b5f02054a5e54c72e`.
-Old backups remain untouched. This new archive is **local only**, not durable
-remote retention. Its selected site current is intentionally consistent with the
-selected Cloudflare current.
+Old backups remain untouched. Initially local-only, this exact archive is now
+published and download/restore-verified as recorded below. Its selected site current
+is intentionally consistent with the selected Cloudflare current.
 
 A fresh read-only live audit compared this prepared cf-dist against
 https://p3-preview.cosmic-stream-scenes.pages.dev/ and passed all 169 files / three
@@ -87,7 +88,47 @@ namespaces, cache/MIME/canonical query redirects and missing-path 404 checks.
 This binds the local upload bytes to the current public preview, not to a new
 production deployment. No account access or public changes were needed.
 
-## Remaining publishing sequence
+## Authorized production upload and results
+
+The user explicitly approved the public backup, production upload and HTTP audit.
+The backup prerelease is recovery storage, not latest/production software:
+https://github.com/8heart-under-blade/OBS3DPlanetStartingPage/releases/tag/site-history-20261109T114506Z
+
+The stored archive was downloaded to a new path, authenticated against the
+independently recorded f4002b05...e54c72e pin, and restored into a fresh root.
+Both site/ and cf-dist/ compare byte-identical to the prepared trees; 341 records,
+all three IDs and selected current match. Only archive and nonsecret recovery
+metadata were uploaded; raw atop/screenshots and credentials were excluded.
+
+Cloudflare confirmed the expected Direct Upload project, production branch main.
+Two credential attempts were rejected before upload; a replacement scoped token
+and explicit account ID enabled destination verification and publishing. Credentials
+were read only by publisher commands, not committed or included in artifacts.
+
+Production deployment: https://20ef03a5.cosmic-stream-scenes.pages.dev/
+Production editor: https://cosmic-stream-scenes.pages.dev/editor
+Cloudflare reports environment production and successful deployment at
+2026-11-09T12:09:48.288826Z. The complete upload was made from the independently
+downloaded/restored cf-dist, explicitly retaining the tested current and all IDs.
+
+Both specific deployment and production alias completed full successful audits:
+169 files / three namespaces, byte hashes, cache/MIME/safety headers, canonical
+query redirects and missing-asset/release 404 behavior. Other audit attempts hit
+intermittent 15-second request/body timeouts; one identified texture received HTTP
+200 then timed out reading. Independent curl fetched that asset in 1.26 seconds
+with the expected hash. No integrity/header mismatch was observed; root cause of
+the intermittent timeouts is unconfirmed. Do not describe every audit attempt as
+successful or infer universal availability/performance from the passing runs.
+
+Latest deployed recovery state and exact full pin: [deployed-history.json](deployed-history.json).
+Use that record for the next cumulative preparation; retain history-bootstrap.json
+and the original backup as historical recovery inputs, never prune them.
+
+**Remaining:** user checks production editor plus all three production OBS URLs.
+Preview soak acceptance does not automatically constitute a production URL smoke
+pass. No production audio/visual result has yet been supplied.
+
+## Publishing checklist (steps 1–3 completed; step 4 HTTP passed, OBS pending)
 
 1. Confirm permission to create a uniquely named GitHub backup prerelease (not
    latest/production); upload only the cumulative history archive and nonsecret

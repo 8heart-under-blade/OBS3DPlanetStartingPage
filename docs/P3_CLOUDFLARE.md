@@ -1,4 +1,16 @@
-# P3 Cloudflare Pages target — preview rollout/rollback verified, not production-qualified
+# P3 Cloudflare Pages — preview history and first production upload
+
+## Current production status — 2026-11-09
+
+The first production upload was explicitly approved and completed after a new
+GitHub backup prerelease was uploaded, downloaded and restore-verified. Production
+editor: https://cosmic-stream-scenes.pages.dev/editor . The tested current and all
+three namespaces are retained. Both production origins passed full HTTP audits;
+intermittent timeout attempts remain documented, and production OBS smoke awaits
+the user. See [PRODUCTION_QUALIFICATION.md](PRODUCTION_QUALIFICATION.md) and
+[deployed-history.json](deployed-history.json). Earlier preview-only/no-approval
+statements below describe their historical checkpoints, not current public state.
+Setup-specific user soak/transition smoke acceptance is not universal qualification.
 
 The user selected **Cloudflare Pages** and approved project name
 **cosmic-stream-scenes**. The intended account was authorized through secure inputs;

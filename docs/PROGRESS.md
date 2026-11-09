@@ -1,5 +1,23 @@
 # Project progress and checkpoints
 
+## First production upload — 2026-11-09
+
+Explicitly approved by the user. Published a new non-latest GitHub backup
+prerelease, downloaded its archive and verified the independently pinned hash,
+fresh restore, all 341 records / three namespaces and byte-identical site/cf-dist.
+Uploaded that complete restored cf-dist to cosmic-stream-scenes production/main,
+keeping the tested accepted renderer current. Production editor:
+https://cosmic-stream-scenes.pages.dev/editor
+
+Cloudflare deployment 20ef03a5 reports production/success. Both specific deployment
+and production alias passed full 169-file HTTP audits, but other attempts had
+intermittent 15-second timeouts; no byte mismatch observed, cause unconfirmed.
+See [PRODUCTION_QUALIFICATION.md](PRODUCTION_QUALIFICATION.md) for limitations and
+[deployed-history.json](deployed-history.json) for the durable archive/selection
+record to use for future preparations. Original backups and all pins retained.
+Production OBS/editor URL smoke checks await the user; do not infer them from
+preview soak acceptance. Earlier preparation-only statuses below are historical.
+
 ## Production preparation and user smoke qualification — 2026-11-09
 
 See [PRODUCTION_QUALIFICATION.md](PRODUCTION_QUALIFICATION.md) for the identified
